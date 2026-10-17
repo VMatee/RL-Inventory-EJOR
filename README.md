@@ -1,44 +1,84 @@
-# RL Inventory EJOR Research
+# RL-Inventory-EJOR
 
-**Working title:** *When Is Limited Demand Data Enough? Decision-Sensitive Policy Learning for Inventory Control*
+**Working title:** *When Is a Short Demand History Enough? Decision-Sensitive Policy Learning for Inventory Control*
 
-**Status:** Research design / pre-experiment. This repository contains research plans, a draft manuscript skeleton, and future computational scaffolding. **No new theoretical results, empirical findings, or journal acceptance are claimed.**
+**Stage:** pre-experiment research. The proposed method, theory and empirical benefits are NOT established. Infrastructure checks are not research findings.
 
-## Primary research question
+## Start here
 
-When is a limited history of demand sufficient to justify changing from a tuned baseline inventory policy to a learned one, and can inventory structure help quantify decision-relevant policy-improvement uncertainty more efficiently?
+- [Current status and next action](docs/STATUS.md)
+- [Agent instructions](AGENTS.md)
+- [ChatGPT / GitHub / local workflow](docs/WORKFLOW.md)
+- [Task queue and acceptance criteria](docs/TASKS.md)
+- [Research charter](docs/PROJECT_CHARTER.md)
+- [Manuscript source and build](manuscript/README.md)
 
-## Proposed scope
+## Research direction
 
-Single-item, periodic-review, lost-sales inventory with a known, fixed positive lead time; limited initial demand histories; Gaussian-process demand uncertainty; an inventory simulator with known stock-flow dynamics; and policy learning with decision-sensitive safeguards. Rolling service constraints, multi-echelon extensions, and censored-demand inference are **not** the core contributions in the current research brief.
+Can a short initial demand history justify changing a replenishment policy when the demand model is uncertain? We investigate whether inventory-specific sensitivity of **policy-cost differences** helps a learned policy avoid exploiting an inaccurate model without becoming uniformly conservative.
+
+Core scope: single-item, periodic-review lost sales; known positive fixed lead time; exogenous demand observed after each period; limited initial real-data histories; GP demand posterior; known stock-flow equations; neural policy improvement. GP models unknown demand, not known inventory accounting.
+
+GP + RL, Bayesian uncertainty and baseline-relative policy improvement are established ideas. Novelty must be demonstrated against prior work. See [claims](docs/CLAIMS.md) and [proof obligations](theory/PROOF_OBLIGATIONS.md). Do not reopen EV charging, rolling service constraints, multi-echelon control or censored-demand inference without a documented research decision.
+
+## One project record, complementary tools
+
+| Component | Responsibility |
+|---|---|
+| GitHub main | Reviewed manuscript, code, protocols, decisions and small evidence summaries |
+| ChatGPT web | Literature verification, scientific criticism, planning, drafting and interpretation |
+| SeneraAiServer / Serena | Inspect this PC checkout, synchronize safely, edit scoped files, execute short checks and inspect logs |
+| Local Codex, optional | Implement one accepted task, tests and code review under AGENTS.md |
+| Local PC / user terminal | Data processing and approved long experiments |
+
+GitHub holds the authoritative **reviewed version**, but uncommitted local work must be preserved. Synchronization is explicit, not automatic. Only one agent writes a checkout at a time. ChatGPT does not continue working after the conversation ends.
+
+## Local quick start
+
+```bash
+cd "/home/jvserver/Desktop/work/research journal/RL-Inventory-EJOR"
+git status --short --branch
+# Only for a clean, idle main checkout:
+bash scripts/sync_main.sh
+.venv/bin/python scripts/check_project.py
+.venv/bin/python -m unittest discover -s tests -v
+.venv/bin/python scripts/run_experiment.py --config experiments/configs/smoke.json --seed 0
+```
+
+The smoke run checks repository plumbing only. It does not train GP/RL, download data or generate inventory performance. See [runbook](docs/EXPERIMENT_RUNBOOK.md). The existing local Python is 3.10.12. These tools need only the standard library; scientific dependencies will be selected and pinned in a later approved task.
+
+## Manuscript
+
+Edit `manuscript/sections/*.tex` and `manuscript/references.bib`. LaTeX is canonical; PDF/Word exports are review copies. The Introduction is imported from the supplied Word draft, with its source archive and checksum retained. Other sections remain placeholders.
+
+```bash
+make manuscript  # Requires latexmk, BibTeX and elsarticle
+```
+
+This is not a complete submission. Check current EJOR requirements before submitting. No new bibliography verification or research results are implied by importing the draft.
+
+## Evidence plan
+
+1. Synthetic instances and small-state DP references.
+2. M5 sales-driven replay with proposed initial histories of 28, 56, 112 and 224 days.
+3. Favorita external validation after the method and protocol are frozen.
+
+M5/Favorita contain sales, not complete uncensored demand or actual inventory cost ledgers. Costs and lead times are scenario assumptions unless documented otherwise. Match information and compute; count calibration, validation and pretraining. Posterior credibility is not frequentist coverage. No dataset is downloaded by this setup.
 
 ## Repository map
 
-- `research/briefs/`: original research strategy (Thai), preserved for traceability
-- `research/literature/` and `research/novelty/`: verified references and prior-art checks
-- `docs/`: charter, decisions, and milestones
-- `manuscript/`: EJOR-oriented LaTeX draft, currently placeholders
-- `theory/`: inventory specification and proposed claims requiring proof
-- `data/`: dataset provenance and leakage-safe data handling (no raw datasets committed)
-- `experiments/`: fixed evaluation protocols, baseline registry, and experiment configurations
-- `src/inventory_ejor/` and `tests/`: future Python implementation and tests
-- `results/`: eventually reproducible outputs, with provenance
-- `infrastructure/`: local Serena/GitHub setup guidance
+- `AGENTS.md`: canonical agent rules; `agent.md` is a convenience pointer.
+- `docs/`: status, tasks, workflow, claims, decisions and handoffs.
+- `manuscript/`: editable LaTeX, bibliography and provenance.
+- `research/`, `theory/`: references, source archives, novelty and analysis.
+- `src/inventory_ejor/`, `tests/`: research implementation and tests.
+- `experiments/`: configurations, protocol and baseline registry.
+- `data/`: provenance; raw and processed data stay local.
+- `results/runs/`: local logs/manifests, ignored by Git.
+- `results/summaries/`: small reviewed evidence returned to GitHub.
+- `scripts/`: synchronization, static checks and provenance runner.
+- `.github/`: PR template and manually triggered checks only.
 
-## Proposed evidence plan
+## Next milestone
 
-1. Controlled synthetic cases and small-state dynamic programming references.
-2. M5 sales-driven inventory simulations with strictly limited training windows (28, 56, 112, 224 days proposed).
-3. Favorita as external validation once the method and evaluation protocol are frozen.
-
-M5 and Favorita report retail **sales**, not complete latent demand, real replenishment decisions, or actual operational cost ledgers. Cost and lead-time values used in simulation must be reported as scenario assumptions unless supported by data.
-
-## Research integrity and reproducibility
-
-Do not invent citations, mathematical guarantees, test results, or business impact. Compare strong inventory-specific baselines under matched information and computational budgets, track training/validation/test information separately, and preregister non-inferiority margins **before** examining final results.
-
-See `AGENTS.md` for rules used by ChatGPT/Codex/Serena and the original Thai strategy in `research/briefs/`.
-
-## Getting started
-
-Read `docs/PROJECT_CHARTER.md`, `experiments/protocol/`, and `infrastructure/SERENA_GITHUB_SETUP.md` before implementing new algorithms. The repository is **not yet an implemented experiment pipeline**.
+**M1: finalize inventory event timing and implement a tested minimal simulator.** Do not begin large RL training before the simulator and exact reference are validated. EJOR is the target, not a guaranteed outcome. No automatic cloud training, paid APIs or self-hosted GitHub runner are configured.

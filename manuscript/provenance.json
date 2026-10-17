@@ -1,0 +1,12 @@
+{
+  "source_filename": "EJOR_Introduction_Limited_Data_GP_RL.docx",
+  "source_sha256": "d4c1b030df2e60e9a3385818b0cff36d124170819a4dd3db8422e07d7a39f579",
+  "import_date": "2026-10-17",
+  "source": "DOCX supplied in conversation",
+  "canonical": "manuscript/sections/01_introduction.tex",
+  "archive": "research/briefs/INTRODUCTION_SOURCE_20261017.md",
+  "body_paragraphs": 16,
+  "references": 16,
+  "conversion": "Substantive prose preserved exactly; author-year citation text changed to natbib keys. Bibliography transcribed.",
+  "validation": "Reverse citation substitution matches source prose. Bibliography fact-check is a separate pending task."
+}

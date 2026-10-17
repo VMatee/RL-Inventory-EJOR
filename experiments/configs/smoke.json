@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "name": "repository-smoke",
+  "purpose": "Infrastructure validation only, not research",
+  "data_source": "none",
+  "training": false
+}

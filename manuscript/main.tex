@@ -1,22 +1,26 @@
-\documentclass[preprint,12pt]{elsarticle}
+\documentclass[preprint,12pt,authoryear]{elsarticle}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb}
+\usepackage{xurl}
+\usepackage{microtype}
+\setlength{\emergencystretch}{2em}
+\usepackage[hidelinks]{hyperref}
 \journal{European Journal of Operational Research}
 \begin{document}
 \begin{frontmatter}
-\title{When Is Limited Demand Data Enough? Decision-Sensitive Policy Learning for Inventory Control}
-\author{Author details to be completed}
-\begin{abstract}
-Research question and findings to be written after analysis and experiments.
-\end{abstract}
-\begin{keyword}
-Inventory control \sep Limited data \sep Gaussian processes \sep Policy learning \sep Decision uncertainty
-\end{keyword}
+\title{When Is a Short Demand History Enough? Decision-Sensitive Policy Learning for Inventory Control}
+% Add actual author information and abstract only when supplied/written.
 \end{frontmatter}
 \input{sections/01_introduction}
-\input{sections/02_literature_review}
-\input{sections/03_problem_formulation}
-\input{sections/04_methodology}
-\input{sections/05_theory}
-\input{sections/06_experiments}
-\input{sections/07_results}
-\input{sections/08_conclusion}
+% Include other sections only after they are actually drafted:
+% \input{sections/02_literature_review}
+% \input{sections/03_problem_formulation}
+% \input{sections/04_methodology}
+% \input{sections/05_theory}
+% \input{sections/06_experiments}
+% \input{sections/07_results}
+% \input{sections/08_conclusion}
+\bibliographystyle{elsarticle-harv}
+\bibliography{references}
 \end{document}
