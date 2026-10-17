@@ -1,0 +1,5 @@
+# Data acquisition helpers for Python 3.10: do not install in system Python.
+# Kaggle CLI v2 requires Python >=3.11, so pin the compatible 1.7 series.
+kaggle==1.7.4
+py7zr==1.1.2
+requests>=2.32,<3

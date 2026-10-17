@@ -20,9 +20,11 @@ Acceptance for use in M2: local automated tests and fixture pass **AND** the own
 
 Depends M1. Small finite-support DP plus tuned base-stock. Compare tiny instances with exhaustive enumeration. Specify bounds/truncations, initial and terminal states. Deliver config, fixtures and paired evaluation.
 
-## M3 - Data/information audit [planned]
+## M3 - Data/information audit [raw-data acquisition partially completed: M5 verified, Favorita Kaggle authorization outstanding]
 
-Audit M5 provenance, licensing/access and chronological budgets. Download only with authorization; hash raw files and record splits/series selection. Count calibration/validation/pretraining. Keep raw data local. Favorita reserved for frozen external validation.
+The user authorized acquisition of both planned external datasets. All five M5 source CSVs were downloaded locally (450,472,284 bytes), verified against organizer Zenodo file sizes/MD5, SHA256 recorded with source provenance and raw schema counts; see `data/manifests/m5_verified_20261017.json` and `results/summaries/M3_DATA_ACQUISITION_20261017.md`. The original item-level 2017 Favorita competition requires Kaggle credentials and accepted rules; absent on the connected PC, **not downloaded**. `scripts/fetch_favorita.py` provides authenticated CLI acquisition and archive verification after user action. No raw file enters Git.
+
+**M3 scientific work still pending:** verify access/redistribution terms; define SKU eligibility, treatment of returns/zero sale records/censoring, frozen chronological splits and leakage-safe real-data budgets; account for cross-series, calibration/validation and pretraining. Raw acquisition is not evaluation readiness. Favorita remains a prospective frozen external validation track.
 
 ## M4 - Plain GP baselines [planned]
 

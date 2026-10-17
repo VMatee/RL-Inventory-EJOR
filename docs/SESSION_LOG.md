@@ -1,5 +1,15 @@
 # Session handoff log
 
+## 2026-10-17 - M3 source acquisition audit (incomplete: Favorita auth required)
+
+At the user's request, confirmed the frozen study plan calls for TWO public retail-sales sources (M5 Walmart and original 2017 item-level Corporación Favorita) plus a synthetic experiment track that is generated rather than downloaded. M3 acquisition started ahead of M2; no scientific split or training was changed.
+
+Downloaded all five M5 CSVs to Git-ignored `data/raw/m5/`, totaling 450,472,284 bytes. Two small CSVs came from organizer Zenodo record 10203108; larger CSVs used a pinned Hugging Face mirror with concurrent byte-range downloads. **All five were verified byte-for-byte with exact Zenodo file lengths and MD5**, with SHA256, schema and row-count metadata recorded in tracked `data/manifests/m5_verified_20261017.json`. A time-limited incomplete Zenodo part was deleted only after its complete counterpart passed verification. Confirmed raw sales, not uncensored demand; no leakage-prone preprocessing or data-driven item selection was performed.
+
+Installed Kaggle CLI 1.7.4 (Python3.10-compatible) and py7zr 1.1.2 in isolated `code/.venv`; added a guarded Favorita official-competition download/ZIP verification tool. Original Kaggle competition data are gated by accepted rules and credentials. No Kaggle credential was present on the PC, so **Favorita was not downloaded**, and no unauthorized third-party substitute was used. Details and next user action: `data/sources/FAVORITA.md`, `results/summaries/M3_DATA_ACQUISITION_20261017.md`.
+
+M1 timing approval and M2 DP remain the next method milestones. M3 preprocessing/split protocol and the Favorita external holdout remain pending. No RL/GP experiment or publication result is claimed.
+
 ## 2026-10-17 - M1 model specification and deterministic inventory simulator
 
 At the owner's request, verified that no running process used the obsolete local `code/legacy-venv-pre-migration` environment, validated the active `code/.venv` and then deleted only the obsolete environment directory. Git checkout and current venv remain intact. Historic setup logs are retained as point-in-time records.
