@@ -1,4 +1,4 @@
-PYTHON ?= .venv/bin/python
+PYTHON ?= $(shell if [ -x ../code/.venv/bin/python ]; then echo ../code/.venv/bin/python; else echo python3; fi)
 
 .PHONY: check test smoke manuscript
 check:

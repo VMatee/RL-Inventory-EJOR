@@ -13,6 +13,10 @@
 - [Research charter](docs/PROJECT_CHARTER.md)
 - [Manuscript source and build](manuscript/README.md)
 
+## Local workspace layout
+
+The local workspace is `~/Desktop/work/research journal/RL-Inventory-EJOR/`. The **Git repository is the `github/` child**, not the workspace parent. All versioned source, manuscript, experiment protocols and tests stay inside `github/`. The sibling `code/` holds the isolated `code/.venv` Python environment and convenient links to the versioned source. The Serena configuration remains in the parent `.serena/` directory so the connected plugin can inspect both children. Always run Git commands from `github/` (or specify its path), and use `../code/.venv/bin/python` for research Python. See [environment setup](environment/README.md). Do not create a second Git checkout in `code/`.
+
 ## Research direction
 
 Can a short initial demand history justify changing a replenishment policy when the demand model is uncertain? We investigate whether inventory-specific sensitivity of **policy-cost differences** helps a learned policy avoid exploiting an inaccurate model without becoming uniformly conservative.
@@ -36,16 +40,16 @@ GitHub holds the authoritative **reviewed version**, but uncommitted local work 
 ## Local quick start
 
 ```bash
-cd "/home/jvserver/Desktop/work/research journal/RL-Inventory-EJOR"
+cd "/home/jvserver/Desktop/work/research journal/RL-Inventory-EJOR/github"
 git status --short --branch
 # Only for a clean, idle main checkout:
 bash scripts/sync_main.sh
-.venv/bin/python scripts/check_project.py
-.venv/bin/python -m unittest discover -s tests -v
-.venv/bin/python scripts/run_experiment.py --config experiments/configs/smoke.json --seed 0
+../code/.venv/bin/python scripts/check_project.py
+../code/.venv/bin/python -m unittest discover -s tests -v
+../code/.venv/bin/python scripts/run_experiment.py --config experiments/configs/smoke.json --seed 0
 ```
 
-The smoke run checks repository plumbing only. It does not train GP/RL, download data or generate inventory performance. See [runbook](docs/EXPERIMENT_RUNBOOK.md). The existing local Python is 3.10.12. These tools need only the standard library; scientific dependencies will be selected and pinned in a later approved task.
+The smoke run checks repository plumbing only. It does not train GP/RL, download data or generate inventory performance. See [runbook](docs/EXPERIMENT_RUNBOOK.md). The Python environment belongs to the *sibling* workspace directory `../code/.venv` (Python 3.10.12), not to the Git repository. Installation and version snapshots are documented in [environment setup](environment/README.md).
 
 ## Manuscript
 
@@ -71,7 +75,7 @@ M5/Favorita contain sales, not complete uncensored demand or actual inventory co
 - `docs/`: status, tasks, workflow, claims, decisions and handoffs.
 - `manuscript/`: editable LaTeX, bibliography and provenance.
 - `research/`, `theory/`: references, source archives, novelty and analysis.
-- `src/inventory_ejor/`, `tests/`: research implementation and tests.
+- `src/inventory_ejor/`, `tests/`: research implementation and tests; `pyproject.toml` supports `pip install -e .` from `github/` into `code/.venv`.
 - `experiments/`: configurations, protocol and baseline registry.
 - `data/`: provenance; raw and processed data stay local.
 - `results/runs/`: local logs/manifests, ignored by Git.

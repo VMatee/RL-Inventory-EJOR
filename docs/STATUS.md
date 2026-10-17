@@ -14,7 +14,7 @@ Updated: 2026-10-17. See Git history and SESSION_LOG for actual validation.
 ## Infrastructure
 
 - Agent instructions are now maintained solely in `AGENTS.md`; the redundant lowercase `agent.md` pointer was removed. Research scope is unchanged.
-Observed local project and SSH remote, existing Python 3.10.12 virtualenv and Codex CLI 0.163.0. Codex authentication/model access has not been tested. Local TeX tools were not detected. No system/ML packages were installed, no raw data was downloaded, and no long training was launched.
+The Git checkout now resides under the workspace's `github/` child, while the existing Serena project configuration stays in the parent `.serena/`. All scientific source and manuscript remain Git-tracked under `github/`. The active Python 3.10.12 virtual environment is isolated in sibling `code/.venv`; the initial minimal venv is preserved as an inactive backup in `code/legacy-venv-pre-migration`. Project-specific Python dependencies are installed with a pinned snapshot in `environment/requirements-lock.txt`, including CUDA-enabled PyTorch 2.9.1, GPyTorch, BoTorch and Stable-Baselines3. All four RTX 3090 GPUs passed allocation/compute checks, and a small BoTorch/GPyTorch posterior evaluated on GPU 0. Codex authentication/model access remains untested. No system drivers, OS packages, TeX, raw datasets or long scientific training were installed/launched.
 
 GitHub remains the canonical reviewed record; synchronization is explicit and refuses dirty/divergent local trees. Only one writer may use a checkout. The manuscript revision was published to a task branch through the GitHub connector and validated on the PC in an isolated temporary worktree without changing local main.
 
@@ -30,4 +30,4 @@ M1: finalize arrival/order/demand timing, initial stock/pipeline, terminal treat
 
 ## Research blockers
 
-Model conventions, exact reference implementation, pinned scientific dependencies, approved dataset provenance, complete reference/novelty audit, and a frozen information/compute protocol. The full current EJOR author guide was not accessible during the revision; final submission requirements must be checked before submission.
+Model conventions, exact reference implementation, baseline-specific implementations/dependencies, approved dataset provenance, complete reference/novelty audit, and a frozen information/compute protocol. The full current EJOR author guide was not accessible during the revision; final submission requirements must be checked before submission.
