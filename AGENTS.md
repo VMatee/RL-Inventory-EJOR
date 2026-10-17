@@ -34,7 +34,7 @@ Serena shell calls must be short, synchronous and noninteractive. Do not start i
 
 Use scripts/run_experiment.py for approved runs. Record config, seed, code SHA, dirty state, data fingerprint, versions, command, runtime and exit status. The child algorithm must consume its config/seed explicitly; the wrapper does not inject them. Infrastructure success is not a scientific result.
 
-Raw data, logs, exports and checkpoints stay ignored. Commit small reviewed summaries with provenance under results/summaries. Inspect outputs for private records or credentials before sharing.
+Raw data, logs, exports and checkpoints stay ignored. Commit small reviewed summaries with provenance under results/summaries. Inspect outputs for private records or credentials before sharing. The planned empirical data are M5 (primary) and the **original item-level 2017 Favorita** competition (external validation), plus generated synthetic scenarios. Never substitute the unrelated later Favorita family-level competition, redistribute datasets lacking permission, handle Kaggle tokens in chat, or claim missing/zero sales are uncensored demand. M5 raw acquisition has verified Zenodo MD5+SHA256; Favorita needs user-accepted Kaggle rules and credentials. M3 historical splits and leakage controls remain pending.
 
 ## Manuscript
 

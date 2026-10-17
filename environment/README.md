@@ -30,6 +30,18 @@ The dependency snapshot is a version record from the installed Linux/Python/CUDA
 
 The snapshot should be committed only after successful installation and verification; the environment folder, raw data, checkpoints, logs and cache should remain local. Before reproducibility claims, record the package versions, GPU smoke test, code commit and corresponding run configuration.
 
+## Dataset acquisition tools (separate optional group)
+
+For original Kaggle competition retrieval and `.7z` archive inspection, Python 3.10 uses **Kaggle CLI 1.7.4** and **py7zr 1.1.2**, installed in `code/.venv` only. The latest Kaggle CLI major version requires Python 3.11+, so do not silently upgrade the project interpreter. Their pinned direct requirements are in `environment/requirements-data.in`; all resolved installed package versions are captured in `environment/requirements-lock.txt`.
+
+```bash
+cd "$HOME/Desktop/work/research journal/RL-Inventory-EJOR/github"
+../code/.venv/bin/python scripts/fetch_m5.py --verify-only
+../code/.venv/bin/python scripts/fetch_favorita.py --status
+```
+
+The user must separately accept Favorita's Kaggle competition rules and configure their **own local credentials**; never paste credentials into ChatGPT or commit them to Git. The code does not fake authorization or download from unverified substitutes. See `data/DATASET_PLAN.md`.
+
 ## What this DOES NOT install
 
 It does not fetch M5/Favorita datasets, install DynaPlex/TED from separate repositories, compile custom CUDA extensions, or install every possible GP/RL package. TensorFlow, Ray, CUDA toolkit and other frameworks remain optional until a baseline demonstrably requires them.

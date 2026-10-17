@@ -9,7 +9,8 @@ Updated: 2026-10-17. See Git history and SESSION_LOG for actual validation.
 - Contributions and evaluations remain proposed: no new theory or numerical findings are asserted.
 - Other manuscript sections remain excluded placeholders.
 - M1 deterministic inventory simulator is now implemented and locally tested (pure transition plus Gymnasium wrapper, hand-computed reference trajectory and independent calendar cross-check). The event ordering and terminal conventions are explicit **engineering selections still awaiting scientific/owner review**, not a finished theory result.
-- Small-state optimal DP, tuned inventory baselines, GP/RL training, public-data pipelines and empirical findings have **not** been implemented.
+- M3 acquisition: **all five M5 CSVs are present locally**, matching the Zenodo MD5/size metadata (450,472,284 bytes total); schema and row counts were checked. Public provenance and SHA256 are recorded in `data/manifests/m5_verified_20261017.json`. **Favorita is not acquired:** user Kaggle account, accepted rules and credentials are required. See `data/DATASET_PLAN.md` and the M3 acquisition report.
+- Small-state optimal DP, tuned inventory baselines, GP/RL training, leakage-safe data transformations/frozen train-test splits and empirical findings have **not** been implemented.
 - References: all 16 citation keys resolve. Scoped primary-source claim checks are documented in research/literature/REFERENCE_AUDIT.md; a complete bibliography/theorem/novelty audit remains outstanding.
 
 ## Infrastructure
@@ -31,4 +32,4 @@ M1 code, stock-flow timing specification, deterministic hand-calculated fixture 
 
 ## Research blockers
 
-Owner review of selected M1 model conventions, independent M2 exact DP reference, baseline-specific implementations/dependencies, approved dataset provenance, complete reference/novelty audit, and frozen information/compute protocol. The full current EJOR author guide was not accessible during the revision; final submission requirements must be checked before submission.
+Owner review of selected M1 model conventions, independent M2 exact DP reference, baseline-specific implementations, **Favorita authorized Kaggle acquisition and raw-data usage terms**, M3 time-series preprocessing/eligibility and frozen splits, complete reference/novelty audit, and frozen information/compute protocol. The full current EJOR author guide was not accessible during the revision; final submission requirements must be checked before submission.

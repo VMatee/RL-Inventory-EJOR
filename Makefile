@@ -1,6 +1,6 @@
 PYTHON ?= $(shell if [ -x ../code/.venv/bin/python ]; then echo ../code/.venv/bin/python; else echo python3; fi)
 
-.PHONY: check test smoke manuscript m1-reference
+.PHONY: check test smoke manuscript m1-reference data-status
 check:
 	$(PYTHON) scripts/check_project.py
 
@@ -12,6 +12,10 @@ smoke:
 
 m1-reference:
 	$(PYTHON) scripts/run_m1_reference.py
+
+data-status:
+	$(PYTHON) scripts/fetch_m5.py --verify-only
+	$(PYTHON) scripts/fetch_favorita.py --status
 
 manuscript:
 	@command -v latexmk >/dev/null 2>&1 || { echo "latexmk missing; see manuscript/README.md"; exit 1; }
