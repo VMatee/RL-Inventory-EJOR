@@ -23,3 +23,7 @@ M1: finalize arrival/order/demand timing, initial stock/pipeline, terminal treat
 ## Research blockers
 
 Model conventions, exact reference implementation, pinned scientific dependencies, approved dataset provenance, reference audit and frozen information/compute protocol.
+
+## Completed validation
+
+Static checks, six unit tests and success/failure/timeout runner checks passed on code commit ebdfca7162eb28f7b0167c08bd59f3994816ea4d. A matching manuscript compiled and was visually reviewed in the ChatGPT temporary environment, not on the PC. See results/summaries/SETUP_VALIDATION.md. M1 remains planned.

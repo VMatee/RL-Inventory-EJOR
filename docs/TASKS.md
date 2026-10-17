@@ -2,7 +2,7 @@
 
 Statuses are planned/in progress/blocked/validated. Mark validated only with code SHA and evidence. Begin one task at a time.
 
-## M0 - Workflow setup [in progress]
+## M0 - Workflow setup [validated: infrastructure only]
 
 Canonical LaTeX/BibTeX, source archive, README/AGENTS, workflow, sync/check scripts, provenance and infrastructure tests. See SESSION_LOG. No scientific results.
 

@@ -11,3 +11,5 @@ Python 3.10.12 and Codex 0.163.0 detected. No Codex task, scientific experiment,
 Next: M1 model conventions and deterministic simulator tests. Scientific dependencies and local TeX remain setup/approval tasks.
 
 Local commit identity was initially unset; configured repository-local name/email from the existing commits. No global identity or authentication was changed. The first commit attempt was blocked before writing a commit; no source was discarded.
+
+Validation completed on ebdfca7162eb28f7b0167c08bd59f3994816ea4d: six unit tests, 16 citation keys, runner success/failure/timeout and non-main sync guard passed. Matching manuscript sources compiled to seven reviewed pages in the ChatGPT temporary environment only. Evidence: results/summaries/SETUP_VALIDATION.md. Next: publish reviewed maintenance to main and confirm local/remote synchronization.

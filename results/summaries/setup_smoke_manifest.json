@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "run_id": "20261017T115923Z-smoke-0482a48e",
+  "kind": "smoke",
+  "status": "succeeded",
+  "started_utc": "2026-10-17T11:59:23.923998+00:00",
+  "source_commit": "ebdfca7162eb28f7b0167c08bd59f3994816ea4d",
+  "git_status_before": "",
+  "clean_source": true,
+  "config_path": "/home/jvserver/Desktop/work/research journal/RL-Inventory-EJOR/experiments/configs/smoke.json",
+  "config_sha256": "b9dc9575dfbed3521b1280f0e670ed25c5a070dd5d02b5221953d7876de635b0",
+  "seed": 0,
+  "seed_note": "Recorded only; child command must consume its config/seed explicitly.",
+  "data_manifest": null,
+  "command": [
+    "/home/jvserver/Desktop/work/research journal/RL-Inventory-EJOR/.venv/bin/python",
+    "/home/jvserver/Desktop/work/research journal/RL-Inventory-EJOR/scripts/check_project.py"
+  ],
+  "timeout_seconds": 120,
+  "cwd": "/home/jvserver/Desktop/work/research journal/RL-Inventory-EJOR",
+  "is_scientific_evidence": false,
+  "pid": 209119,
+  "exit_code": 0,
+  "finished_utc": "2026-10-17T11:59:23.956262+00:00",
+  "runtime_seconds": 0.032002,
+  "git_status_after": "",
+  "source_commit_after": "ebdfca7162eb28f7b0167c08bd59f3994816ea4d",
+  "source_unchanged": true
+}
