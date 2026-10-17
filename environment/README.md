@@ -6,7 +6,7 @@ Inside it:
 - `code/.venv/` is the only **active** project Python virtual environment. It is **not** Git-tracked.
 - `code/src`, `code/tests` and `code/experiments` are local symbolic links into the Git repository, not independent source copies.
 - `.serena/` stays in the outer workspace so the existing connected SeneraAiServer project remains usable.
-- `code/legacy-venv-pre-migration/` may contain the preserved initial minimal venv; it is **not usable after moving**, and can be removed later by the owner once satisfied with the replacement.
+- The former `code/legacy-venv-pre-migration/` backup was **deleted at the owner's explicit request** after verifying that `code/.venv` works and no running processes use the old path.
 
 All relative commands in this repository assume `cd "$HOME/Desktop/work/research journal/RL-Inventory-EJOR/github"`. Quote paths because the parent contains spaces.
 

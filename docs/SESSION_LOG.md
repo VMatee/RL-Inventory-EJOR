@@ -1,5 +1,13 @@
 # Session handoff log
 
+## 2026-10-17 - M1 model specification and deterministic inventory simulator
+
+At the owner's request, verified that no running process used the obsolete local `code/legacy-venv-pre-migration` environment, validated the active `code/.venv` and then deleted only the obsolete environment directory. Git checkout and current venv remain intact. Historic setup logs are retained as point-in-time records.
+
+Selected/documented M1 **engineering conventions** in `theory/INVENTORY_MODEL.md`: after-arrival decision epoch, known lead time `L>=1`, current order first available in period `t+L`, sales=min(stock,demand), no backlogs, end-stock holding/shortage/order costs, and zero *additional* terminal value/cost. Added pure stock-flow transition, Gymnasium wrapper, independent hand fixture, tests, and explicit no-lookahead/terminal semantics. Conventions are **pending owner review before M2**; no GP/RL model, data ingestion, proof or real-world outcome is claimed.
+
+Validation and remaining limitations: `results/summaries/M1_SIMULATOR_VALIDATION_20261017.md`. Next scientific task only after owner review: M2 exact finite-state DP and tuned base-stock reference.
+
 ## 2026-10-17 - Parent workspace, Git child and isolated ML environment
 
 At the user's request, migrated the entire clean Git checkout (including `.git`, version history, manuscript and code) into `<workspace>/github/`; kept the connected Serena `.serena/` at the parent. Created `<workspace>/code/.venv` and local source symlinks to the tracked `github/src`, `github/tests`, and `github/experiments`. The original lightweight environment was preserved, not removed, as `code/legacy-venv-pre-migration`. No second Git repository or fork of the Python code was created.
