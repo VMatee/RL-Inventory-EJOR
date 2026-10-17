@@ -16,7 +16,7 @@ def main() -> int:
     expected = repo.parent / "code" / ".venv"
     data = {
         "python": sys.version.split()[0],
-        "executable": str(Path(sys.executable).resolve()),
+        "executable": sys.executable,
         "expected_virtualenv": str(expected),
         "packages": {},
         "torch_cuda": {},
@@ -24,7 +24,7 @@ def main() -> int:
     packages = [
         "numpy", "scipy", "pandas", "sklearn", "matplotlib", "pyarrow",
         "gpytorch", "botorch", "gymnasium", "stable_baselines3",
-        "tensorboard", "pytest",
+        "tensorboard", "pytest", "inventory_ejor",
     ]
     errors: list[str] = []
     if expected.resolve() != Path(sys.prefix).resolve():

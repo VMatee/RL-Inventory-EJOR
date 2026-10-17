@@ -1,5 +1,13 @@
 # Session handoff log
 
+## 2026-10-17 - Parent workspace, Git child and isolated ML environment
+
+At the user's request, migrated the entire clean Git checkout (including `.git`, version history, manuscript and code) into `<workspace>/github/`; kept the connected Serena `.serena/` at the parent. Created `<workspace>/code/.venv` and local source symlinks to the tracked `github/src`, `github/tests`, and `github/experiments`. The original lightweight environment was preserved, not removed, as `code/legacy-venv-pre-migration`. No second Git repository or fork of the Python code was created.
+
+Installed official PyTorch CUDA 13.0 wheels and compatible GP/RL scientific/development dependencies in the new Python 3.10.12 venv. All four RTX 3090 GPUs passed small tensor computations; a GPyTorch/BoTorch posterior worked on GPU 0. Pip dependency integrity and all environment imports passed. Captured actual package versions in `environment/requirements-lock.txt`. The initial bounded PyTorch installation timed out after downloading wheels; a second installation resumed from cached wheels and completed successfully. See `results/summaries/LOCAL_WORKSPACE_SETUP_20261017.md` for exact checks and limitations.
+
+No DynaPlex baseline replication, dataset download, TeX installation, long GPU training, or scientific inference occurred. Next research task remains M1 (formal model and simulator), unchanged.
+
 ## 2026-10-17 - Agent instruction cleanup
 
 Removed redundant `agent.md` pointer at the user's request. Kept canonical `AGENTS.md`; updated README references and the repository static checker to no longer require the removed file. Research scope and manuscript were not changed. Validation and Git synchronization are recorded with the corresponding commit and checks.

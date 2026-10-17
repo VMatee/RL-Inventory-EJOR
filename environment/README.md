@@ -19,9 +19,11 @@ python3.10 -m venv ../code/.venv
 # Verified official PyTorch CUDA 13.0 wheel line. No system CUDA toolkit needed for standard wheels.
 ../code/.venv/bin/python -m pip install --index-url https://download.pytorch.org/whl/cu130 'torch==2.9.1'
 ../code/.venv/bin/python -m pip install -r environment/requirements-science.in -r environment/requirements-dev.in
+../code/.venv/bin/python -m pip install -e .
 ../code/.venv/bin/python -m pip check
 ../code/.venv/bin/python scripts/check_environment.py
-../code/.venv/bin/python -m pip freeze --all > environment/requirements-lock.txt
+# Local editable install is represented by an absolute path; exclude it from the transferable snapshot.
+../code/.venv/bin/python -m pip freeze --all | grep -v -E '^(-e |rl-inventory-ejor==)' > environment/requirements-lock.txt
 ```
 
 The dependency snapshot is a version record from the installed Linux/Python/CUDA environment, **not a cross-platform lock**. Reproduction on other hardware needs its own compatible PyTorch wheel before installing the remaining packages. Installations may download several gigabytes. Use only the virtual environment's pip; do not install global or OS packages, change drivers or reconfigure system CUDA.

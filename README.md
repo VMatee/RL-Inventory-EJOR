@@ -75,7 +75,7 @@ M5/Favorita contain sales, not complete uncensored demand or actual inventory co
 - `docs/`: status, tasks, workflow, claims, decisions and handoffs.
 - `manuscript/`: editable LaTeX, bibliography and provenance.
 - `research/`, `theory/`: references, source archives, novelty and analysis.
-- `src/inventory_ejor/`, `tests/`: research implementation and tests.
+- `src/inventory_ejor/`, `tests/`: research implementation and tests; `pyproject.toml` supports `pip install -e .` from `github/` into `code/.venv`.
 - `experiments/`: configurations, protocol and baseline registry.
 - `data/`: provenance; raw and processed data stay local.
 - `results/runs/`: local logs/manifests, ignored by Git.
