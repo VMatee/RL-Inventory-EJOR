@@ -6,7 +6,7 @@ import re
 
 ROOT = Path(__file__).resolve().parents[1]
 REQUIRED = (
-    'README.md', 'AGENTS.md', 'agent.md', 'docs/STATUS.md', 'docs/TASKS.md',
+    'README.md', 'AGENTS.md', 'docs/STATUS.md', 'docs/TASKS.md',
     'docs/WORKFLOW.md', 'docs/CLAIMS.md', 'docs/EXPERIMENT_RUNBOOK.md',
     'docs/PROJECT_CHARTER.md', 'experiments/protocol/EVALUATION.md',
     'manuscript/main.tex', 'manuscript/references.bib', 'manuscript/provenance.json',
