@@ -5,9 +5,9 @@
 A standard-library provenance wrapper and an infrastructure smoke config. No scientific simulator, GP or RL implementation is supplied by setup. The wrapper records execution, not mathematical correctness.
 
 ```bash
-.venv/bin/python scripts/check_project.py
-.venv/bin/python -m unittest discover -s tests -v
-.venv/bin/python scripts/run_experiment.py --config experiments/configs/smoke.json --seed 0
+../code/.venv/bin/python scripts/check_project.py
+../code/.venv/bin/python -m unittest discover -s tests -v
+../code/.venv/bin/python scripts/run_experiment.py --config experiments/configs/smoke.json --seed 0
 ```
 
 The smoke run uses no dataset and creates no inventory performance metrics. Local output is results/runs/<UTC>-smoke-<id>/ with manifest.json, config.json, environment.json and console.log. These are ignored by Git.
@@ -17,7 +17,7 @@ The smoke run uses no dataset and creates no inventory performance metrics. Loca
 Use this pattern with an ACTUAL implemented command:
 
 ```text
-.venv/bin/python scripts/run_experiment.py --kind pilot --config <tracked-config.json> --seed <seed> --timeout <approved-seconds> -- <command> <arguments>
+../code/.venv/bin/python scripts/run_experiment.py --kind pilot --config <tracked-config.json> --seed <seed> --timeout <approved-seconds> -- <command> <arguments>
 ```
 
 Run kinds: smoke (plumbing), pilot (exploratory) and research (frozen evaluation). Pilot/research require an explicit command. Research additionally requires --data-manifest <file>, whose SHA-256 is stored. That manifest should describe dataset/generator/version, hashes, split dates, series selection, access terms and information budgets. The wrapper hashes it but does not validate its scientific contents.

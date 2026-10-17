@@ -1,5 +1,7 @@
 # GitHub-first research workflow
 
+The checkout is in `<workspace>/github`, while the isolated Python virtual environment is `<workspace>/code/.venv`; Serena stays activated on the outer workspace with `.serena/`. All commands below assume the Git child directory. Do not move scientific source out of the tracked repository.
+
 GitHub main is the reviewed project record. The PC executes experiments. ChatGPT web supports research/planning/review; SeneraAiServer bridges the chat to this checkout; local Codex is an optional implementation assistant. None automatically synchronizes or validates the others.
 
 ## Normal cycle
@@ -13,11 +15,11 @@ GitHub main is the reviewed project record. The PC executes experiments. ChatGPT
 7. Return small reviewed summaries with provenance to GitHub, not raw data/checkpoints. Update STATUS and SESSION_LOG.
 
 ```bash
-cd "/home/jvserver/Desktop/work/research journal/RL-Inventory-EJOR"
+cd "/home/jvserver/Desktop/work/research journal/RL-Inventory-EJOR/github"
 bash scripts/sync_main.sh
 git switch -c feat/m1-inventory-env
-.venv/bin/python scripts/check_project.py
-.venv/bin/python -m unittest discover -s tests -v
+../code/.venv/bin/python scripts/check_project.py
+../code/.venv/bin/python -m unittest discover -s tests -v
 git diff --check
 git diff
 # Stage named reviewed files, commit, and push the task branch for review.
@@ -36,7 +38,7 @@ Observed at setup: codex-cli 0.163.0. Login, quota, model selection and executio
 Run interactively in the USER'S terminal, not the Serena shell tool:
 
 ```bash
-cd "/home/jvserver/Desktop/work/research journal/RL-Inventory-EJOR"
+cd "/home/jvserver/Desktop/work/research journal/RL-Inventory-EJOR/github"
 # First synchronize, create the task branch, and stop other writers.
 codex --sandbox workspace-write
 ```

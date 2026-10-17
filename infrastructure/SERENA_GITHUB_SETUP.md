@@ -3,7 +3,10 @@
 Inspected 2026-10-17 through the requested SeneraAiServer:
 
 - Project: RL-Inventory-EJOR.
-- Checkout: /home/jvserver/Desktop/work/research journal/RL-Inventory-EJOR.
+- Serena workspace root: /home/jvserver/Desktop/work/research journal/RL-Inventory-EJOR (local .serena stays here).
+- Git checkout: /home/jvserver/Desktop/work/research journal/RL-Inventory-EJOR/github.
+- Python environment: /home/jvserver/Desktop/work/research journal/RL-Inventory-EJOR/code/.venv.
+- Canonical Python code remains versioned under github/src; code/src is a local convenience symlink, never an independent copy.
 - Remote: git@github-rl-inventory-ejor:VMatee/RL-Inventory-EJOR.git.
 - Initial main: clean and matching origin/main at 9019a91c305876b0c156a547f4b3ee0c72c96c98.
 - Existing virtualenv: Python 3.10.12.

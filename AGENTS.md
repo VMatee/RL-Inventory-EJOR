@@ -6,7 +6,7 @@ These rules apply to this repository. AGENTS.md is the single canonical agent in
 
 Read docs/STATUS.md, docs/PROJECT_CHARTER.md, docs/TASKS.md and the applicable protocol. Read docs/DECISION_LOG.md for scope decisions. Inspect actual branch, commit and working-tree state; prior chat is not a substitute for repository evidence.
 
-When using SeneraAiServer, call initial_instructions once per coding session and confirm the active project is RL-Inventory-EJOR. Follow the server's execution restrictions. Never operate in another connected workspace. Quote the local path because it contains spaces.
+When using SeneraAiServer, call initial_instructions once per coding session and confirm the active Serena project is RL-Inventory-EJOR at the workspace parent. The Git repository is nested in `github/` beneath that workspace, while the Python environment lives in sibling `code/.venv`. Use an explicit `cwd` ending in `/github` for Git and source commands. Follow the server's execution restrictions; never operate in another connected workspace. Quote paths containing spaces.
 
 ## Scientific scope and integrity
 
@@ -22,13 +22,13 @@ Count calibration, normalization, validation, cross-item pretraining and hyperpa
 
 Inspect pwd, git status --short --branch, remote identity and HEAD before edits. Do not expose credentials embedded in URLs. Never discard, reset, clean, automatically stash or force-push another person's work. Dirty/diverged trees are synchronization blockers.
 
-Use scripts/sync_main.sh only on clean, idle main. Normal work uses task branches and reviewed PRs. Direct main maintenance requires explicit user authorization; the initial workflow setup is such a maintenance task. Inspect diffs and stage named files, not a blind git add. Push only to VMatee/RL-Inventory-EJOR when authorized.
+The project workspace parent is not a Git checkout: run Git/source commands from its `github/` child. Keep versioned Python code in `github/src/`; local `code/src` is only a convenience link. Do not move or duplicate .git into `code/`. Use scripts/sync_main.sh only on clean, idle main. Normal work uses task branches and reviewed PRs. Direct main maintenance requires explicit user authorization; the initial workflow setup is such a maintenance task. Inspect diffs and stage named files, not a blind git add. Push only to VMatee/RL-Inventory-EJOR when authorized.
 
 Only one writer per checkout: Serena OR Codex. Parallel work requires separate worktrees/clones, branches and output directories. Different branch names in the same directory do not prevent conflicts. Never pull, switch branches or edit source in a running experiment's checkout.
 
 ## Local execution
 
-Use the existing .venv/bin/python (observed Python 3.10.12). No package/CUDA/system upgrades, data downloads, paid APIs or long GPU jobs without explicit approval and resource scope. Do not print secret environment variables or authentication files.
+From the Git checkout (`github/`), use `../code/.venv/bin/python` (Python 3.10.12). The owner explicitly approved installing the project's Python dependencies inside that isolated environment; do not use global pip or alter NVIDIA drivers, system CUDA or OS packages. Later upgrades, data downloads, paid APIs and long GPU jobs require separate explicit approval and resource scope. Do not print secret environment variables or authentication files.
 
 Serena shell calls must be short, synchronous and noninteractive. Do not start interactive Codex, a server, detached training or an unattended job there. The user may run approved long jobs from a terminal/tmux. Later calls may inspect logs, but do not promise background monitoring.
 
@@ -47,9 +47,9 @@ Run static checks after edits; compile and visually inspect the PDF when TeX is 
 ## Checks and handoff
 
 ```bash
-.venv/bin/python scripts/check_project.py
-.venv/bin/python -m unittest discover -s tests -v
-.venv/bin/python scripts/run_experiment.py --config experiments/configs/smoke.json --seed 0
+../code/.venv/bin/python scripts/check_project.py
+../code/.venv/bin/python -m unittest discover -s tests -v
+../code/.venv/bin/python scripts/run_experiment.py --config experiments/configs/smoke.json --seed 0
 ```
 
 Current tests validate plumbing, not a research model. Report exact commands/results, failures, untested items, changed files, branch/commit and next task. Update docs/STATUS.md and docs/SESSION_LOG.md. Add scientific claims only with evidence in docs/CLAIMS.md. Stop after the accepted task rather than implementing the entire roadmap.
