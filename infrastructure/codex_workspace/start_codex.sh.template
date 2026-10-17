@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# User-terminal launcher only. --check performs no model session or training.
+set -euo pipefail
+if [[ $# -gt 1 || ( $# -eq 1 && "$1" != --check ) ]]; then
+  printf 'Usage: bash start_codex.sh [--check]\n' >&2
+  exit 2
+fi
+code_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
+repo_dir="$(cd -- "$code_dir/../github" && pwd -P)"
+[[ -x "$code_dir/.venv/bin/python" ]] || { echo 'Missing code/.venv/bin/python' >&2; exit 2; }
+[[ -f "$code_dir/AGENTS.md" && -f "$repo_dir/AGENTS.md" ]] || { echo 'Missing project instructions' >&2; exit 2; }
+[[ "$(git -C "$repo_dir" rev-parse --show-toplevel)" == "$repo_dir" ]] || { echo 'Unexpected Git root' >&2; exit 2; }
+origin="$(git -C "$repo_dir" remote get-url origin)"
+case "$origin" in
+  git@github-rl-inventory-ejor:VMatee/RL-Inventory-EJOR.git|git@github.com:VMatee/RL-Inventory-EJOR.git|https://github.com/VMatee/RL-Inventory-EJOR.git) ;;
+  *) echo 'Unexpected repository origin; inspect privately. Not launching.' >&2; exit 2 ;;
+esac
+codex_bin="$(command -v codex)" || { echo 'Codex CLI not found' >&2; exit 2; }
+help_text="$("$codex_bin" --help)"
+for flag in --cd --add-dir --sandbox --ask-for-approval; do
+  grep -qF -- "$flag" <<< "$help_text" || { printf 'Installed CLI lacks %s; not launching.\n' "$flag" >&2; exit 2; }
+done
+prompt='Read AGENTS.md in this code workspace and explicitly read ../github/AGENTS.md, ../github/docs/STATUS.md, ../github/docs/TASKS.md, and ../github/docs/CODEX_IMPLEMENTATION_PLAN.md. Inspect the actual branch/status without editing. Summarize readiness and wait for my task. Saved prompts in CODEX_PROMPT.md are not authorization until I send them.'
+args=(--cd "$code_dir" --add-dir "$repo_dir" --sandbox workspace-write --ask-for-approval on-request "$prompt")
+if [[ "${1:-}" == --check ]]; then
+  "$codex_bin" --version
+  printf 'Working directory: %s\nAdditional writable directory: %s\n' "$code_dir" "$repo_dir"
+  printf 'Command:'; printf ' %q' "$codex_bin" "${args[@]}"; printf '\n'
+  echo 'PASS: paths and CLI flags only. No login/model/sandbox execution verified.'
+  exit 0
+fi
+printf 'Do not run another writer or experiment in this checkout simultaneously.\n'
+export VIRTUAL_ENV="$code_dir/.venv"
+export PATH="$VIRTUAL_ENV/bin:$PATH"
+cd -- "$code_dir"
+exec "$codex_bin" "${args[@]}"

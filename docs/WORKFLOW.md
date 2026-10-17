@@ -35,13 +35,20 @@ Canonical source: manuscript/sections/*.tex and references.bib. Draft/critique o
 
 Observed at setup: codex-cli 0.163.0. Login, quota, model selection and execution of a Codex task were NOT verified. Existing authentication must never be printed or copied. Check installed help before using flags.
 
+Preferred entry is the sibling `code/` directory requested by the owner. Its `AGENTS.md` adapter explicitly reads `../github/AGENTS.md`; the launcher grants sibling repository write access with `--add-dir`, while retaining `workspace-write` and `on-request` approvals. This is not automatic permission to run a full study.
+
 Run interactively in the USER'S terminal, not the Serena shell tool:
 
 ```bash
-cd "/home/jvserver/Desktop/work/research journal/RL-Inventory-EJOR/github"
-# First synchronize, create the task branch, and stop other writers.
-codex --sandbox workspace-write
+cd "$HOME/Desktop/work/research journal/RL-Inventory-EJOR/code"
+# Stop other writers and jobs using the checkout first.
+bash start_codex.sh --check
+bash start_codex.sh
 ```
+
+Then review/send the body of `CODEX_PROMPT.md` for M2. That prompt explicitly accepts the existing M1 conventions as the engineering reference for M2; its presence on disk does not record user acceptance. The full task chain and acceptance checks are in `../github/docs/CODEX_IMPLEMENTATION_PLAN.md`. The first session ends after M2 review; further milestones and expensive experiments need scoped authorization.
+
+The local entry files are managed copies of Git-tracked templates. After a clean, idle main sync, refresh them from github/ with `../code/.venv/bin/python scripts/install_codex_workspace.py`. The installer stops on unknown/local edits; reconcile those rather than overwriting. Direct `codex` use from github/ remains possible, but do not start a second writer.
 
 Retain approval prompts using the options supported by the installed version. Never use approval/sandbox bypass flags. Do not hard-code legacy approval flags without checking installed help. ChatGPT plugin installation does not automatically configure Codex's own MCP servers; sharing this Git checkout is sufficient for the proposed workflow.
 

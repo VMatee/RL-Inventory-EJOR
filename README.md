@@ -37,6 +37,20 @@ GP + RL, Bayesian uncertainty and baseline-relative policy improvement are estab
 
 GitHub holds the authoritative **reviewed version**, but uncommitted local work must be preserved. Synchronization is explicit, not automatic. Only one agent writes a checkout at a time. ChatGPT does not continue working after the conversation ends.
 
+## Codex from the code/ workspace
+
+The local entry files are `../code/README.md`, `../code/AGENTS.md`, `../code/CODEX_PROMPT.md` and `../code/start_codex.sh`. `code/AGENTS.md` is a startup adapter to this repository's canonical rules, not a second research policy. Canonical source still lives here under `src/`.
+
+```bash
+cd "$HOME/Desktop/work/research journal/RL-Inventory-EJOR/code"
+bash start_codex.sh --check  # no Codex model session
+bash start_codex.sh          # user-terminal interactive session
+```
+
+Review `CODEX_PROMPT.md` before sending it: the first task approves the existing M1 engineering conventions for **M2 only**, not an unattended full study. The [complete implementation plan](docs/CODEX_IMPLEMENTATION_PLAN.md) defines M2-M7 outputs, scientific gates and tests. This setup does not implement those milestones or verify Codex login/model access.
+
+After a reviewed Git sync, run `../code/.venv/bin/python scripts/install_codex_workspace.py` from this checkout to refresh the four local entry files. The installer protects unknown/local edits instead of overwriting them. The source templates are in `infrastructure/codex_workspace/`.
+
 ## Local quick start
 
 ```bash
