@@ -8,7 +8,7 @@ Codex may start in sibling `code/` using its AGENTS adapter and `CODEX_PROMPT.md
 
 Canonical LaTeX/BibTeX, source archive, README/AGENTS, workflow, sync/check scripts, provenance and infrastructure tests. See SESSION_LOG. No scientific results.
 
-## M1 - Model specification and minimal simulator [implemented and locally tested; event conventions pending scientific approval]
+## M1 - Model specification and minimal simulator [implemented and locally tested; engineering conventions accepted for M2]
 
 Agree on units, lead-time convention, receipt/order/demand timing, initial stock and pipeline, action bounds, holding/shortage/order costs, horizon and terminal treatment. Document before implementation; do not silently resolve scientific ambiguity.
 
@@ -18,9 +18,13 @@ Implementation evidence: `theory/INVENTORY_MODEL.md` gives explicit state/event 
 
 Acceptance for use in M2: local automated tests and fixture pass **AND** the owner reviews/accepts selected event timing, initial-state interpretation and terminal handling. Do not present a provisional convention as confirmed by the user. Update formulation, tests and decision log together if modified.
 
-## M2 - Exact reference and baseline [planned]
+The owner explicitly accepted the current conventions for M2 in the 2026-10-17 session instruction. Final publication assumptions remain open; no M1 source or test fixtures changed.
+
+## M2 - Exact reference and baseline [implemented and locally tested; awaiting owner review]
 
 Depends M1. Small finite-support DP plus tuned base-stock. Compare tiny instances with exhaustive enumeration. Specify bounds/truncations, initial and terminal states. Deliver config, fixtures and paired evaluation.
+
+Implemented finite iid demand validation, exact reachable-state finite-horizon DP, forward policy evaluation, and naive constant and horizon-aware capped base-stock with exact known-model finite-grid tuning on the same grid and allowance. No inventory truncation; explicit state/work/time failure. Tiny independent rational/calendar enumeration covers 128 contingent policies per fixture. Before the review correction: 61 tests passed; after: 66 tests passed, including unchanged M1 tests. The unchanged demo now reports DP=horizon-aware S=1 cost 2.875 and naive S=1 cost 3.000. The earlier 0.125 gap disappears with the horizon-aware baseline; no new example was selected. Independent hand/calendar tests cover the cutoff, L exceeding the horizon, and no lookahead. Ruff E,F,I,B,UP and formatting checks pass. Source: base `2cbce59fd0cf0f738e177a0ef7e8bc6347882431` plus the uncommitted M2 diff on `feat/m2-exact-reference`; no standalone M2 commit yet. Evidence and exact commands: `results/summaries/M2_REFERENCE_VALIDATION_20261017.md`. Implementation evidence only; stop for review before M3/M4.
 
 ## M3 - Data/information audit [raw-data acquisition partially completed: M5 verified, Favorita Kaggle authorization outstanding]
 

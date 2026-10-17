@@ -1,6 +1,6 @@
 # M1 inventory model: deterministic reference semantics
 
-**Status (2026-10-17):** Selected and implemented as the **M1 engineering convention**, not yet an empirical research result or a user-approved final theoretical formulation. Review/change these assumptions explicitly in `docs/DECISION_LOG.md` before beginning M2. This document is the reference for code, test fixtures and eventual problem-formulation equations.
+**Status (2026-10-17):** The owner explicitly accepted the current **M1 engineering conventions for M2** in the session instruction; see `docs/DECISION_LOG.md`. This is not an empirical research result or approval of every final publication assumption. This document remains the unchanged semantic reference for code, test fixtures and eventual problem-formulation equations; future convention changes require explicit review.
 
 ## 1. Scope and units
 

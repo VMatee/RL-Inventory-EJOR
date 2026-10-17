@@ -1,5 +1,82 @@
 # Session handoff log
 
+## 2026-10-17 - Independent M2 PR preparation (separate worktree)
+
+M2 correction was reviewed via an isolated `review/m2-exact-reference-pr` worktree created from clean `main` at `2cbce59` while two Codex interactive sessions remained open. An explicit 16-file source allowlist was copied and each file's SHA256 checked; **the original dirty `feat/m2-exact-reference` checkout and raw M5/results directories were not edited**. The manual repository GitHub Actions job was extended to run deterministic M2 checks alongside M1. A suspected pre-existing line-continuation typo was independently checked at byte level and proved not to be a defect; the original valid shell continuation was preserved.
+
+Independent checks: 66 unit tests, Ruff lint/format, numeric DP/policy/base-stock replay (2.875/2.875/3.000), 36 additional bounded synthetic cross-checks and the repository static check passed. Scientific interpretation remains unchanged: corrected horizon-aware baseline closes the naive 0.125 toy-example gap. Evidence and outstanding boundaries: `results/summaries/M2_INDEPENDENT_PR_REVIEW_20261017.md`. The PR is for human review, **not authorization to merge or begin M3**. Preserve the original Codex worktree until its owner safely reconciles the outstanding uncommitted changes.
+
+## 2026-10-17 - M2 benchmark-fairness correction and Ruff review
+
+The user supplied an independent review identifying that the tiny example's
+0.125 gap vanished when base-stock stopped ordering outside the horizon, and
+authorized M2 corrections only. Continued on dirty `feat/m2-exact-reference`
+at base `2cbce59fd0cf0f738e177a0ef7e8bc6347882431`; preserved all existing work,
+old run artifacts, M1 equations/code/tests, and the original demo configuration.
+
+Added `HorizonAwareBaseStockPolicy` with `remaining <= lead_time` cutoff;
+retained the original as a clearly labeled naive constant comparator. Tuned
+both on the same grid, known demand law, initial state and resource allowance.
+The cutoff uses only decision-time information. Revised CLI output names both
+variants explicitly. Corrected interpretation: DP and horizon-aware S=1 both
+cost **2.875**; naive S=1 costs **3.000**. The entire earlier 0.125 gap was due
+to unnecessary final-period placement costs, not a demonstrated DP advantage
+over a horizon-aware baseline. No replacement example was selected.
+
+Before correction: 61 tests passed in 0.640 s. After: **66 passed in 0.718 s**.
+Independent rational/calendar enumeration agrees for both variants at each
+grid level, and hand path costs explain the gap. New tests cover L=3,T=2,
+the exact cutoff and last useful order, same-prefix no-lookahead, per-variant
+budget enforcement and repeatable default calls. Fixed imports, strict zip,
+loop variable binding, and construction of default limits inside functions;
+formatted only new M2 Python files. Installed Ruff 0.17.1 reports no diagnostics
+under `--select E,F,I,B,UP`; format check passes. Initial narrower selection
+reproduced 14 diagnostics, rather than the review's reported 15. No packages
+were installed. Static project check and M1 cost-47 fixture still pass.
+
+New smoke evidence: `results/runs/20261017T154421Z-smoke-2ce059a3/`, exit 0;
+external elapsed 0.34 s, peak RSS 39,296 KiB. Exact commands, changed files,
+independent calculations and final patch artifacts are recorded in
+`results/summaries/M2_REFERENCE_VALIDATION_20261017.md`. Historical evidence
+below remains a record of the original implementation, with interpretation
+superseded by this correction. No commit/push/merge, download, GPU/training,
+or M3 work. Stop after corrected M2 review.
+
+## 2026-10-17 - M2 exact reference and known-model base-stock (Codex)
+
+The actual user instruction invoked `CODEX_PROMPT.md`, explicitly approved current
+M1 conventions as the **M2 engineering reference only**, and authorized M2 only.
+Final publication assumptions remain open. Read local/canonical rules, current
+status/charter/tasks/decision log, implementation plan, M1 specification,
+evaluation/data protocol and affected source/tests. Confirmed existing venv and
+canonical symlinks. Clean main began at `2cbce59fd0cf0f738e177a0ef7e8bc6347882431`;
+no experiment or active repository writer was found. Created
+`feat/m2-exact-reference`; no pre-existing work was discarded.
+
+Implemented validated known iid finite-support demand, reachable-state exact
+finite-horizon DP, forward policy evaluation, and constant capped base-stock
+with exact known-model grid tuning. No inventory truncation; explicit state,
+work and time failure. Preserved M1 code/tests/fixtures; changed only its
+specification's approval-status paragraph. Added strict config/CLI, dirty-source
+hashes, bounded synthetic demo, and independent rational/calendar enumeration
+of 128 contingent policies for each L=1/L=2 fixture.
+
+Before edits: 46 tests passed. After: 61 passed in 0.550 s, including 15 M2 tests.
+Static checks and `git diff --check` passed. M1 fixture remains 47.0. M2 demo:
+DP/returned-policy cost 2.875; tuned constant S=1 cost 3.000, gap 0.125. L=1
+open-loop sanity minimum is 3.000, strictly worse than the adaptive optimum.
+Saved smoke artifact `results/runs/20261017T153021Z-smoke-bdef32de/`: exit 0,
+child runtime 0.214406 s, external elapsed 0.37 s, peak RSS 38,888 KiB.
+
+Existing environment, serial tiny CPU computations, process timeouts <=120 s.
+No installation/download, real-data access, GPU/training, sweep, commit, push or
+merge. Work remains unstaged/uncommitted; evidence identifies the base SHA plus
+dirty source hashes. Files, exact commands, outputs, conventions and limitations:
+`results/summaries/M2_REFERENCE_VALIDATION_20261017.md`.
+
+Stopped at M2 review. Next: owner review; M3 leakage-safe information/data
+contracts require separate authorization. No later milestone started.
+
 ## 2026-10-17 - Codex entry point in code/ and staged implementation plan
 
 At the user's request, inspected the latest clean repository at base 758d439d31ddadadd9e4ebeb6b22bca0bf0df4c7 and the existing code/ workspace/symlinks. Added Git-tracked templates for code/README.md, AGENTS.md (startup adapter only), CODEX_PROMPT.md and start_codex.sh, plus a hash-guarded local installer and seven offline safety tests. The canonical scientific rulebook remains github/AGENTS.md. No second source tree, Git repository, lowercase agent.md alias, dependency environment or dataset copy was created.

@@ -1,0 +1,12 @@
+{
+  "inventory": {
+    "lead_time": 1,
+    "horizon": 3,
+    "max_order": 1,
+    "costs": {"holding": 1, "lost_sales": 4, "variable_order": 0.5, "fixed_order": 0}
+  },
+  "initial_state": {"on_hand": 1, "pipeline": []},
+  "demand": {"support": [0, 1], "probabilities": [0.5, 0.5]},
+  "base_stock_levels": [0, 1, 2, 3],
+  "limits": {"max_states": 1000, "max_transitions": 10000, "max_seconds": 10}
+}
