@@ -1,0 +1,79 @@
+# Local Codex workspace - RL-Inventory-EJOR
+
+Start Codex in this `code/` directory. Research source remains in sibling `../github/`; do not create a second Git repository or duplicate Python implementations here.
+
+## Locations
+
+| Location relative to code/ | Purpose |
+|---|---|
+| `.venv/bin/python` | Existing Python environment; never use global pip |
+| `../github/` | Authoritative Git checkout, manuscript, source, tests, protocols |
+| `src`, `tests`, `experiments` | Existing symlinks into `../github/`, not copies |
+| `../github/data/raw/` | Local-only raw data; preserve, never commit |
+| `../github/data/processed/` | Versioned-by-manifest derived data; preserve, never silently overwrite |
+| `../github/results/runs/` | Local experiment outputs; unique run directories |
+| `../github/results/summaries/` | Small reviewed evidence suitable for Git |
+
+`AGENTS.md` in this directory is a startup adapter: it explicitly directs Codex to the canonical scientific/Git rules in `../github/AGENTS.md`. There is intentionally no lowercase `agent.md` alias.
+
+## Start from your terminal
+
+First stop other agents and experiments that use this checkout. The launcher does not detect every possible writer and does not synchronize, switch branches, edit files, or run training automatically.
+
+```bash
+cd "$HOME/Desktop/work/research journal/RL-Inventory-EJOR/code"
+bash start_codex.sh --check   # validates paths/flags; does not launch Codex
+bash start_codex.sh           # interactive session, prompts for normal permissions
+```
+
+Equivalent command (verified against installed Codex CLI 0.163.0 help during setup):
+
+```bash
+source .venv/bin/activate
+codex --cd "$PWD" --add-dir "$(cd ../github && pwd -P)" \
+  --sandbox workspace-write --ask-for-approval on-request
+```
+
+The additional writable directory is needed because `github/` is a sibling of `code/`. Symlinks alone do not grant write permissions. This permission is scoped, not read-only: it can reach ignored data in that directory, so retain the data-preservation instructions and backups. Do not grant access to the entire home directory or disable the sandbox. A model/credential/sandbox error is not a reason to bypass safety controls.
+
+Codex login, available model, quota, and end-to-end interactive execution must be verified by the user. No particular model name is hard-coded. No global Codex configuration, authentication, or background daemon is changed by this setup.
+
+## Prompt to send
+
+Open `CODEX_PROMPT.md`, review it, then paste its prompt body into Codex. It provides the complete implementation direction but authorizes **M2 only for the first session**.
+
+Important: sending that prompt explicitly accepts the existing M1 event timing and zero-extra-terminal-cost convention as the engineering reference for M2. The setup files themselves do not record that approval. The final publication formulation can still be revised with coordinated code, tests, and decision-log changes.
+
+For subsequent sessions, name one milestone from `../github/docs/CODEX_IMPLEMENTATION_PLAN.md`, include a bounded test/run budget, and say whether a commit or push is authorized. Do not say only 'generate everything and run all experiments'. Generated code, passing tests, benchmark replication, and publishable findings are different completion states.
+
+## Current starting point - re-check before relying on it
+
+At setup, the Git checkout contained the tested deterministic M1 simulator and 39 tests. M2 exact DP and tuned base-stock were not implemented. M5 had five verified raw CSVs; original item-level Favorita was blocked by Kaggle authorization. These are dated observations, not permanent facts: read STATUS/TASKS and actual files at the start of every task.
+
+## Quick checks (start in code/)
+
+```bash
+git -C ../github status --short --branch
+(cd ../github && ../code/.venv/bin/python scripts/check_project.py)
+(cd ../github && ../code/.venv/bin/python -m pytest tests -q)
+(cd ../github && make m1-reference)
+```
+
+Use explicit `cwd=../github` for experiment commands. Do not run `git init` here. `code/` is not the Git checkout.
+
+## Update these instructions after a reviewed GitHub sync
+
+The editable, Git-tracked sources for this workspace are `../github/infrastructure/codex_workspace/*.template`. These local copies are deployed by a hash-guarded installer:
+
+```bash
+# Run only while the checkout and workspace have no other writer.
+(cd ../github && bash scripts/sync_main.sh)  # clean, idle main only
+.venv/bin/python ../github/scripts/install_codex_workspace.py --check
+.venv/bin/python ../github/scripts/install_codex_workspace.py
+```
+
+The installer refuses locally edited or unknown files rather than discarding them. Edit the tracked templates for permanent changes; preserve/reconcile intentional local edits before refreshing. It does not touch `.venv`, datasets, checkpoints, source symlinks, credentials, or scientific code.
+
+## Data safety
+
+Ignored local data/results are not backed up by GitHub. Never delete them while syncing. Do not use `git clean`, `git reset --hard`, automatic stashing, directory replacement, or force pushes. Use fixed-commit execution worktrees for approved long runs and a separate backup target for irreplaceable outputs. Do not pull or switch branches in a checkout used by a running experiment.

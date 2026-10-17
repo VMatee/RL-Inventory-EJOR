@@ -1,5 +1,13 @@
 # Session handoff log
 
+## 2026-10-17 - Codex entry point in code/ and staged implementation plan
+
+At the user's request, inspected the latest clean repository at base 758d439d31ddadadd9e4ebeb6b22bca0bf0df4c7 and the existing code/ workspace/symlinks. Added Git-tracked templates for code/README.md, AGENTS.md (startup adapter only), CODEX_PROMPT.md and start_codex.sh, plus a hash-guarded local installer and seven offline safety tests. The canonical scientific rulebook remains github/AGENTS.md. No second source tree, Git repository, lowercase agent.md alias, dependency environment or dataset copy was created.
+
+Added docs/CODEX_IMPLEMENTATION_PLAN.md with M2-M7 outputs, independent validation requirements and scientific/resource gates. The first-task prompt explicitly accepts current M1 conventions for M2 engineering only when the owner sends it; this setup does not record an approval that has not occurred. No M2 implementation or GP/RL experiment was performed.
+
+Observed Codex CLI 0.163.0 supports --cd, --add-dir, --sandbox and --ask-for-approval. Local entry files were installed, installer idempotence checked, and start_codex.sh --check passed. No interactive Codex session, model invocation, authentication check or full sandbox runtime was launched. Scientific data and code/.venv were left unchanged. Validation record: results/summaries/CODEX_WORKSPACE_SETUP_20261017.md.
+
 ## 2026-10-17 - M3 source acquisition audit (incomplete: Favorita auth required)
 
 At the user's request, confirmed the frozen study plan calls for TWO public retail-sales sources (M5 Walmart and original 2017 item-level Corporación Favorita) plus a synthetic experiment track that is generated rather than downloaded. M3 acquisition started ahead of M2; no scientific split or training was changed.

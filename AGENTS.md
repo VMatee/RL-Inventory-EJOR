@@ -1,6 +1,6 @@
 # Agent instructions: RL-Inventory-EJOR
 
-These rules apply to this repository. AGENTS.md is the single canonical agent instruction file. Platform safety rules and explicit user instructions take precedence.
+These rules apply to this repository. This AGENTS.md is the single canonical scientific/Git rulebook. The sibling code/AGENTS.md is only a Codex startup adapter that explicitly loads these rules; do not maintain conflicting research instructions there. Its source is versioned under infrastructure/codex_workspace/AGENTS.md.template. Platform safety rules and explicit user instructions take precedence.
 
 ## Before acting
 

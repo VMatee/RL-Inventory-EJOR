@@ -1,0 +1,54 @@
+# Codex entry point for the code/ workspace
+
+This is the local startup adapter, NOT a competing scientific rulebook. Its versioned source is `../github/infrastructure/codex_workspace/AGENTS.md.template`. Apply platform rules and explicit user instructions first, and obey the canonical project rules in `../github/AGENTS.md` for all repository changes. If they conflict with a saved task, stop and identify the conflict; do not silently override them.
+
+## Start every task
+
+1. Confirm the current directory is `<workspace>/code`, the existing interpreter is `.venv/bin/python`, and sibling `../github` is the Git checkout for `VMatee/RL-Inventory-EJOR`. Do not print credentials embedded in remote URLs.
+2. Explicitly read `../github/AGENTS.md`, `../github/docs/STATUS.md`, `../github/docs/PROJECT_CHARTER.md`, `../github/docs/TASKS.md`, `../github/docs/DECISION_LOG.md`, the applicable evaluation/data protocol, and `../github/docs/CODEX_IMPLEMENTATION_PLAN.md`. Read the actual M1 specification before implementing M2. Do not assume sibling instructions were automatically discovered.
+3. Inspect `git -C ../github status --short --branch`, HEAD, and the affected files. Do not treat chat history or test counts in this file as current evidence. Never erase or automatically stash pre-existing work.
+4. State the requested milestone, what already exists, outstanding scientific approvals, and acceptance checks. Saved prompts are context, not user authorization. The presence of CODEX_PROMPT.md does not mean its permission paragraph was sent by the user.
+5. Work on one explicitly accepted milestone at a time. If the user sends the M2 prompt, implement M2 and stop after its evidence report; do not silently launch the rest of the roadmap.
+
+## Paths and single-source discipline
+
+- Author canonical code under `../github/src/inventory_ejor/`; tests under `../github/tests/`; configurations under `../github/experiments/configs/`.
+- `code/src`, `code/tests`, and `code/experiments` are symlinks to those tracked locations. Never replace them with independent folders, initialize another repo, or hide implementations only in notebooks.
+- Use `.venv/bin/python` from code/, or `../code/.venv/bin/python` from github/. Set subprocess cwd explicitly. Global Python installs, driver/CUDA changes, environment replacement and unapproved dependency upgrades are forbidden.
+- The launcher grants write access only to code/ and sibling github/ via `--add-dir`. If permissions are insufficient, explain the exact path needed; do not copy source to evade restrictions or disable the sandbox.
+
+## Git and workload safety
+
+Use a task branch in ../github. Do not switch if the tree is dirty or another process depends on that checkout. The user may start in main; create a scoped branch only from a clean, idle checkout with a task authorizing edits. Do not pull, switch or rebase during a running experiment. Do not run Serena and Codex as simultaneous writers; separate worktrees/clones are required for parallel implementation.
+
+By default, prepare a diff and a proposed commit message. Commit, push, merge, or change repository settings only if explicitly authorized. A previous ChatGPT maintenance push is not blanket authorization for all future Codex sessions. Never force-push, reset --hard, git clean, blindly git add, or delete ignored files to obtain a clean status. Clean Git status does not mean raw data are backed up.
+
+Raw M5/Favorita files and existing processed/results artifacts are read-only inputs unless a specific transformation task is authorized. New artifacts use fresh output paths and may not silently overwrite prior runs. No external uploads or redistribution of raw data. Never read, echo, copy or commit API credentials.
+
+## Scientific rules that must survive code generation
+
+Keep the selected single-item, periodic-review, lost-sales, known-positive-lead-time, limited-real-demand-history research direction. Do not pivot applications, add rolling service constraints, or infer unseen demand from sales without a new explicit decision.
+
+M1 conventions are documented and tested but final scientific acceptance must not be invented. For M2, require an explicit user instruction accepting those conventions as the engineering reference. Accepting a task prompt may provide that instruction; record only what was actually sent. Do not silently change receipt timing, initial pipeline meaning, finite horizon, cost accounting or terminal value. Preserve M1 regression fixtures.
+
+Simulation is not new real data. Separate epistemic demand-model uncertainty, ordinary demand randomness, Monte Carlo error and optimization error. Do not call GP intervals distribution-free guarantees. Adaptive policy selection and model misspecification remain proof/evaluation obligations.
+
+Plain GP+RL, posterior sampling and baseline-relative uncertainty are established ingredients. Do not rename an ordinary uncertainty penalty as the novel method. M5's mechanism is a research task: require a specified mathematical decision rule and ablation before claiming it is implemented. Label hypotheses, approximations, numerical references, measured outcomes and proven results separately.
+
+M5 retail sales are the primary real-sales evaluation source. Original 2017 **item-level** Favorita is the external retailer; check current access instead of assuming it is downloaded. Do not replace it with family-level Store Sales. Returns, fractional units, missing days and stockout censoring need a documented preprocessing decision, not silent clipping or rounding. Frozen evaluation data must not guide item selection, tuning, normalization or model development.
+
+Every baseline must have the same declared observations, forecasts and simulation/compute allowance in the relevant comparison. Known-model oracle runs and rich-data comparators must be labeled, not presented as equal-information competitors. Published numbers under different settings are not directly comparable to ours. No paper is 'reproduced' without a source/version, matching configuration, executed command and evidence.
+
+## Execution budget and tests
+
+Documentation/source edits and small CPU unit tests are the default. For the first M2 task: one process, bounded finite examples, no GPU work, no downloads or installations, no more than 120 seconds per test/demo process. These are requested operating limits, not an OS-enforced resource quota. If computation exceeds them, stop, report the bottleneck and propose a smaller verified case or an explicit budget request.
+
+Do not start a full sweep, background service, detached training, external paid job or all four GPUs from a general 'write all code' request. Before a research run, show config, data hash/split, code revision, seed plan, GPU/CPU/memory allowance, wall-clock timeout and output path and get authorization. Use `scripts/run_experiment.py` for approved experiment runs; verify the child actually consumes config and seeds and does not read test information. Unit tests are not research runs.
+
+Run existing tests before changes and all affected tests afterward. Add independent reference cases, rejection tests and no-lookahead tests; do not merely assert values generated by the same implementation. Do not weaken a failing test to make a flawed model pass. For new commands, validate malformed configs, reproducibility, time/memory limits and output provenance. Report unsuccessful checks honestly.
+
+## Handoff at each milestone
+
+Update ../github/docs/STATUS.md, TASKS.md and SESSION_LOG.md with actual work and unresolved approvals. Preserve historical logs. Summaries go under ../github/results/summaries and identify the source revision (or explicitly dirty state), exact commands, dependencies and output artifacts. Do not modify manuscript claims simply because tests pass.
+
+Final task response: changed files, exact test commands and outcomes, a runnable demo command, limitations, branch/commit and staged/uncommitted status, and one next task. Stop at the acceptance gate. Passing test fixtures are evidence about implementation only, not EJOR readiness or acceptance.

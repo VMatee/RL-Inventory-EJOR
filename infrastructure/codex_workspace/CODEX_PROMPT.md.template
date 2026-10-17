@@ -1,0 +1,23 @@
+# Prompt for the first Codex implementation session
+
+Read before sending. The prompt below explicitly accepts the existing M1 timing and terminal convention **for the M2 engineering reference** and authorizes M2 implementation only. Merely storing this file does not grant approval; paste the prompt into your Codex conversation when ready. It does not authorize all research experiments, publishing, installations, or GPU training.
+
+---
+
+You are my research software engineer for the RL-Inventory-EJOR project. Help me build the complete, reproducible implementation needed for the agreed EJOR research direction, one verified milestone at a time. Do not change the topic and do not attempt to generate or run the entire study in one pass.
+
+Your starting directory is `~/Desktop/work/research journal/RL-Inventory-EJOR/code`. The real Git repository is sibling `../github`, and the existing Python interpreter is `.venv/bin/python`. The local `src`, `tests`, and `experiments` entries are symlinks into that repository. Do not create another repository or independent implementation in code/.
+
+Read local AGENTS.md and explicitly read ../github/AGENTS.md, docs/STATUS.md, docs/PROJECT_CHARTER.md, docs/TASKS.md, docs/DECISION_LOG.md, docs/CODEX_IMPLEMENTATION_PLAN.md, theory/INVENTORY_MODEL.md, experiments/protocol/EVALUATION.md and the relevant existing code/tests (paths after ../github/ are repository-relative). Inspect actual Git state and report the starting revision.
+
+For this M2 task, I accept the existing M1 conventions as the engineering reference: decision state after current receipts; nonnegative integer orders; positive fixed lead time L; an order at t first available at t+L; unmet demand is lost, not backlogged; holding cost applies before the next receipt; ordering costs are charged on placement; the finite horizon has zero additional terminal salvage or penalty. Preserve these semantics and the M1 fixtures. This does not establish that these boundaries are final for the publication study.
+
+Implement **M2 only**: finite-support demand validation, an exact finite-horizon dynamic-programming reference, a clearly defined base-stock baseline with controlled known-model tuning, and a small runnable configuration/demo. Follow the detailed M2 acceptance criteria in docs/CODEX_IMPLEMENTATION_PLAN.md. The DP must condition only on currently available information, include time remaining, and use no silent inventory truncation. Handle ties and zero reference cost explicitly. Independently validate tiny cases using a decision-tree or exhaustive contingent-policy check, not only the same recursion under a different name. Open-loop enumeration is not an optimal adaptive-policy benchmark.
+
+Run the existing tests before edits. If the checkout is clean and idle, create a scoped task branch. If it contains pre-existing changes, report them and do not discard, stash or overwrite them. Use the installed environment, one CPU process and bounded tiny examples; keep each test/demo process within 120 seconds. No package installation, dataset download, GPU training, full sweep, destructive cleanup, commit, push or merge is authorized by this prompt.
+
+All canonical source, tests and configs must remain inside ../github. Preserve all raw/processed data and past results. Use synthetic cases for M2; do not use M5 test outcomes or access Favorita. Do not change manuscript prose, claimed contributions or the proposed GP mechanism to make the implementation appear complete.
+
+After implementation, run all relevant tests and the deterministic reference/demo; inspect the diff. Record the actual task approval, assumptions, commands, test outcomes and remaining blockers in the project logs without claiming a theorem or empirical RL result. Leave a reviewable uncommitted diff and propose a commit message.
+
+Your final response must state: what changed; exact commands I can rerun; measured reference/demo results and test outcomes; limitations; branch and dirty/clean status; and the next milestone. Stop at M2 review. Do not continue to M3/M4 or launch any training until I authorize the next task.

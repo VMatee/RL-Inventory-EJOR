@@ -2,6 +2,8 @@
 
 Statuses are planned/in progress/blocked/validated. Mark validated only with code SHA and evidence. Begin one task at a time.
 
+Codex may start in sibling `code/` using its AGENTS adapter and `CODEX_PROMPT.md`. Detailed engineering requirements for M2-M7 are in `docs/CODEX_IMPLEMENTATION_PLAN.md`; this queue remains the completion record. The saved prompt approves current M1 conventions for M2 only **when explicitly sent by the owner**. Instruction/launcher setup does not mark M2-M7 complete or authorize a full training sweep.
+
 ## M0 - Workflow setup [validated: infrastructure only]
 
 Canonical LaTeX/BibTeX, source archive, README/AGENTS, workflow, sync/check scripts, provenance and infrastructure tests. See SESSION_LOG. No scientific results.
