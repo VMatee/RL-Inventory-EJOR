@@ -49,6 +49,8 @@ bash scripts/sync_main.sh
 ../code/.venv/bin/python scripts/run_experiment.py --config experiments/configs/smoke.json --seed 0
 ```
 
+To verify the M1 deterministic inventory simulator without RL training, run `make m1-reference` and `../code/.venv/bin/python -m unittest discover -s tests -v`. The M1 model equations, period timing and terminal boundary are in [the model specification](theory/INVENTORY_MODEL.md); conventions are selected for implementation and require owner review before M2.
+
 The smoke run checks repository plumbing only. It does not train GP/RL, download data or generate inventory performance. See [runbook](docs/EXPERIMENT_RUNBOOK.md). The Python environment belongs to the *sibling* workspace directory `../code/.venv` (Python 3.10.12), not to the Git repository. Installation and version snapshots are documented in [environment setup](environment/README.md).
 
 ## Manuscript

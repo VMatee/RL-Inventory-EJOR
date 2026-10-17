@@ -47,7 +47,7 @@ Retain approval prompts using the options supported by the installed version. Ne
 
 Task prompt:
 
-> Read AGENTS.md, docs/STATUS.md, docs/TASKS.md, theory/INVENTORY_MODEL.md and the evaluation protocol. Work only on M1 in the current task branch. Identify unresolved event-timing/terminal assumptions before implementing. Build the agreed minimal environment and deterministic tests. No GP/RL training, data downloads, dependency upgrades or pushes. Run checks and report exact diff, test results and remaining blockers.
+> Read AGENTS.md, docs/STATUS.md, docs/TASKS.md, theory/INVENTORY_MODEL.md and the evaluation protocol. M1 deterministic inventory transitions have been implemented and tested; **first review the selected event-timing and terminal conventions with the owner before M2 work**. Once that scope is approved, implement only the accepted next task in a new branch, never silently change timing or terminal treatment. No GP/RL training, data downloads, dependency upgrades or pushes without separate approval. Run checks and report the exact diff, test results and remaining blockers.
 
 ## Long jobs
 

@@ -52,4 +52,4 @@ Run static checks after edits; compile and visually inspect the PDF when TeX is 
 ../code/.venv/bin/python scripts/run_experiment.py --config experiments/configs/smoke.json --seed 0
 ```
 
-Current tests validate plumbing, not a research model. Report exact commands/results, failures, untested items, changed files, branch/commit and next task. Update docs/STATUS.md and docs/SESSION_LOG.md. Add scientific claims only with evidence in docs/CLAIMS.md. Stop after the accepted task rather than implementing the entire roadmap.
+Current tests validate infrastructure and the deterministic M1 inventory stock-flow model, **not** learned GP/RL policies, exact DP optimality, real-data results, or new theorems. Report exact commands/results, failures, untested items, changed files, branch/commit and next task. Update docs/STATUS.md and docs/SESSION_LOG.md. Add scientific claims only with evidence in docs/CLAIMS.md. Stop after the accepted task rather than implementing the entire roadmap.

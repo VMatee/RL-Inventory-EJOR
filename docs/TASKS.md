@@ -6,13 +6,15 @@ Statuses are planned/in progress/blocked/validated. Mark validated only with cod
 
 Canonical LaTeX/BibTeX, source archive, README/AGENTS, workflow, sync/check scripts, provenance and infrastructure tests. See SESSION_LOG. No scientific results.
 
-## M1 - Model specification and minimal simulator [planned]
+## M1 - Model specification and minimal simulator [implemented and locally tested; event conventions pending scientific approval]
 
 Agree on units, lead-time convention, receipt/order/demand timing, initial stock and pipeline, action bounds, holding/shortage/order costs, horizon and terminal treatment. Document before implementation; do not silently resolve scientific ambiguity.
 
 Implement src/inventory_ejor/envs with tests for zero demand/order, exact depletion, lost sales versus backlog, L=1 and L>1 pipeline progression, arrival date, nonnegative inventory, cost decomposition, invalid inputs and terminal accounting. Cross-check hand-computed trajectories. No GP/RL, downloads or new dependencies without approval.
 
-Acceptance: equations and code agree; deterministic tests catch off-by-one errors; reference fixtures are reproducible. Update formulation only after conventions are accepted.
+Implementation evidence: `theory/INVENTORY_MODEL.md` gives explicit state/event equations, lead-time and terminal semantics; `src/inventory_ejor/envs/lost_sales.py` contains a pure transition and a Gymnasium wrapper; `tests/fixtures/m1_hand_calculated.json` is an independently hand-calculated reference (cost 47), cross-checked by deterministic tests including a separately written event-calendar comparator. `scripts/run_m1_reference.py` replays the fixture. See `results/summaries/M1_SIMULATOR_VALIDATION_20261017.md` for exact checks/code SHA.
+
+Acceptance for use in M2: local automated tests and fixture pass **AND** the owner reviews/accepts selected event timing, initial-state interpretation and terminal handling. Do not present a provisional convention as confirmed by the user. Update formulation, tests and decision log together if modified.
 
 ## M2 - Exact reference and baseline [planned]
 
