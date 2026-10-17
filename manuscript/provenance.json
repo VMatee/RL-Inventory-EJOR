@@ -7,6 +7,21 @@
   "archive": "research/briefs/INTRODUCTION_SOURCE_20261017.md",
   "body_paragraphs": 16,
   "references": 16,
-  "conversion": "Substantive prose preserved exactly; author-year citation text changed to natbib keys. Bibliography transcribed.",
-  "validation": "Reverse citation substitution matches source prose. Bibliography fact-check is a separate pending task."
+  "conversion": "Initial import only: substantive prose preserved exactly; author-year citation text changed to natbib keys. Bibliography transcribed.",
+  "validation": "Initial import only: reverse citation substitution matched source prose. Subsequent revisions are recorded below and do not claim verbatim identity with the Word source.",
+  "revision_history": [
+    {
+      "date": "2026-10-17",
+      "base_commit": "89933c8eff05417e9396bc0ce71fb253966d34e4",
+      "scope": "User-requested Introduction revision for the existing limited-data inventory direction; no other manuscript section or research scope changed.",
+      "changes": "Sharper operational motivation, explicit policy-cost-difference equation, inventory-specific research objective, conditional contributions and matched-information evaluation plan. Existing source archive preserved.",
+      "introduction_sha256": "a02187633f9e215ff0dc9b747c084790235fbc99d92539e919d83bc518c9f6a7",
+      "bibliography_sha256": "b78ba8f9e007b0000e05a45e224c0360f7658ba2c7284dc33a8cf33745200238",
+      "main_tex_sha256": "562fe30f6632cb7997bb5a027e6d83e7a3f6fed3a2ce4d6aab080a6d9b4ace66",
+      "source_checks": "Scoped primary-source claim checks documented in research/literature/REFERENCE_AUDIT.md; not an exhaustive metadata, theorem or novelty audit.",
+      "build": "Matching source compiled to seven pages and all pages visually inspected in the ChatGPT temporary environment. Local PC TeX was not available. No PDF is committed.",
+      "review_pdf_sha256": "9b637ef569cd0b911e723b1ae7262902e63533df2cd14de571f015d2f4075ac4",
+      "research_status": "Pre-experiment proposal; no new proof, numerical finding or service guarantee is asserted."
+    }
+  ]
 }
