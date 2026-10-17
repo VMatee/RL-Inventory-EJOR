@@ -1,6 +1,6 @@
 # Agent instructions: RL-Inventory-EJOR
 
-These rules apply to this repository. AGENTS.md is canonical; agent.md is only a pointer. Platform safety rules and explicit user instructions take precedence.
+These rules apply to this repository. AGENTS.md is the single canonical agent instruction file. Platform safety rules and explicit user instructions take precedence.
 
 ## Before acting
 

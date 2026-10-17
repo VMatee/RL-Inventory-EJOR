@@ -13,6 +13,7 @@ Updated: 2026-10-17. See Git history and SESSION_LOG for actual validation.
 
 ## Infrastructure
 
+- Agent instructions are now maintained solely in `AGENTS.md`; the redundant lowercase `agent.md` pointer was removed. Research scope is unchanged.
 Observed local project and SSH remote, existing Python 3.10.12 virtualenv and Codex CLI 0.163.0. Codex authentication/model access has not been tested. Local TeX tools were not detected. No system/ML packages were installed, no raw data was downloaded, and no long training was launched.
 
 GitHub remains the canonical reviewed record; synchronization is explicit and refuses dirty/divergent local trees. Only one writer may use a checkout. The manuscript revision was published to a task branch through the GitHub connector and validated on the PC in an isolated temporary worktree without changing local main.

@@ -67,7 +67,7 @@ M5/Favorita contain sales, not complete uncensored demand or actual inventory co
 
 ## Repository map
 
-- `AGENTS.md`: canonical agent rules; `agent.md` is a convenience pointer.
+- `AGENTS.md`: the single canonical instruction file for local Codex and other project agents.
 - `docs/`: status, tasks, workflow, claims, decisions and handoffs.
 - `manuscript/`: editable LaTeX, bibliography and provenance.
 - `research/`, `theory/`: references, source archives, novelty and analysis.

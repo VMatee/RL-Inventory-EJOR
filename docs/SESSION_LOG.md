@@ -1,5 +1,9 @@
 # Session handoff log
 
+## 2026-10-17 - Agent instruction cleanup
+
+Removed redundant `agent.md` pointer at the user's request. Kept canonical `AGENTS.md`; updated README references and the repository static checker to no longer require the removed file. Research scope and manuscript were not changed. Validation and Git synchronization are recorded with the corresponding commit and checks.
+
 ## 2026-10-17 - GitHub-first setup
 
 Starting SHA: 9019a91c305876b0c156a547f4b3ee0c72c96c98. Clean checkout matched origin/main. Created setup/github-first-workflow for scoped maintenance.
