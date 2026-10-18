@@ -1,0 +1,1 @@
+"""Classical inventory baseline definitions."""
