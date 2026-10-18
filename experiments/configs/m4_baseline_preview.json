@@ -17,6 +17,6 @@
   "sampling": {"tuning_paths": 256, "decision_paths": 256, "max_generated_count": 1000000},
   "gamma_poisson": {"prior_shape": 1.0, "prior_rate": 1.0},
   "gp": {"steps": 75, "learning_rate": 0.05, "dtype": "float64", "noise_floor": 0.0001, "cholesky_jitter": 0.000001},
-  "resources": {"gpu_ids": [0, 1, 2, 3], "workers_per_gpu": 1, "cpu_workers": 2, "cpu_threads_per_worker": 2, "job_timeout_seconds": 300, "max_jobs": 256, "gpu_memory_fraction": 0.7},
+  "resources": {"gpu_ids": [0, 1, 2, 3], "workers_per_gpu": 1, "cpu_workers": 2, "cpu_threads_per_worker": 2, "job_timeout_seconds": 300, "session_timeout_seconds": 7200, "max_jobs": 256, "gpu_memory_fraction": 0.7},
   "run_authorized": false
 }

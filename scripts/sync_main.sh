@@ -2,6 +2,10 @@
 # Never discards local work; the caller must also ensure this checkout is idle.
 set -euo pipefail
 cd "$(git rev-parse --show-toplevel)"
+if [[ -e ../code/.baseline_execution.lock ]]; then
+  printf 'Refusing sync: baseline execution lock exists. Do not change running code.\n' >&2
+  exit 2
+fi
 branch="$(git symbolic-ref --short -q HEAD || true)"
 if [[ "$branch" != main ]]; then
   printf 'Refusing sync: branch is %s, not main.\n' "$branch" >&2; exit 2

@@ -8,8 +8,10 @@ from __future__ import annotations
 
 import copy
 import hashlib
+import importlib.metadata
 import json
 import math
+import platform
 import subprocess
 from collections import Counter
 from pathlib import Path
@@ -29,6 +31,7 @@ SCRIPT_NAMES = (
     "scripts/prepare_baselines.py",
     "scripts/run_baselines.py",
     "scripts/baseline_worker.py",
+    "scripts/start_baselines.py",
     "scripts/run_experiment.py",
     "scripts/validate_baseline_numerics.py",
     "tests/validation_m4_numerics.py",
@@ -190,6 +193,7 @@ def validate_config(c):
         "job_timeout_seconds",
         "max_jobs",
         "gpu_memory_fraction",
+        "session_timeout_seconds",
     }:
         raise ValueError("Unexpected resource limits")
     if (
@@ -206,8 +210,18 @@ def validate_config(c):
     _int(r["cpu_threads_per_worker"], "CPU threads per worker", 1, 4)
     _int(r["job_timeout_seconds"], "per-job time cap", 30, 1800)
     _int(r["max_jobs"], "job cap", 1, 1000)
+    _int(r["session_timeout_seconds"], "session time cap", 30, 21600)
     _real(r["gpu_memory_fraction"], "GPU memory fraction", 0.1, 0.9)
     return c
+
+
+def runtime_state():
+    """Installed versions, not imports or CUDA initialization."""
+    names = ("numpy", "scipy", "torch", "gpytorch", "gymnasium")
+    return {
+        "python": platform.python_version(),
+        "packages": {name: importlib.metadata.version(name) for name in names},
+    }
 
 
 def execution_sources(root):
@@ -359,6 +373,7 @@ def build_plan(root, config_path):
         "data_source_fingerprint": m["dataset"],
         "study_information": m["study_information"],
         "git": git_state(root),
+        "runtime": runtime_state(),
         "execution_sources": execution_sources(root),
         "jobs": jobs,
         "summary": {
@@ -422,6 +437,8 @@ def check_live_plan(root, plan):
         raise PermissionError(
             "Commit reviewed code, then regenerate and approve a clean-source plan"
         )
+    if plan.get("runtime") != runtime_state():
+        raise PermissionError("Python/package versions differ from the approved plan")
     if execution_sources(root) != plan["execution_sources"]:
         raise PermissionError("Executable source differs from approved plan")
     for key, hkey in (
