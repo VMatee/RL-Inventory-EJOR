@@ -20,3 +20,9 @@ The broader baselines below remain planned.
 7. Neural-ensemble uncertainty replacement for GP.
 
 Critical ablation: identical GP, DCL, data and compute; change **only** the proposed decision-sensitive safeguard. Compare known-model and data-limited DCL separately.
+
+## M4a preparation on 2026-10-18 (not run)
+
+Source now exists for four initial development comparators in `src/inventory_ejor/baselines/`: `empirical_base_stock`, `gamma_poisson_base_stock`, `gp_base_stock`, and `gp_rollout`. The last is a one-step scenario rollout with fixed base-stock continuation, **not** a DCL/TED/HDPO reproduction or globally solved MPC. GP inference is exact conditional on fitted hyperparameters for a standardized log1p Gaussian surrogate, not an exact count-likelihood posterior. Real-data histories and all transformed statistics remain per-learner; the trusted scorer alone receives outcomes.
+
+The numerical implementations are prepared, but have not been fitted, evaluated or numerically validated during the prepare-only task. The four-GPU plan remains locked for owner inspection; scoped preparation tests exercise file contracts and refusal behavior only. See `docs/M4_BASELINE_PREPARATION.md` for formulas, initial scenario, limitations, deferred numerical tests and the larger still-planned benchmark set.

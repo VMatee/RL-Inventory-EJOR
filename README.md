@@ -17,6 +17,20 @@
 
 The local workspace is `~/Desktop/work/research journal/RL-Inventory-EJOR/`. The **Git repository is the `github/` child**, not the workspace parent. All versioned source, manuscript, experiment protocols and tests stay inside `github/`. The sibling `code/` holds the isolated `code/.venv` Python environment and convenient links to the versioned source. The Serena configuration remains in the parent `.serena/` directory so the connected plugin can inspect both children. Always run Git commands from `github/` (or specify its path), and use `../code/.venv/bin/python` for research Python. See [environment setup](environment/README.md). Do not create a second Git checkout in `code/`.
 
+## Baseline preparation - owner review required before running
+
+M3 is merged at `9151cec`. The next deliverable is **M4a preparation only**, not a baseline experiment. See [Baseline preparation and review guide](docs/M4_BASELINE_PREPARATION.md). A new M5 development bundle contains 12 eligible series and 48 history-budget-specific learner views. Original Favorita remains blocked by Kaggle authorization.
+
+Four initial baseline source implementations and a four-GPU/two-CPU-worker scheduler are prepared. They have **not** been fitted, numerically validated, timed as algorithms, or scored. The proposed plan has 192 development jobs; the default launcher only prints a dry-run summary and the approval template is entirely false. Numerical validation and baseline execution require separate owner authorization.
+
+```bash
+# From this github/ checkout; builds metadata and checks data, never fits a model:
+../code/.venv/bin/python scripts/prepare_baselines.py --config experiments/configs/m4_baseline_preview.json
+# Then inspect the printed REVIEW.md / plan.json / approval.example.json.
+# Without --execute the following prints a dry-run summary only:
+../code/.venv/bin/python scripts/run_baselines.py --plan "data/processed/m4-plan-REPLACE_ME/plan.json"
+```
+
 ## Research direction
 
 Can a short initial demand history justify changing a replenishment policy when the demand model is uncertain? We investigate whether inventory-specific sensitivity of **policy-cost differences** helps a learned policy avoid exploiting an inaccurate model without becoming uniformly conservative.
@@ -102,3 +116,7 @@ M5/Favorita contain sales, not complete uncensored demand or actual inventory co
 ## Next milestone
 
 **M1: finalize inventory event timing and implement a tested minimal simulator.** Do not begin large RL training before the simulator and exact reference are validated. EJOR is the target, not a guaranteed outcome. No automatic cloud training, paid APIs or self-hosted GitHub runner are configured.
+
+## Start the finalized initial development baseline campaign
+
+The owner has delegated the initial run settings; no further option selection is needed for this scope. From `<workspace>/code`, use `bash run_baselines.sh --check` for read-only preflight, or `bash run_baselines.sh` to start the sealed 192-job M5 development run in the foreground (four GPU lanes and two CPU lanes). Do not change branches, sync or run Codex in this checkout during execution. The real campaign is not launched during preparation. Full protocol, safety behavior and remaining research boundaries: [BASELINE_RUN_PROTOCOL](docs/BASELINE_RUN_PROTOCOL.md). Numerical and whole-stack synthetic acceptance: [readiness report](results/summaries/M4_RUN_READINESS_20261018.md). Raw and processed data/results remain local.

@@ -1,5 +1,27 @@
 # Session handoff log
 
+## 2026-10-18 - Finalize user-startable M5 development baselines
+
+The owner delegated remaining pre-run decisions, source review/merge and readiness without another judgment cycle. Fixed the initial M5 campaign to the existing 12-series/4-budget/4-method/one-seed configuration (192 jobs; four GPU lanes plus two CPU lanes). Added failure/timeout/interruption cleanup, immutable plan snapshots, environment/data pins, session/source locks, one-shot start and verified CSV/JSON reporting. The real complete worker/scheduler stack ran only on 12 SYNTHETIC fixture jobs in an isolated local clone; all four GPUs participated, output receipts passed and the lease was released. No real M5 baseline jobs were started by this task. Complete protocol/evidence: `docs/BASELINE_RUN_PROTOCOL.md`, `results/summaries/M4_RUN_READINESS_20261018.md`.
+
+After merging reviewed PR #9, regenerate the clean-main plan and write a private hash-bound approval reflecting the owner's explicit delegation. `code/run_baselines.sh` is the user start; `--check` performs no training. Preserve all old plans/results and do not automatically retry failures or expand scope. The final EJOR study, Favorita access, specialized learning baselines and our contribution remain separate research milestones.
+
+## 2026-10-18 - Owner-authorized synthetic numerical validation (no M5 runs)
+
+Following M4a source/data preparation, the owner separately asked to verify numerical correctness with small CPU/GPU synthetic fixtures before any baseline campaign. Direct SeneraAiServer tests were used, without launching Codex or touching other projects. Original 3/3 CPU checks passed, and independently seeded NumPy/GPU/M1 inventory cost parity was extended to 72 synthetic scenarios (L=1..4; T in 1,2,3,4,6,8; nonzero initial pipeline, ordering/holding/lost-sales costs and 24 overridden first orders). All 6 opt-in fixtures passed when independently isolated to each of the four RTX 3090 GPUs via UUID. The two-step synthetic GP check now verifies posterior-draw reproducibility and rejects out-of-horizon queries. The ordinary repository discovery passed 142 tests; scoped M4 Ruff/format passed. Evidence and limitations: `results/summaries/M4_NUMERICAL_VALIDATION_20261018.md`.
+
+**No M5 baseline model was fitted or scored, no full GPU job was scheduled, and the 192-job dry-run plan remains unapproved.** These bounded synthetic checks support owner review; stronger baseline pilots, final scientific protocol and PR #9 merging require separate decisions. Existing raw data, processed bundles, virtualenv and other project's tasks are preserved.
+
+## 2026-10-18 - M4a prepare-only baseline package
+
+Owner requested data preparation followed by baseline source preparation, emphasizing future use of four available GPUs but explicitly requiring review before any run. Read canonical rules and current GitHub main (`9151cec`). The server already contained 13 uncommitted M4 preparation files on `feat/m4-baselines-prepare-only`; they were archived and SHA256-recorded under local `code/backups/m4-prepare-entry-20261018T085915Z/` before continuing. The remaining Codex session belonged to another project and was not altered.
+
+Prepared a fresh M5 development bundle from 32 fixed hash-ranked candidates with no replacement, retaining 12 series and creating 48 learner views / 12 evaluator trajectories. Independent data audit confirmed all five source hashes, schema-2 contracts, and 3,248 distinct historical sales cells. Old data/results were preserved. Favorita still lacks local Kaggle authorization; no substitute, download, credential handling or dependency installation occurred.
+
+Completed/reviewed four initial baseline source implementations, CPU/GPU batch-cost code, a nonexecuting plan builder, independent single-GPU job lanes, explicit source/plan approval gates and opt-in deferred numerical tests. Strengthened task identity/common-cohort checks, integer input guards and GPU UUID/idle checks. The default plan contains 192 jobs (96 CPU / 96 GPU), but **zero models were fitted and zero baselines scored**. Actual GPU code, fitting, numerical parity tests and scheduler execution are deliberately deferred. Twenty-three preparation-only contract tests passed; scoped syntax/lint/format and data audits are distinct from numerical validation.
+
+Review guide: `docs/M4_BASELINE_PREPARATION.md`. Execution approval templates remain false. Local metadata/job-plan creation is allowed; do not treat it as training authorization. Next action is owner review, followed only by a separately approved synthetic numerical-validation stage before any baseline pilot.
+
 ## 2026-10-18 - Independent M3 PR preparation (isolated worktree)
 
 The corrected M3 implementation was snapshotted from uncommitted `feat/m3-data-information-protocol` through a verified 25-file SHA256 allowlist into isolated `review/m3-data-information-pr`, based on reviewed M2 main `14d0741`. The original Codex checkout and all raw M5 CSVs, processed data, run logs, backups, and active environment were preserved. The remaining Codex process had its working directory in an unrelated research project, not this checkout.

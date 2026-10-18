@@ -26,6 +26,10 @@ The project workspace parent is not a Git checkout: run Git/source commands from
 
 Only one writer per checkout: Serena OR Codex. Parallel work requires separate worktrees/clones, branches and output directories. Different branch names in the same directory do not prevent conflicts. Never pull, switch branches or edit source in a running experiment's checkout.
 
+## Current execution authorization (2026-10-18)
+
+The owner subsequently delegated finalization of all pre-run decisions and requested a ready-to-start four-GPU baseline campaign without further scientific-option questions. The bounded initial scope is the existing M5 DEVELOPMENT preview: 12 series, 4 history budgets, 4 initial methods, one seed (192 jobs), four independent GPUs plus two CPU workers. Synthetic end-to-end worker/scheduler validation, code corrections, PR review/merge, and a hash-bound local authorization for the USER's later foreground launch are authorized. Do NOT start the real M5 campaign from this preparation session, access final holdouts, add datasets, or expand to RL/our proposed method. Keep example templates false; a separate sealed approval may record the owner's explicit delegation. `tests/validation_m4_numerics.py` and `scripts/validate_baseline_stack.py` remain opt-in synthetic checks. Current operating decisions are in `docs/BASELINE_RUN_PROTOCOL.md`.
+
 ## Local execution
 
 From the Git checkout (`github/`), use `../code/.venv/bin/python` (Python 3.10.12). The owner explicitly approved installing the project's Python dependencies inside that isolated environment; do not use global pip or alter NVIDIA drivers, system CUDA or OS packages. Later upgrades, data downloads, paid APIs and long GPU jobs require separate explicit approval and resource scope. Do not print secret environment variables or authentication files.

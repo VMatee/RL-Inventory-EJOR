@@ -26,6 +26,11 @@ jobs:
           python -m ruff check src/inventory_ejor/envs tests/test_inventory_env.py scripts/run_m1_reference.py
           python -m ruff check --select E,F,I,B,UP src/inventory_ejor/demand src/inventory_ejor/policies src/inventory_ejor/solvers tests/test_m2_reference.py scripts/run_m2_reference.py
           git diff --check
+      - name: M4 preparation contracts only (no fitting, baseline scoring or CUDA)
+        run: |
+          python -m unittest discover -s tests -p 'test_m4_preparation.py' -v
+          python -m ruff check --select E,F,I,B,UP src/inventory_ejor/baselines scripts/prepare_baselines.py scripts/run_baselines.py scripts/baseline_worker.py scripts/validate_baseline_numerics.py tests/test_m4_preparation.py tests/validation_m4_numerics.py
+          python -m ruff format --check src/inventory_ejor/baselines scripts/prepare_baselines.py scripts/run_baselines.py scripts/baseline_worker.py scripts/validate_baseline_numerics.py tests/test_m4_preparation.py tests/validation_m4_numerics.py
       - name: M3 offline data contracts (synthetic fixtures; no retailer data)
         run: |
           python -m unittest discover -s tests -p 'test_m3*.py' -v

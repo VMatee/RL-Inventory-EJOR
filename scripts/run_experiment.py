@@ -115,6 +115,16 @@ def main(argv: list[str] | None = None) -> int:
     write_json(directory/'manifest.json', manifest)
     started = time.monotonic()
     code = 1
+    process = None
+    old_signals = {}
+
+    def stop_requested(signum, frame):
+        raise KeyboardInterrupt(f'Stop requested by signal {signum}')
+
+    for name in ('SIGTERM', 'SIGHUP'):
+        number = getattr(signal, name, None)
+        if number is not None:
+            old_signals[number] = signal.signal(number, stop_requested)
     try:
         with (directory/'console.log').open('w', encoding='utf-8') as log:
             process = subprocess.Popen(command, cwd=ROOT, stdout=log, stderr=subprocess.STDOUT,
@@ -129,10 +139,17 @@ def main(argv: list[str] | None = None) -> int:
                 manifest['status'] = 'timed_out' if timed_out else 'interrupted'
                 code = 124 if timed_out else 130
                 terminate(process)
+    except KeyboardInterrupt:
+        code = 130
+        manifest['status'] = 'interrupted'
+        if process is not None:
+            terminate(process)
     except OSError as exc:
         manifest['status'] = 'failed_to_start'
         manifest['error'] = str(exc)
     finally:
+        for number, handler in old_signals.items():
+            signal.signal(number, handler)
         manifest['exit_code'] = code
         manifest['finished_utc'] = stamp()
         manifest['runtime_seconds'] = round(time.monotonic()-started,6)

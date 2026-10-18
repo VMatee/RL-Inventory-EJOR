@@ -28,7 +28,7 @@ Depends M1. Small finite-support DP plus tuned base-stock. Compare tiny instance
 
 Implemented finite iid demand validation, exact reachable-state finite-horizon DP, forward policy evaluation, and naive constant and horizon-aware capped base-stock with exact known-model finite-grid tuning on the same grid and allowance. No inventory truncation; explicit state/work/time failure. Tiny independent rational/calendar enumeration covers 128 contingent policies per fixture. Before the review correction: 61 tests passed; after: 66 tests passed, including unchanged M1 tests. The unchanged demo now reports DP=horizon-aware S=1 cost 2.875 and naive S=1 cost 3.000. The earlier 0.125 gap disappears with the horizon-aware baseline; no new example was selected. Independent hand/calendar tests cover the cutoff, L exceeding the horizon, and no lookahead. Ruff E,F,I,B,UP and formatting checks pass. Source: base `2cbce59fd0cf0f738e177a0ef7e8bc6347882431` plus the uncommitted M2 diff on `feat/m2-exact-reference`; no standalone M2 commit yet. Evidence and exact commands: `results/summaries/M2_REFERENCE_VALIDATION_20261017.md`. Implementation evidence only; stop for review before M3/M4.
 
-## M3 - Data/information audit [engineering independently reviewed; PR pending owner review; scientific protocol not frozen]
+## M3 - Data/information audit [engineering merged in PR #8 at 9151cec; scientific protocol not frozen]
 
 The user authorized acquisition of both planned external datasets. All five M5 source CSVs were downloaded locally (450,472,284 bytes), verified against organizer Zenodo file sizes/MD5, SHA256 recorded with source provenance and raw schema counts; see `data/manifests/m5_verified_20261017.json` and `results/summaries/M3_DATA_ACQUISITION_20261017.md`. The original item-level 2017 Favorita competition requires Kaggle credentials and accepted rules; absent on the connected PC, **not downloaded**. `scripts/fetch_favorita.py` provides authenticated CLI acquisition and archive verification after user action. No raw file enters Git.
 
@@ -38,9 +38,17 @@ The user authorized acquisition of both planned external datasets. All five M5 s
 
 **M3 scientific acceptance still pending:** verify access/redistribution terms; review/approve proposed SKU eligibility, treatment of zero sale records/censoring, chronological phases and real-data budgets; approve shared cross-series development, calibration/validation and pretraining rules. Favorita returns/fractional units need decisions after authorized access. Raw acquisition is not evaluation readiness. Favorita remains a prospective frozen external validation track.
 
-## M4 - Plain GP baselines [planned]
+## M4a - Initial baseline run preparation [finalized; user launch pending]
 
-Depends M2 and data specification. Simple Bayesian demand model, GP posterior, GP+MPC and ordinary GP+DCL; explicit likelihood/joint sampling, epistemic/aleatoric separation and matched budgets. Select and pin approved dependencies. Do not assume GP superiority.
+The owner delegated final pre-run decisions and Git review/merge, retaining USER control of the real start command. Scope is fixed by `docs/BASELINE_RUN_PROTOCOL.md`: 12 M5 development series, four history budgets, four initial methods, one seed, 192 jobs; four GPU lanes plus two CPU lanes. This is not the final EJOR evaluation or our proposed method. The existing data/GP likelihood/scenario are disclosed as development assumptions.
+
+Kernel numerical checks passed on each GPU; real subprocess fault/timeout/source-integrity tests passed; the real scheduler, wrappers, workers, models and report generator completed 12 SYNTHETIC jobs using all four GPUs in an isolated clone. See `results/summaries/M4_RUN_READINESS_20261018.md`. Source/runtime/data hashes and an explicit delegated local authorization bind the user launch. No real M5 campaign is run in this preparation task; no further scientific-choice questionnaire is required for this scoped pilot.
+
+Start from local `code/` with `bash run_baselines.sh`; inspect only with `bash run_baselines.sh --check`. A one-shot marker avoids duplicate campaigns. M5 rows/processed files and outputs remain private/Git-ignored. After the campaign, inspect the automatically audited CSV/JSON summaries and all failed/capped cases before expanding the study.
+
+## M4b - Strong learning baselines and validation [planned; separate approval required]
+
+After M4a review and numerical checks, separately authorize limited baseline pilots, then stronger GP+MPC/DCL and appropriate TED/HDPO reproductions or clearly labeled adaptations. Implement explicit likelihood/joint sampling, epistemic/aleatoric separation, comparable information access and declared compute. Final comparator roster and evaluation assumptions remain pending; do not assume GP superiority or start the proposed method without a separate specification.
 
 ## M5 - Decision-sensitive mechanism and analysis [planned]
 
