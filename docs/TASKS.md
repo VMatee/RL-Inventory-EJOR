@@ -28,7 +28,7 @@ Depends M1. Small finite-support DP plus tuned base-stock. Compare tiny instance
 
 Implemented finite iid demand validation, exact reachable-state finite-horizon DP, forward policy evaluation, and naive constant and horizon-aware capped base-stock with exact known-model finite-grid tuning on the same grid and allowance. No inventory truncation; explicit state/work/time failure. Tiny independent rational/calendar enumeration covers 128 contingent policies per fixture. Before the review correction: 61 tests passed; after: 66 tests passed, including unchanged M1 tests. The unchanged demo now reports DP=horizon-aware S=1 cost 2.875 and naive S=1 cost 3.000. The earlier 0.125 gap disappears with the horizon-aware baseline; no new example was selected. Independent hand/calendar tests cover the cutoff, L exceeding the horizon, and no lookahead. Ruff E,F,I,B,UP and formatting checks pass. Source: base `2cbce59fd0cf0f738e177a0ef7e8bc6347882431` plus the uncommitted M2 diff on `feat/m2-exact-reference`; no standalone M2 commit yet. Evidence and exact commands: `results/summaries/M2_REFERENCE_VALIDATION_20261017.md`. Implementation evidence only; stop for review before M3/M4.
 
-## M3 - Data/information audit [engineering independently reviewed; PR pending owner review; scientific protocol not frozen]
+## M3 - Data/information audit [engineering merged in PR #8 at 9151cec; scientific protocol not frozen]
 
 The user authorized acquisition of both planned external datasets. All five M5 source CSVs were downloaded locally (450,472,284 bytes), verified against organizer Zenodo file sizes/MD5, SHA256 recorded with source provenance and raw schema counts; see `data/manifests/m5_verified_20261017.json` and `results/summaries/M3_DATA_ACQUISITION_20261017.md`. The original item-level 2017 Favorita competition requires Kaggle credentials and accepted rules; absent on the connected PC, **not downloaded**. `scripts/fetch_favorita.py` provides authenticated CLI acquisition and archive verification after user action. No raw file enters Git.
 
@@ -38,9 +38,17 @@ The user authorized acquisition of both planned external datasets. All five M5 s
 
 **M3 scientific acceptance still pending:** verify access/redistribution terms; review/approve proposed SKU eligibility, treatment of zero sale records/censoring, chronological phases and real-data budgets; approve shared cross-series development, calibration/validation and pretraining rules. Favorita returns/fractional units need decisions after authorized access. Raw acquisition is not evaluation readiness. Favorita remains a prospective frozen external validation track.
 
-## M4 - Plain GP baselines [planned]
+## M4a - Initial baseline preparation [source prepared for review; runs NOT authorized]
 
-Depends M2 and data specification. Simple Bayesian demand model, GP posterior, GP+MPC and ordinary GP+DCL; explicit likelihood/joint sampling, epistemic/aleatoric separation and matched budgets. Select and pin approved dependencies. Do not assume GP superiority.
+Owner authorization on 2026-10-18 covers preparing data and code ONLY, with GPU-focused future execution and a stop before fitting/scoring. M3 has merged at `9151cec` (PR #8). The available M5 data were prepared into a new 12-series/48-learner-view development bundle from 32 fixed candidates; no final holdout dates are frozen. Favorita remains authorization-gated.
+
+Source implementations: empirical iid base-stock, Gamma-Poisson base-stock, exact log1p-Gaussian-surrogate GP base-stock, and one-step GP rollout over a fixed base-stock continuation policy. Rollout is NOT DCL or a globally optimized MPC. The GP is NOT a Poisson-likelihood model or a calibrated guarantee. Details, proposed 192-job configuration and four-GPU scheduling are in `docs/M4_BASELINE_PREPARATION.md`.
+
+The plan builder and default launcher do not fit/score anything. Explicit owner approval, numerical-validation confirmation, exact plan hash and unchanged clean source are required for execution. Numerical tests are separately opt-in in `tests/validation_m4_numerics.py` and have not run. Preparation/interface tests are not scientific or numerical evidence. Stop for owner inspection.
+
+## M4b - Strong learning baselines and validation [planned; separate approval required]
+
+After M4a review and numerical checks, separately authorize limited baseline pilots, then stronger GP+MPC/DCL and appropriate TED/HDPO reproductions or clearly labeled adaptations. Implement explicit likelihood/joint sampling, epistemic/aleatoric separation, comparable information access and declared compute. Final comparator roster and evaluation assumptions remain pending; do not assume GP superiority or start the proposed method without a separate specification.
 
 ## M5 - Decision-sensitive mechanism and analysis [planned]
 

@@ -1,5 +1,15 @@
 # Session handoff log
 
+## 2026-10-18 - M4a prepare-only baseline package
+
+Owner requested data preparation followed by baseline source preparation, emphasizing future use of four available GPUs but explicitly requiring review before any run. Read canonical rules and current GitHub main (`9151cec`). The server already contained 13 uncommitted M4 preparation files on `feat/m4-baselines-prepare-only`; they were archived and SHA256-recorded under local `code/backups/m4-prepare-entry-20261018T085915Z/` before continuing. The remaining Codex session belonged to another project and was not altered.
+
+Prepared a fresh M5 development bundle from 32 fixed hash-ranked candidates with no replacement, retaining 12 series and creating 48 learner views / 12 evaluator trajectories. Independent data audit confirmed all five source hashes, schema-2 contracts, and 3,248 distinct historical sales cells. Old data/results were preserved. Favorita still lacks local Kaggle authorization; no substitute, download, credential handling or dependency installation occurred.
+
+Completed/reviewed four initial baseline source implementations, CPU/GPU batch-cost code, a nonexecuting plan builder, independent single-GPU job lanes, explicit source/plan approval gates and opt-in deferred numerical tests. Strengthened task identity/common-cohort checks, integer input guards and GPU UUID/idle checks. The default plan contains 192 jobs (96 CPU / 96 GPU), but **zero models were fitted and zero baselines scored**. Actual GPU code, fitting, numerical parity tests and scheduler execution are deliberately deferred. Twenty-three preparation-only contract tests passed; scoped syntax/lint/format and data audits are distinct from numerical validation.
+
+Review guide: `docs/M4_BASELINE_PREPARATION.md`. Execution approval templates remain false. Local metadata/job-plan creation is allowed; do not treat it as training authorization. Next action is owner review, followed only by a separately approved synthetic numerical-validation stage before any baseline pilot.
+
 ## 2026-10-18 - Independent M3 PR preparation (isolated worktree)
 
 The corrected M3 implementation was snapshotted from uncommitted `feat/m3-data-information-protocol` through a verified 25-file SHA256 allowlist into isolated `review/m3-data-information-pr`, based on reviewed M2 main `14d0741`. The original Codex checkout and all raw M5 CSVs, processed data, run logs, backups, and active environment were preserved. The remaining Codex process had its working directory in an unrelated research project, not this checkout.

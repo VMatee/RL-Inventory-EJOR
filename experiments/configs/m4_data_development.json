@@ -1,0 +1,20 @@
+{
+  "schema_version": 1,
+  "dataset_version": "m5-accuracy-zenodo-10203108-v1",
+  "mode": "development_demo",
+  "seed": 0,
+  "candidate_count": 32,
+  "min_nonzero": 1,
+  "origins": [225],
+  "horizon": 28,
+  "development_window": {"start": 1, "stop": 253},
+  "budgets": [28, 56, 112, 224],
+  "calendar_features": true,
+  "limits": {
+    "max_seconds": 100,
+    "max_rows": 7000000,
+    "max_series": 40000,
+    "max_days": 3000,
+    "max_selected": 32
+  }
+}

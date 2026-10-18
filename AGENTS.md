@@ -26,6 +26,10 @@ The project workspace parent is not a Git checkout: run Git/source commands from
 
 Only one writer per checkout: Serena OR Codex. Parallel work requires separate worktrees/clones, branches and output directories. Different branch names in the same directory do not prevent conflicts. Never pull, switch branches or edit source in a running experiment's checkout.
 
+## Current execution authorization (2026-10-18)
+
+The owner requested M4a data and baseline-code preparation, with future use of four GPUs, **but explicitly said not to run baselines and to wait for review**. Keep baseline approvals false. Preparing M3 data/metadata, building a dry-run job plan, syntax checks and preparation-only tests are allowed; GP fitting, predictive-policy tuning/scoring, numerical GPU tests, RL training and experiment sweeps require a new scoped authorization. `tests/validation_m4_numerics.py` is deliberately opt-in and must not be added to default test discovery. This section records the current task boundary, not permanent approval for any later run. Refer to `docs/M4_BASELINE_PREPARATION.md`.
+
 ## Local execution
 
 From the Git checkout (`github/`), use `../code/.venv/bin/python` (Python 3.10.12). The owner explicitly approved installing the project's Python dependencies inside that isolated environment; do not use global pip or alter NVIDIA drivers, system CUDA or OS packages. Later upgrades, data downloads, paid APIs and long GPU jobs require separate explicit approval and resource scope. Do not print secret environment variables or authentication files.

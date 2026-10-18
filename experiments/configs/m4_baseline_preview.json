@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "purpose": "development_preview_not_publication",
+  "prepared_bundle": "data/processed/m3-demo-9vex_g9j",
+  "budgets": [28, 56, 112, 224],
+  "seeds": [0],
+  "methods": ["empirical_base_stock", "gamma_poisson_base_stock", "gp_base_stock", "gp_rollout"],
+  "scenario": {
+    "lead_time": 3,
+    "max_order": 20,
+    "initial_on_hand": 0,
+    "initial_pipeline": [0, 0],
+    "costs": {"holding": 1.0, "lost_sales": 10.0, "variable_order": 0.0, "fixed_order": 0.0},
+    "additional_terminal_value": 0.0
+  },
+  "base_stock_levels": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60],
+  "sampling": {"tuning_paths": 256, "decision_paths": 256, "max_generated_count": 1000000},
+  "gamma_poisson": {"prior_shape": 1.0, "prior_rate": 1.0},
+  "gp": {"steps": 75, "learning_rate": 0.05, "dtype": "float64", "noise_floor": 0.0001, "cholesky_jitter": 0.000001},
+  "resources": {"gpu_ids": [0, 1, 2, 3], "workers_per_gpu": 1, "cpu_workers": 2, "cpu_threads_per_worker": 2, "job_timeout_seconds": 300, "max_jobs": 256, "gpu_memory_fraction": 0.7},
+  "run_authorized": false
+}
