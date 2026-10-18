@@ -1,6 +1,6 @@
 # Current status
 
-Updated: 2026-10-17. See Git history and SESSION_LOG for actual validation.
+Updated: 2026-10-18. See Git history and SESSION_LOG for actual validation.
 
 ## Research
 
@@ -10,7 +10,9 @@ Updated: 2026-10-17. See Git history and SESSION_LOG for actual validation.
 - Other manuscript sections remain excluded placeholders.
 - M1 deterministic inventory simulator is implemented and locally tested (pure transition plus Gymnasium wrapper, hand-computed reference trajectory and independent calendar cross-check). The owner explicitly accepted its current conventions **for M2 engineering** on 2026-10-17. Final publication assumptions remain open. M1 source/tests/fixtures are unchanged by M2.
 - M3 acquisition: **all five M5 CSVs are present locally**, matching the Zenodo MD5/size metadata (450,472,284 bytes total); schema and row counts were checked. Public provenance and SHA256 are recorded in `data/manifests/m5_verified_20261017.json`. **Favorita is not acquired:** user Kaggle account, accepted rules and credentials are required. See `data/DATASET_PLAN.md` and the M3 acquisition report.
-- M2 known-iid finite-support demand, reachable-state finite-horizon DP, forward policy evaluation and naive constant and horizon-aware capped base-stock tuning are implemented and locally tested, **awaiting owner review**. All 66 tests pass after review corrections (61 before correction); independent contingent-policy enumeration agrees for both variants. On the unchanged demo, DP and horizon-aware S=1 both cost 2.875; naive S=1 costs 3.000. The earlier 0.125 gap disappears with the horizon-aware baseline. Ruff E,F,I,B,UP and formatting checks pass. Evidence: `results/summaries/M2_REFERENCE_VALIDATION_20261017.md`; source is base `2cbce59` plus an uncommitted M2 diff. No GP/RL training, leakage-safe data transformations/frozen train-test splits or empirical retail findings are implemented.
+- M2 was reviewed and merged into local/GitHub `main` at `14d0741ea2328aa28cef7612976357c4b3cb6d53`, as stated by the owner and independently checked on 2026-10-18. Earlier M2 reports remain historical evidence. M1/M2 mechanics are unchanged; the baseline before M3 passed all 66 existing tests.
+- M3 ingestion, chronological contracts, information accounting, independent leakage traps and bounded local preparation are implemented on `feat/m3-data-information-protocol` as original uncommitted Codex work, now byte-for-byte independently reviewed in a separate `review/m3-data-information-pr` engineering PR candidate. M3 scientific protocol/holdout acceptance remains pending. See `data/M3_PIPELINE.md`, `experiments/protocol/EVALUATION.md` and `results/summaries/M3_IMPLEMENTATION_REVIEW_20261018.md`. No final holdout is frozen and no GP/RL training or empirical inventory-cost experiment has run.
+- M3 independent-review correction: full-source SHA256 is now confined to trusted provenance; learner artifacts use a predeclared logical dataset version. A single withheld d_226 mutation leaves every learner byte unchanged. Study-wide historical access is explicitly 1,204 distinct cells (1,120 selected histories plus 84 additional screening cells). All 119 tests pass (53 M3; six dedicated noninterference/accounting tests); scoped Ruff/format checks pass. Repository-wide checks retain 54 lint findings and 13 formatting failures in unchanged files. The appended correction section of the M3 report and `results/summaries/m3_correction_verification_20261018.json` record current evidence. Independent re-review remains pending.
 - References: all 16 citation keys resolve. Scoped primary-source claim checks are documented in research/literature/REFERENCE_AUDIT.md; a complete bibliography/theorem/novelty audit remains outstanding.
 
 ## Infrastructure
@@ -29,8 +31,8 @@ For manuscript source commit 17e9304c67d6993a0631fed2d8b5be872730708a: static ch
 
 ## Next task
 
-Review the uncommitted M2 implementation and evidence. After acceptance and explicit authorization, the next implementation milestone is M3 leakage-safe data/information contracts using synthetic miniature fixtures first. No later milestone, dataset transformation or GP/RL training has started.
+Independently review the M3 diff and proposed evaluation/information protocol. Resolve the listed scientific decisions before separately authorizing M4. Favorita remains unavailable; no additional acquisition was attempted.
 
 ## Research blockers
 
-Owner review of M2 and eventual publication boundary assumptions, remaining baseline-specific implementations, **Favorita authorized Kaggle acquisition and raw-data usage terms**, M3 time-series preprocessing/eligibility and frozen splits, complete reference/novelty audit, and frozen information/compute protocol. The full current EJOR author guide was not accessible during the revision; final submission requirements must be checked before submission.
+Owner review of M3 and eventual publication boundary assumptions, remaining baseline-specific implementations, **Favorita authorized Kaggle acquisition and raw-data usage terms**, M3 time-series preprocessing/eligibility and frozen splits, complete reference/novelty audit, and frozen information/compute protocol. The full current EJOR author guide was not accessible during the revision; final submission requirements must be checked before submission.

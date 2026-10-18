@@ -20,17 +20,23 @@ Acceptance for use in M2: local automated tests and fixture pass **AND** the own
 
 The owner explicitly accepted the current conventions for M2 in the 2026-10-17 session instruction. Final publication assumptions remain open; no M1 source or test fixtures changed.
 
-## M2 - Exact reference and baseline [implemented and locally tested; awaiting owner review]
+## M2 - Exact reference and baseline [reviewed and merged at 14d0741]
+
+Current owner confirmation (2026-10-18): reviewed and merged into main at `14d0741`. The implementation narrative below preserves historical pre-merge evidence.
 
 Depends M1. Small finite-support DP plus tuned base-stock. Compare tiny instances with exhaustive enumeration. Specify bounds/truncations, initial and terminal states. Deliver config, fixtures and paired evaluation.
 
 Implemented finite iid demand validation, exact reachable-state finite-horizon DP, forward policy evaluation, and naive constant and horizon-aware capped base-stock with exact known-model finite-grid tuning on the same grid and allowance. No inventory truncation; explicit state/work/time failure. Tiny independent rational/calendar enumeration covers 128 contingent policies per fixture. Before the review correction: 61 tests passed; after: 66 tests passed, including unchanged M1 tests. The unchanged demo now reports DP=horizon-aware S=1 cost 2.875 and naive S=1 cost 3.000. The earlier 0.125 gap disappears with the horizon-aware baseline; no new example was selected. Independent hand/calendar tests cover the cutoff, L exceeding the horizon, and no lookahead. Ruff E,F,I,B,UP and formatting checks pass. Source: base `2cbce59fd0cf0f738e177a0ef7e8bc6347882431` plus the uncommitted M2 diff on `feat/m2-exact-reference`; no standalone M2 commit yet. Evidence and exact commands: `results/summaries/M2_REFERENCE_VALIDATION_20261017.md`. Implementation evidence only; stop for review before M3/M4.
 
-## M3 - Data/information audit [raw-data acquisition partially completed: M5 verified, Favorita Kaggle authorization outstanding]
+## M3 - Data/information audit [engineering independently reviewed; PR pending owner review; scientific protocol not frozen]
 
 The user authorized acquisition of both planned external datasets. All five M5 source CSVs were downloaded locally (450,472,284 bytes), verified against organizer Zenodo file sizes/MD5, SHA256 recorded with source provenance and raw schema counts; see `data/manifests/m5_verified_20261017.json` and `results/summaries/M3_DATA_ACQUISITION_20261017.md`. The original item-level 2017 Favorita competition requires Kaggle credentials and accepted rules; absent on the connected PC, **not downloaded**. `scripts/fetch_favorita.py` provides authenticated CLI acquisition and archive verification after user action. No raw file enters Git.
 
-**M3 scientific work still pending:** verify access/redistribution terms; define SKU eligibility, treatment of returns/zero sale records/censoring, frozen chronological splits and leakage-safe real-data budgets; account for cross-series, calibration/validation and pretraining. Raw acquisition is not evaluation readiness. Favorita remains a prospective frozen external validation track.
+**2026-10-18 M3 implementation:** reusable streaming M5 ingestion; immutable learner/evaluator views; disjoint chronological phase contracts; exact 28/56/112/224-day accounting; pooling/pretraining/normalization/tuning ledgers; separate learner artifacts; deterministic fixtures and bounded CPU preparation. Source base `14d0741` plus uncommitted diff on `feat/m3-data-information-protocol`. Evidence: `results/summaries/M3_IMPLEMENTATION_REVIEW_20261018.md`. The owner explicitly authorized M3 only. No final dates/holdout frozen, no new downloads, model fitting, commits or publication claims.
+
+**2026-10-18 review correction:** separated full-source fingerprints from learner-visible logical dataset versions; retained pinned artifact and identity validation; added complete-byte d_226 noninterference and independent study-union checks. Trusted manifest schema 2 records 1,204 historical cells without double-counting shared screening. Current checks: 119 total tests, 53 M3 tests, six dedicated correction tests passed; M1/M2 reference outputs unchanged. Review remains open; this is implementation evidence, not scientific acceptance.
+
+**M3 scientific acceptance still pending:** verify access/redistribution terms; review/approve proposed SKU eligibility, treatment of zero sale records/censoring, chronological phases and real-data budgets; approve shared cross-series development, calibration/validation and pretraining rules. Favorita returns/fractional units need decisions after authorized access. Raw acquisition is not evaluation readiness. Favorita remains a prospective frozen external validation track.
 
 ## M4 - Plain GP baselines [planned]
 

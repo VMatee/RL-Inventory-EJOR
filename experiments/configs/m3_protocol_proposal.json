@@ -1,0 +1,18 @@
+{
+  "status": "proposal_requires_owner_review_not_executable",
+  "budgets": [28, 56, 112, 224],
+  "proposed_horizon_days": 28,
+  "phase_policy": "disjoint_context_and_outcome_windows",
+  "phases": {
+    "development": {"start_date": null, "stop_date_exclusive": null, "origins": []},
+    "calibration": {"start_date": null, "stop_date_exclusive": null, "origins": []},
+    "validation": {"start_date": null, "stop_date_exclusive": null, "origins": []},
+    "final_test": {"start_date": null, "stop_date_exclusive": null, "origins": []}
+  },
+  "proposed_eligibility": "fixed hash candidates; at least one positive sale in first origin's 28-day history; no replacement",
+  "proposed_features": ["weekday", "month"],
+  "prices_promotions_snap": "disabled_without_availability_evidence",
+  "online_updating": "separate_future_track_not_implemented",
+  "final_holdout_frozen": false,
+  "favorita": "original_2017_item_level; unavailable; freeze adaptation rules before acquisition"
+}
