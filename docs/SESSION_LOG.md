@@ -1,5 +1,13 @@
 # Session handoff log
 
+## 2026-10-18 - Independent M3 PR preparation (isolated worktree)
+
+The corrected M3 implementation was snapshotted from uncommitted `feat/m3-data-information-protocol` through a verified 25-file SHA256 allowlist into isolated `review/m3-data-information-pr`, based on reviewed M2 main `14d0741`. The original Codex checkout and all raw M5 CSVs, processed data, run logs, backups, and active environment were preserved. The remaining Codex process had its working directory in an unrelated research project, not this checkout.
+
+Independent checks from the isolated source: 119 unittest tests; pytest 119 passed plus 144 subtests; M3 Ruff lint/format; M1=47 and M2 DP/horizon-aware/naive=2.875/2.875/3.000; four extra withheld-day learner-byte noninterference tests; and independent read-only real-M5 audit. A second M5 preparation computed in memory, without any new stored outputs, reproduced all 22 schema-2 artifact fingerprints (5 selected series, 20 learner views, 1,204 study-wide historical sales observations). The existing **manual-only** GitHub Actions workflow gained fixture-only M3 checks. Complete evidence and scientific gates: `results/summaries/M3_INDEPENDENT_PR_REVIEW_20261018.md`. **This engineering PR preparation does not approve the final chronological splits, sales-as-demand assumptions, novel method, or M4 training.**
+
+Note: a prior `fetch_m5.py --verify-only` invocation regenerated ignored `data/raw/m5/manifest.json` with updated verification timestamp. All five original CSV identities remained correct; no original dataset values were changed. PR contents contain no raw or processed data.
+
 ## 2026-10-17 - Independent M2 PR preparation (separate worktree)
 
 M2 correction was reviewed via an isolated `review/m2-exact-reference-pr` worktree created from clean `main` at `2cbce59` while two Codex interactive sessions remained open. An explicit 16-file source allowlist was copied and each file's SHA256 checked; **the original dirty `feat/m2-exact-reference` checkout and raw M5/results directories were not edited**. The manual repository GitHub Actions job was extended to run deterministic M2 checks alongside M1. A suspected pre-existing line-continuation typo was independently checked at byte level and proved not to be a defect; the original valid shell continuation was preserved.
@@ -142,3 +150,101 @@ Matching source compiled to a seven-page PDF in the ChatGPT temporary environmen
 Fetched the GitHub task branch to the PC. Validated source commit 17e9304c67d6993a0631fed2d8b5be872730708a in a temporary detached worktree: static structure/citation check passed, six infrastructure unit tests passed, git diff --check passed, and three source SHA256 values matched the compiled sources. The temporary worktree was removed normally. Local main stayed clean at the starting SHA during this pre-merge validation.
 
 See results/summaries/INTRODUCTION_REVISION_20261017.md for exact checks and limitations. Final merge and local synchronization are to be evidenced by the GitHub PR/commit and final tool report, not inferred from this pre-merge record. M1 remains the next research task.
+
+## 2026-10-18 — M3 preparation and information-contract implementation
+
+The owner explicitly authorized the full M3 specification, then confirmed the
+launcher blocker was resolved. Rechecked clean main and live GitHub main at
+`14d0741ea2328aa28cef7612976357c4b3cb6d53`, Python 3.10.12, no observed competing
+checkout process/index lock. Created `feat/m3-data-information-protocol`. The
+unrelated launcher branch remains at `cd43843`; no existing branch was altered.
+All 66 pre-change tests passed. Read canonical rules and the full M1/M2/M3 source
+protocols; reconciled stale current-status descriptions of M2 with actual merge
+and owner confirmation, preserving earlier session/evidence records.
+
+Implemented streaming M5/schema/calendar/price utilities, disjoint chronological
+phase contracts, exact per-series budgets, explicit pooling/pretraining/tuning/
+calibration/normalization/initialization ledgers, synthetic counts, separate pinned
+learner artifacts and evaluator outcomes, strict configs/provenance, a bounded
+CPU CLI and an independent original-CSV audit. Added 45 independent/adversarial
+fixture tests. Proposed scientific rules are in the expanded evaluation protocol;
+final dates remain null, and executable config is development-only.
+
+Validation: final all-tests command passed **111 tests in 1.372 s**; M3-only passed
+**45 in 0.758 s**. M3 Ruff E,F,I,B,UP and formatting passed; project check passed.
+Repository-wide Ruff has 54 pre-existing diagnostics in 12 unchanged files and
+formatting flags 13 unchanged files; preserved and reported, not suppressed.
+M1 output remains cost 47; M2 remains DP=horizon-aware 2.875, naive 3.000. Complete
+reference JSON is unchanged apart from M2 source provenance; original mechanics,
+code/tests/fixtures are untouched.
+
+Two wrapper-run development preparations completed in 8.018 and 7.562 seconds,
+peak RSS 55,028/55,256 KiB, with CPU/address-space and wall-clock limits. All five
+raw SHA256/size identities matched. Seed-0 eight-candidate cohort retained five,
+excluded three without replacement; 20 exact-budget learner views and five
+separate outcome trajectories were saved locally. Independent CSV/statistics
+checks matched all views, all 22 data artifacts matched between runs, and all 59
+pre-existing raw/processed/results files matched the initial snapshot. Selected
+maximum histories contained 1,120 observations (988 zero); 140 development outcome
+cells were separate. Excluded-candidate screening adds 84 historical sales to the
+study-wide information use; this is disclosed, not hidden behind a per-series n.
+A post-selection retrospective price audit found 406/1,120 item-days without price
+joins; no imputation, stockout inference or learner price access occurred.
+
+Complete commands, files, artifact paths, initial failed checks/corrections and
+limitations: `results/summaries/M3_IMPLEMENTATION_REVIEW_20261018.md` and
+`results/summaries/m3_verification_20261018.json`. Ignored local audit directory:
+`results/runs/m3-audit-r1y6p0fm`. Prepared bundles:
+`data/processed/m3-demo-9xfx5j08`, `data/processed/m3-demo-myd3wrbj`.
+
+M3 remains an uncommitted review diff, nothing staged. No commit, push, merge,
+download, installation, GP/RL fitting, inventory experiment or manuscript result.
+Owner review remains necessary for final phases/origins/horizon, cohort/shared
+information rules, covariate availability, sales-replay interpretation, costs/
+initialization, compute parity, inferential design and original Favorita access/
+transformation decisions. Stop after M3. Next task is independent M3 review and
+protocol acceptance before any separately authorized M4 work.
+
+## 2026-10-18 — M3 independent-review correction (uncommitted)
+
+Owner requested continuation on the existing dirty M3 branch after an independent
+review found whole-artifact leakage through a full-source SHA256 dataset ID.
+Rechecked `feat/m3-data-information-protocol`, HEAD `14d0741`, existing Python
+3.10.12 and canonical instructions. Preserved the existing diff; captured source
+before-images, all Git refs and SHA256/size identities for 134 existing data,
+results and discovered backup files in `results/runs/m3-correction-m7x4j4x1`.
+Baseline: 111 tests passed in 1.492 s; M1/M2 reference checks passed.
+
+Reproduced all 12 miniature learner files changing after only withheld d_226 was
+mutated. Corrected preparation to retain full source fingerprints exclusively in
+trusted provenance, with a required predeclared logical dataset version in learner
+views. Added schema-2 study-wide cell-union accounting and independent audit
+verification; strengthened deterministic calendar feature validation. Complete-byte
+noninterference now passes while evaluator outcomes and trusted input fingerprints
+change. Existing strict version/series/origin/budget/checksum/normalization checks
+remain enforced. Calendar values/evidence cannot carry a future-derived marker.
+
+Executed: 119 full tests passed (1.954 s), 53 M3 tests passed (1.250 s), and six
+dedicated noninterference/accounting tests passed (0.296 s). Scoped Ruff E,F,I,B,UP
+and formatting pass. Project check passes (16 bibliography entries/keys). Global
+Ruff still reports 54 findings in 12 unchanged files; global formatting flags 13
+unchanged files. M1 reference output is identical; M2 differs only in source
+provenance, with all reference values unchanged (DP/horizon-aware 2.875, naive 3).
+
+A fresh bounded CPU-only wrapper demonstration completed in 8.224 s, peak RSS
+55,044 KiB, producing `data/processed/m3-demo-_zw6b5hj`; wrapper evidence is in
+`results/runs/20261018T075246Z-smoke-9b4d055b`. Independent audit verified all five
+raw identities, 20 learner files, 1,120 selected historical cells and the study
+union 1,120 + 224 - 140 = 1,204. Ex-post roster warning remains. The 140 separate
+development outcomes are not credited as training observations. Before report
+updates, all 134 preservation snapshot files matched. The authorized M3 report
+is subsequently appended; the other 133 files remain unchanged, with the complete
+original report retained as an exact prefix and in the before-image archive.
+
+Updated the M3 review report with correction details and exact commands; fresh
+aggregate evidence is `results/summaries/m3_correction_verification_20261018.json`.
+Old processed bundles, verification summaries, runs, backups and Git refs are
+preserved. Nothing staged, committed, pushed or merged. No downloads, dependency
+changes, GP/RL fitting, M4 implementation or final-date freeze. Next task: independent
+re-review and explicit approval of outstanding scientific information/evaluation
+choices before separately authorizing M4.

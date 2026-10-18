@@ -1,0 +1,423 @@
+{
+  "branch": "feat/m3-data-information-protocol",
+  "commands_and_exit_codes": {
+    "all-tests": {
+      "command": [
+        "timeout",
+        "120s",
+        "../code/.venv/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "exit_code": 0
+    },
+    "m1-after": {
+      "command": [
+        "timeout",
+        "120s",
+        "../code/.venv/bin/python",
+        "scripts/run_m1_reference.py"
+      ],
+      "exit_code": 0
+    },
+    "m2-after": {
+      "command": [
+        "timeout",
+        "120s",
+        "../code/.venv/bin/python",
+        "scripts/run_m2_reference.py",
+        "--config",
+        "experiments/configs/m2_tiny.json"
+      ],
+      "exit_code": 0
+    },
+    "m3-format": {
+      "command": [
+        "timeout",
+        "120s",
+        "../code/.venv/bin/python",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "src/inventory_ejor/data",
+        "scripts/prepare_m3.py",
+        "scripts/audit_m3.py",
+        "tests/test_m3_data.py",
+        "tests/test_m3_noninterference.py",
+        "tests/m3_fixtures.py",
+        "data/M3_PIPELINE.md"
+      ],
+      "exit_code": 0
+    },
+    "m3-ruff": {
+      "command": [
+        "timeout",
+        "120s",
+        "../code/.venv/bin/python",
+        "-m",
+        "ruff",
+        "check",
+        "--select",
+        "E,F,I,B,UP",
+        "src/inventory_ejor/data",
+        "scripts/prepare_m3.py",
+        "scripts/audit_m3.py",
+        "tests/test_m3_data.py",
+        "tests/test_m3_noninterference.py",
+        "tests/m3_fixtures.py"
+      ],
+      "exit_code": 0
+    },
+    "m3-tests": {
+      "command": [
+        "timeout",
+        "120s",
+        "../code/.venv/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_m3*.py",
+        "-v"
+      ],
+      "exit_code": 0
+    },
+    "noninterference": {
+      "command": [
+        "timeout",
+        "120s",
+        "../code/.venv/bin/python",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_m3_noninterference.py",
+        "-v"
+      ],
+      "exit_code": 0
+    },
+    "project": {
+      "command": [
+        "timeout",
+        "120s",
+        "../code/.venv/bin/python",
+        "scripts/check_project.py"
+      ],
+      "exit_code": 0
+    },
+    "repo-format": {
+      "command": [
+        "timeout",
+        "120s",
+        "../code/.venv/bin/python",
+        "-m",
+        "ruff",
+        "format",
+        "--check",
+        "."
+      ],
+      "exit_code": 1
+    },
+    "repo-ruff": {
+      "command": [
+        "timeout",
+        "120s",
+        "../code/.venv/bin/python",
+        "-m",
+        "ruff",
+        "check",
+        "--select",
+        "E,F,I,B,UP",
+        ".",
+        "--output-format",
+        "concise"
+      ],
+      "exit_code": 1
+    }
+  },
+  "correction_files": [
+    "data/M3_PIPELINE.md",
+    "docs/DECISION_LOG.md",
+    "docs/SESSION_LOG.md",
+    "docs/STATUS.md",
+    "docs/TASKS.md",
+    "experiments/configs/m3_development_demo.json",
+    "experiments/protocol/EVALUATION.md",
+    "results/summaries/M3_IMPLEMENTATION_REVIEW_20261018.md",
+    "results/summaries/m3_correction_verification_20261018.json",
+    "scripts/audit_m3.py",
+    "src/inventory_ejor/data/budgets.py",
+    "src/inventory_ejor/data/preparation.py",
+    "src/inventory_ejor/data/views.py",
+    "tests/m3_fixtures.py",
+    "tests/test_m3_data.py",
+    "tests/test_m3_noninterference.py"
+  ],
+  "demonstration": {
+    "directory": "data/processed/m3-demo-_zw6b5hj",
+    "logical_dataset_version": "m5-accuracy-zenodo-10203108-v1",
+    "manifest_identity": {
+      "bytes": 69956,
+      "sha256": "2190abe5f5b9a6fc5f421aeda4ead32bc63068aaddfa3c11219236c008af5c72"
+    },
+    "peak_rss_kib": 55044,
+    "runtime_seconds": 8.223844168999676,
+    "second_corrected_real_data_repeat_executed": false,
+    "trusted_source_fingerprint": "m5-sha256:975e2a16a90d3ec7ba7cee145dbebd62a119bcf2dcbcf4b3885d04263de8dbc5",
+    "wrapper_run": "results/runs/20261018T075246Z-smoke-9b4d055b"
+  },
+  "dirty": true,
+  "final_preservation": {
+    "all_git_refs_unchanged": true,
+    "authorized_append_only_report": "results/summaries/M3_IMPLEMENTATION_REVIEW_20261018.md",
+    "original_report_prefix_and_backup_verified": true,
+    "raw_processed_tracked_files": [
+      "data/processed/.gitkeep",
+      "data/raw/.gitkeep"
+    ],
+    "scope": "snapshotted raw, processed, results and discovered backup paths; not all machine files",
+    "snapshot_files": 134,
+    "unchanged_files": 133
+  },
+  "independent_csv_audit_before_report_append": {
+    "candidate_screening_cells": 224,
+    "excluded_candidate_screening_cells": 84,
+    "learner_views_verified": 20,
+    "manifest_schema_version": 2,
+    "original_input_hashes_verified": 5,
+    "preexisting_files_unchanged": 134,
+    "repeat_artifacts_identical": null,
+    "scientific_claim": "engineering audit only",
+    "study_information_counts": {
+      "additional_screening_cells": 84,
+      "candidate_screening_cells": 224,
+      "screening_already_in_selected_history": 140,
+      "selected_history_cells": 1120,
+      "unique_historical_sales_cells": 1204
+    },
+    "study_information_verified": true,
+    "unique_development_outcome_cells": 140,
+    "unique_selected_history_cells": 1120,
+    "zero_selected_history_cells": 988
+  },
+  "limitations": [
+    "Ex-post M5 roster can introduce selection/survivorship bias.",
+    "Logical version assignment and trusted dispatch are procedural, not an OS sandbox.",
+    "No final dates or scientific assumptions frozen; no M4 or GP/RL training.",
+    "Sales are not observed uncensored demand or real inventory cost outcomes."
+  ],
+  "m1_m2_code_and_fixture_paths_unchanged": [
+    "experiments/configs/m2_tiny.json",
+    "scripts/run_m1_reference.py",
+    "scripts/run_m2_reference.py",
+    "src/inventory_ejor/envs/.gitkeep",
+    "src/inventory_ejor/envs/__init__.py",
+    "src/inventory_ejor/envs/lost_sales.py",
+    "src/inventory_ejor/policies/.gitkeep",
+    "src/inventory_ejor/policies/__init__.py",
+    "src/inventory_ejor/policies/base_stock.py",
+    "src/inventory_ejor/solvers/__init__.py",
+    "src/inventory_ejor/solvers/finite_horizon.py",
+    "tests/fixtures/m1_hand_calculated.json",
+    "tests/test_m2_reference.py"
+  ],
+  "m1_output_unchanged": true,
+  "m2_output_unchanged_except_provenance": true,
+  "repository_wide_format": {
+    "exit_code": 1,
+    "unchanged_files": [
+      "scripts/check_environment.py",
+      "scripts/check_project.py",
+      "scripts/fetch_favorita.py",
+      "scripts/fetch_m5.py",
+      "scripts/fetch_m5_hf.py",
+      "scripts/install_codex_workspace.py",
+      "scripts/run_experiment.py",
+      "scripts/run_m1_reference.py",
+      "src/inventory_ejor/envs/lost_sales.py",
+      "tests/test_codex_workspace.py",
+      "tests/test_data_acquisition.py",
+      "tests/test_infrastructure.py",
+      "tests/test_inventory_env.py"
+    ]
+  },
+  "repository_wide_ruff": {
+    "exit_code": 1,
+    "findings": 54,
+    "unchanged_files": [
+      "scripts/check_environment.py",
+      "scripts/check_project.py",
+      "scripts/fetch_favorita.py",
+      "scripts/fetch_m5.py",
+      "scripts/fetch_m5_hf.py",
+      "scripts/install_codex_workspace.py",
+      "scripts/run_experiment.py",
+      "scripts/run_m1_reference.py",
+      "src/inventory_ejor/envs/lost_sales.py",
+      "tests/test_codex_workspace.py",
+      "tests/test_infrastructure.py",
+      "tests/test_inventory_env.py"
+    ]
+  },
+  "review_patches": {
+    "complete": "results/runs/m3-correction-m7x4j4x1/m3-complete-review.patch",
+    "correction_only": "results/runs/m3-correction-m7x4j4x1/m3-correction-review.patch"
+  },
+  "scope": "M3 review correction; engineering evidence only, no scientific freeze",
+  "source_commit": "14d0741ea2328aa28cef7612976357c4b3cb6d53",
+  "source_file_identities_excluding_this_summary": {
+    "data/DATASET_PLAN.md": {
+      "bytes": 5447,
+      "sha256": "6e669ff0fb3be3fad8adf16056802bfe04721d883db85f73ebd9f086d46789a8"
+    },
+    "data/M3_PIPELINE.md": {
+      "bytes": 6542,
+      "sha256": "1292e9d8024f794cccd58b2cf6b200851ef22d75991a03af159b7de363f70370"
+    },
+    "docs/DECISION_LOG.md": {
+      "bytes": 5740,
+      "sha256": "43bac76e8418081e0ce2a12c76cd8b1e41965dca5a17e55c6f34055ef5c653e4"
+    },
+    "docs/SESSION_LOG.md": {
+      "bytes": 22364,
+      "sha256": "118b788c9a454a9452f39864ba349c07195338b611c9998574a7d06d3916d907"
+    },
+    "docs/STATUS.md": {
+      "bytes": 6579,
+      "sha256": "0bb716f415b77716fea95cfb8e364da5883d88ad4eab76f6b45168910624586b"
+    },
+    "docs/TASKS.md": {
+      "bytes": 7676,
+      "sha256": "b638eb35b9071073ca325b92129405fa98d7855cd40d390d243e2b9a112582f1"
+    },
+    "experiments/configs/m3_development_demo.json": {
+      "bytes": 432,
+      "sha256": "1606142ff8bf81a9be15578bf3622ffb5213cee1dec2b9fede49963bbd52309d"
+    },
+    "experiments/configs/m3_protocol_proposal.json": {
+      "bytes": 979,
+      "sha256": "daf3aaf66665b513875810b1744644375c9016754230abb7f73d5f25c14cf9e1"
+    },
+    "experiments/protocol/EVALUATION.md": {
+      "bytes": 18401,
+      "sha256": "114c0291b98d9ac21012e15218f46b5dada2c89a9a4030af56869ff77a77950e"
+    },
+    "results/summaries/M3_IMPLEMENTATION_REVIEW_20261018.md": {
+      "bytes": 32059,
+      "sha256": "b8b210062b6f4cff93fa6c4001dc17f07f29699337ea6c384d1f0dcc13927470"
+    },
+    "results/summaries/m3_verification_20261018.json": {
+      "bytes": 9969,
+      "sha256": "87041928e5e7064401e7f7801acbc4ae30c6899e54314669f588a9f86d754aac"
+    },
+    "scripts/audit_m3.py": {
+      "bytes": 10033,
+      "sha256": "7d559da2b079da0c3152a9a3af17c5ffe24eb2ae6b554fb12702b1449c828ccc"
+    },
+    "scripts/prepare_m3.py": {
+      "bytes": 3697,
+      "sha256": "f0021ddd8376783d799532656e3a0117f21f6418b93224d2db301b9959003d0e"
+    },
+    "src/inventory_ejor/data/__init__.py": {
+      "bytes": 79,
+      "sha256": "7a0f6cb3e247527acab460319f35f133536258a8c181cb5d529ed6625a81dbb9"
+    },
+    "src/inventory_ejor/data/budgets.py": {
+      "bytes": 12944,
+      "sha256": "74fc9e1b72ad09d2a8b8b880c86fa754814f6d2f633cd377016d3ed3ca56cac1"
+    },
+    "src/inventory_ejor/data/contracts.py": {
+      "bytes": 7475,
+      "sha256": "de69778e2144b35401834f02d96b2379880d0bc1e9749c16cef4e3e3f97a62e5"
+    },
+    "src/inventory_ejor/data/m5.py": {
+      "bytes": 10654,
+      "sha256": "9ef45498b814fce5cde7efe93236bfcd229ac6234d622815675734cb1f184575"
+    },
+    "src/inventory_ejor/data/preparation.py": {
+      "bytes": 12026,
+      "sha256": "0a3e5f3f906136754c5a5ebee8946379a27e30e895d5376f5f44a52979136198"
+    },
+    "src/inventory_ejor/data/provenance.py": {
+      "bytes": 3003,
+      "sha256": "395c09957cb752665749788a783c6273912043019c33eaf9b1638ecc3d13ab66"
+    },
+    "src/inventory_ejor/data/synthetic.py": {
+      "bytes": 922,
+      "sha256": "509d71cce8a11e11bc58a089a9ecc0ae653fdfff8457614631e7518821f7ed32"
+    },
+    "src/inventory_ejor/data/views.py": {
+      "bytes": 4007,
+      "sha256": "e11423ab6cc958cf135a76341c09935bd899ce14c9bdb25529b72ab72020b54e"
+    },
+    "tests/m3_fixtures.py": {
+      "bytes": 3389,
+      "sha256": "0ab366085403f345b9ec5cbf9344c9adb51c3cccfa392e67ff8d63dfab20526a"
+    },
+    "tests/test_m3_data.py": {
+      "bytes": 36376,
+      "sha256": "9adb46a9f3bee2f8ff029028f6d2f76b6ff6e32b3f33ffa2407ade71904f97ea"
+    },
+    "tests/test_m3_noninterference.py": {
+      "bytes": 10985,
+      "sha256": "0021224c4b253a40127f471b83181293496e022806b6786d8ca2d28260ac3d0e"
+    }
+  },
+  "staged_files": [],
+  "test_results": {
+    "baseline": {
+      "passed": 111,
+      "seconds": 1.492
+    },
+    "full": {
+      "passed": 119,
+      "seconds": 1.954
+    },
+    "independent_noninterference": {
+      "passed": 6,
+      "seconds": 0.296
+    },
+    "m3": {
+      "passed": 53,
+      "seconds": 1.25
+    }
+  },
+  "tracked_modified_files": [
+    "data/DATASET_PLAN.md",
+    "docs/DECISION_LOG.md",
+    "docs/SESSION_LOG.md",
+    "docs/STATUS.md",
+    "docs/TASKS.md",
+    "experiments/protocol/EVALUATION.md"
+  ],
+  "untracked_review_files": [
+    "data/M3_PIPELINE.md",
+    "experiments/configs/m3_development_demo.json",
+    "experiments/configs/m3_protocol_proposal.json",
+    "results/summaries/M3_IMPLEMENTATION_REVIEW_20261018.md",
+    "results/summaries/m3_correction_verification_20261018.json",
+    "results/summaries/m3_verification_20261018.json",
+    "scripts/audit_m3.py",
+    "scripts/prepare_m3.py",
+    "src/inventory_ejor/data/__init__.py",
+    "src/inventory_ejor/data/budgets.py",
+    "src/inventory_ejor/data/contracts.py",
+    "src/inventory_ejor/data/m5.py",
+    "src/inventory_ejor/data/preparation.py",
+    "src/inventory_ejor/data/provenance.py",
+    "src/inventory_ejor/data/synthetic.py",
+    "src/inventory_ejor/data/views.py",
+    "tests/m3_fixtures.py",
+    "tests/test_m3_data.py",
+    "tests/test_m3_noninterference.py"
+  ]
+}

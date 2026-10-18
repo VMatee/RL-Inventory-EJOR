@@ -33,3 +33,14 @@ cd "$HOME/Desktop/work/research journal/RL-Inventory-EJOR/github"
 ```
 
 See `data/sources/M5.md` and `data/sources/FAVORITA.md` for complete, authenticated acquisition guidance. See `data/manifests/m5_verified_20261017.json` for public source hashes only (no data bytes). `scripts/fetch_m5_hf.py` uses a pinned Hugging Face mirror for efficient segmented transport and verifies output against the University of Nicosia's Zenodo MD5. The pinned mirror does not supersede the original source or alter its legal terms.
+
+## M3 engineering update — 2026-10-18
+
+`data/M3_PIPELINE.md` documents the implemented local preparation interface and
+`experiments/protocol/EVALUATION.md` the proposed chronological/information rules.
+The development demonstration uses the earliest complete 224-day history; it is
+not a frozen publication split. All restricted derivatives remain local/ignored.
+The bounded `inventory_ejor.data.synthetic.sample_iid` utility now supplies seeded
+known-law fixtures, with zero real-observation credit. The acquisition table above
+records the earlier planning state. Favorita remains unacquired and no dataset was
+downloaded during M3. See the M3 implementation review for executed evidence.
