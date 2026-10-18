@@ -204,6 +204,8 @@ class M4PreparationContractTests(unittest.TestCase):
             output = json.loads(stream.getvalue())
             self.assertEqual(output["mode"], "DRY_RUN_ONLY")
             self.assertEqual(output["models_fitted"], 0)
+            self.assertEqual(output["baselines_scored"], 0)
+            self.assertIn("no baseline execution is approved", output["note"])
 
     def test_execute_without_approval_never_starts_worker(self):
         path = self.root / "plan.json"

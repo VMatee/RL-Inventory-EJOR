@@ -45,7 +45,7 @@ OPENBLAS_NUM_THREADS=2 timeout 35 ../code/.venv/bin/python -B \
 -m unittest discover -s tests -p validation_m4_numerics.py -q
 ```
 
-Only the opt-in numerical-validation fixture files were executed. The baseline scheduler's default dry-run and plan remain unchanged: **no `run_baselines.py --execute`, no baseline `worker`, no M5 cost scoring and no `results/runs/m4-approved-*` created**. The reviewed plan's `approval.example.json` continues to have false flags. These validation environment variables do **not** authorize a baseline execution plan.
+Only the opt-in numerical-validation fixture files were executed. The baseline scheduler's default dry-run and plan remain unchanged: **no `run_baselines.py --execute`, no baseline `worker`, no M5 cost scoring and no `results/runs/m4-approved-*` created**. The reviewed plan's `approval.example.json` continues to have false flags. These validation environment variables do **not** authorize a baseline execution plan. The preparation/dry-run CLI messages have additionally been clarified so they do not falsely imply that synthetic validation never occurred: they report that validation is **not performed by plan preparation** and that no baseline job is approved.
 
 ## Boundaries and outstanding review gates
 

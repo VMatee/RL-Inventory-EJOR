@@ -51,7 +51,7 @@ def main(argv=None):
                 "output": str(dest.relative_to(ROOT)),
                 "summary": plan["summary"],
                 "execution_authorized": False,
-                "numerical_validation": "not_run",
+                "numerical_validation": "not_executed_by_preparation_command",
             },
             indent=2,
         )

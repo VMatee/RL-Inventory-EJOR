@@ -229,8 +229,8 @@ def main(argv=None):
                         "approved": False,
                         "models_fitted": 0,
                         "baselines_scored": 0,
-                        "note": "Numerical implementation still requires owner"
-                        "-approved validation.",
+                        "note": "Dry-run only: no baseline execution is approved; "
+                        "synthetic validation alone never grants approval.",
                     },
                     indent=2,
                 )
