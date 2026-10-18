@@ -61,6 +61,104 @@ class DeferredNumericalValidation(unittest.TestCase):
                 atol=1e-12,
             )
 
+    def test_seeded_inventory_cost_parity_over_multiple_states(self):
+        """Compare deterministic M1 trajectories with varied pipeline and first order.
+
+        This is a bounded numerical fixture, not a real-data baseline run.
+        GPU comparison runs only when tiny CUDA validation is separately enabled.
+        """
+        import numpy as np
+
+        from inventory_ejor.baselines.controllers import (
+            numpy_costs,
+            order_up_to,
+        )
+        from inventory_ejor.envs import (
+            CostParameters,
+            InventoryConfig,
+            InventoryState,
+            transition,
+        )
+
+        if CUDA_APPROVED:
+            import torch
+
+        rng = np.random.default_rng(8292026)
+        checked = 0
+        overrides = 0
+        for lead in (1, 2, 3, 4):
+            for horizon in (1, 2, 3, 4, 6, 8):
+                for attempt in range(3):
+                    costs = {
+                        "holding": 1.25,
+                        "lost_sales": 9.5,
+                        "variable_order": 0.75,
+                        "fixed_order": 2.5,
+                    }
+                    scenario = {
+                        "lead_time": lead,
+                        "max_order": 4,
+                        "costs": costs,
+                    }
+                    state = InventoryState(
+                        int(rng.integers(0, 7)),
+                        tuple(int(v) for v in rng.integers(0, 5, size=lead - 1)),
+                    )
+                    paths = rng.integers(0, 9, size=(5, horizon), dtype=np.int64)
+                    levels = [0, 1, 3, 6, 10]
+                    initial_orders = [0, 1, 2, 3, 4] if attempt == 2 else None
+                    cfg = InventoryConfig(lead, horizon, 4, CostParameters(**costs))
+                    reference = []
+                    for candidate, level in enumerate(levels):
+                        trajectory_costs = []
+                        for demands in paths:
+                            current = state
+                            total = 0.0
+                            for t, demand in enumerate(demands):
+                                remaining = horizon - t
+                                if remaining <= lead:
+                                    order = 0
+                                elif t == 0 and initial_orders is not None:
+                                    order = initial_orders[candidate]
+                                else:
+                                    order = order_up_to(
+                                        remaining, current, level, scenario
+                                    )
+                                step = transition(cfg, current, order, int(demand))
+                                total += step.costs.total
+                                current = step.next_state
+                            trajectory_costs.append(total)
+                        reference.append(np.mean(trajectory_costs))
+
+                    with self.subTest(lead=lead, horizon=horizon, attempt=attempt):
+                        np.testing.assert_allclose(
+                            numpy_costs(paths, scenario, state, levels, initial_orders),
+                            reference,
+                            rtol=0,
+                            atol=1e-12,
+                        )
+                        if CUDA_APPROVED:
+                            from inventory_ejor.baselines.controllers import (
+                                torch_costs,
+                            )
+
+                            result = torch_costs(
+                                torch.as_tensor(paths, device="cuda:0"),
+                                scenario,
+                                state,
+                                levels,
+                                initial_orders,
+                            )
+                            np.testing.assert_allclose(
+                                result.detach().cpu().numpy(),
+                                reference,
+                                rtol=0,
+                                atol=1e-12,
+                            )
+                    checked += 1
+                    overrides += int(initial_orders is not None)
+        self.assertEqual((checked, overrides), (72, 24))
+
     def test_tail_arrivals_do_not_generate_orders(self):
         from inventory_ejor.baselines.controllers import order_up_to
         from inventory_ejor.envs import InventoryState
@@ -177,6 +275,10 @@ class DeferredNumericalValidation(unittest.TestCase):
         self.assertEqual(paths.device.type, "cuda")
         self.assertTrue(torch.isfinite(paths).all().item())
         self.assertTrue((paths >= 0).all().item())
+        # Joint latent + observation-noise draws must be repeatable for a pinned seed.
+        torch.testing.assert_close(m.draw(0, 4, 8, 123), paths, rtol=0, atol=0)
+        with self.assertRaisesRegex(ValueError, "outside declared evaluation horizon"):
+            m.draw(1, 4, 8, 123)
 
 
 if __name__ == "__main__":

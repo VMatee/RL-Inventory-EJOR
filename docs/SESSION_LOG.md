@@ -1,5 +1,11 @@
 # Session handoff log
 
+## 2026-10-18 - Owner-authorized synthetic numerical validation (no M5 runs)
+
+Following M4a source/data preparation, the owner separately asked to verify numerical correctness with small CPU/GPU synthetic fixtures before any baseline campaign. Direct SeneraAiServer tests were used, without launching Codex or touching other projects. Original 3/3 CPU checks passed, and independently seeded NumPy/GPU/M1 inventory cost parity was extended to 72 synthetic scenarios (L=1..4; T in 1,2,3,4,6,8; nonzero initial pipeline, ordering/holding/lost-sales costs and 24 overridden first orders). All 6 opt-in fixtures passed when independently isolated to each of the four RTX 3090 GPUs via UUID. The two-step synthetic GP check now verifies posterior-draw reproducibility and rejects out-of-horizon queries. The ordinary repository discovery passed 142 tests; scoped M4 Ruff/format passed. Evidence and limitations: `results/summaries/M4_NUMERICAL_VALIDATION_20261018.md`.
+
+**No M5 baseline model was fitted or scored, no full GPU job was scheduled, and the 192-job dry-run plan remains unapproved.** These bounded synthetic checks support owner review; stronger baseline pilots, final scientific protocol and PR #9 merging require separate decisions. Existing raw data, processed bundles, virtualenv and other project's tasks are preserved.
+
 ## 2026-10-18 - M4a prepare-only baseline package
 
 Owner requested data preparation followed by baseline source preparation, emphasizing future use of four available GPUs but explicitly requiring review before any run. Read canonical rules and current GitHub main (`9151cec`). The server already contained 13 uncommitted M4 preparation files on `feat/m4-baselines-prepare-only`; they were archived and SHA256-recorded under local `code/backups/m4-prepare-entry-20261018T085915Z/` before continuing. The remaining Codex session belonged to another project and was not altered.
