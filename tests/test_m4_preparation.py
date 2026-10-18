@@ -84,6 +84,17 @@ class M4PreparationContractTests(unittest.TestCase):
         ):
             return build_plan(self.root, self.config_path)
 
+    def test_minimal_ci_can_prepare_without_numerical_packages(self):
+        from importlib.metadata import PackageNotFoundError
+
+        with patch(
+            "inventory_ejor.baselines.planning.importlib.metadata.version",
+            side_effect=PackageNotFoundError,
+        ):
+            plan = self.build()
+        self.assertTrue(all(v is None for v in plan["runtime"]["packages"].values()))
+        self.assertFalse(plan["summary"]["training_executed"])
+
     def test_plan_only_has_expected_jobs_and_no_fit(self):
         plan = self.build()
         self.assertEqual(

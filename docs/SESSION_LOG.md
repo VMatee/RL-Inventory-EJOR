@@ -1,5 +1,11 @@
 # Session handoff log
 
+## 2026-10-18 - Finalize user-startable M5 development baselines
+
+The owner delegated remaining pre-run decisions, source review/merge and readiness without another judgment cycle. Fixed the initial M5 campaign to the existing 12-series/4-budget/4-method/one-seed configuration (192 jobs; four GPU lanes plus two CPU lanes). Added failure/timeout/interruption cleanup, immutable plan snapshots, environment/data pins, session/source locks, one-shot start and verified CSV/JSON reporting. The real complete worker/scheduler stack ran only on 12 SYNTHETIC fixture jobs in an isolated local clone; all four GPUs participated, output receipts passed and the lease was released. No real M5 baseline jobs were started by this task. Complete protocol/evidence: `docs/BASELINE_RUN_PROTOCOL.md`, `results/summaries/M4_RUN_READINESS_20261018.md`.
+
+After merging reviewed PR #9, regenerate the clean-main plan and write a private hash-bound approval reflecting the owner's explicit delegation. `code/run_baselines.sh` is the user start; `--check` performs no training. Preserve all old plans/results and do not automatically retry failures or expand scope. The final EJOR study, Favorita access, specialized learning baselines and our contribution remain separate research milestones.
+
 ## 2026-10-18 - Owner-authorized synthetic numerical validation (no M5 runs)
 
 Following M4a source/data preparation, the owner separately asked to verify numerical correctness with small CPU/GPU synthetic fixtures before any baseline campaign. Direct SeneraAiServer tests were used, without launching Codex or touching other projects. Original 3/3 CPU checks passed, and independently seeded NumPy/GPU/M1 inventory cost parity was extended to 72 synthetic scenarios (L=1..4; T in 1,2,3,4,6,8; nonzero initial pipeline, ordering/holding/lost-sales costs and 24 overridden first orders). All 6 opt-in fixtures passed when independently isolated to each of the four RTX 3090 GPUs via UUID. The two-step synthetic GP check now verifies posterior-draw reproducibility and rejects out-of-horizon queries. The ordinary repository discovery passed 142 tests; scoped M4 Ruff/format passed. Evidence and limitations: `results/summaries/M4_NUMERICAL_VALIDATION_20261018.md`.

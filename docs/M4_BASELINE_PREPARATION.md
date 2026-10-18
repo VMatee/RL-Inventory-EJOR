@@ -86,12 +86,11 @@ The plan records input/config/source hashes, source commit, all task identities 
 
 No baseline run can begin through the provided CLI unless `--execute`, an exact-plan-hash-bound owner approval, completed numerical-validation confirmation, permitted GPU use, and clean unchanged source are all supplied. The Boolean confirmation is an owner attestation, not a fabricated test receipt. This is a guard against accidental use, not an OS sandbox against intentionally modified code.
 
-## 6. Required next review and separate authorizations
+## 6. Finalized development launch scope
 
-1. Review this document, dataset cohort, source implementation and the plan. Decide whether the provisional scenario and four-baseline scope are the right first pilot.
-2. **Synthetic numerical validation separately authorized and executed on 2026-10-18.** The opt-in `tests/validation_m4_numerics.py` suite now checks 72 seeded NumPy/GPU/M1 trajectory scenarios (including nonzero pipelines and first-order overrides), Gamma-Poisson reproducibility and tiny GP posterior sampling. All six opt-in tests passed separately on each of the four RTX 3090 devices, using one real device UUID per process. The ordinary test suite passed 142/142. See `results/summaries/M4_NUMERICAL_VALIDATION_20261018.md`. These tiny synthetic GPU checks do **not** fit or score a real M5 baseline.
-3. **Still pending:** owner review of numerical evidence, proposed scenario, worker/scheduler execution handling, runtime limits and source/plan identity. A limited M5 development pilot requires a **new explicit approval** and a regenerated exact-hash-bound clean-source plan. The `numerical_validation_completed` approval flag remains false in every saved example; never flip it automatically after tests.
-4. Full research comparisons, final holdout access, DCL/TED/HDPO reproduction and our proposed method each need their own scientific/execution scope. No entire-paper training command is supplied or silently started here.
+The owner subsequently delegated all remaining pre-run decisions. The fixed initial campaign, source/runtime guards, one-shot launcher and numerical/end-to-end acceptance are now documented in `docs/BASELINE_RUN_PROTOCOL.md` and `results/summaries/M4_RUN_READINESS_20261018.md`. The initial 192-job M5 DEVELOPMENT campaign no longer requires another choice/approval cycle; the user controls when to start it. Prior preparation-only warnings above are historical context, not a ban on the separately approved synthetic acceptance work.
+
+From local `code/`, run `bash run_baselines.sh --check` for preflight only or `bash run_baselines.sh` to start the sealed campaign. Do not manually edit an example approval or use an older plan. No real M5 scoring has been run during finalization. Final holdouts, the novel method, additional datasets or larger experiments are not authorized by this bounded development start.
 
 ## 7. Primary implementation references (API guidance, not research evidence)
 

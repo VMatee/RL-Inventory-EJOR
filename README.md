@@ -116,3 +116,7 @@ M5/Favorita contain sales, not complete uncensored demand or actual inventory co
 ## Next milestone
 
 **M1: finalize inventory event timing and implement a tested minimal simulator.** Do not begin large RL training before the simulator and exact reference are validated. EJOR is the target, not a guaranteed outcome. No automatic cloud training, paid APIs or self-hosted GitHub runner are configured.
+
+## Start the finalized initial development baseline campaign
+
+The owner has delegated the initial run settings; no further option selection is needed for this scope. From `<workspace>/code`, use `bash run_baselines.sh --check` for read-only preflight, or `bash run_baselines.sh` to start the sealed 192-job M5 development run in the foreground (four GPU lanes and two CPU lanes). Do not change branches, sync or run Codex in this checkout during execution. The real campaign is not launched during preparation. Full protocol, safety behavior and remaining research boundaries: [BASELINE_RUN_PROTOCOL](docs/BASELINE_RUN_PROTOCOL.md). Numerical and whole-stack synthetic acceptance: [readiness report](results/summaries/M4_RUN_READINESS_20261018.md). Raw and processed data/results remain local.

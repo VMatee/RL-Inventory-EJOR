@@ -32,6 +32,7 @@ SCRIPT_NAMES = (
     "scripts/run_baselines.py",
     "scripts/baseline_worker.py",
     "scripts/start_baselines.py",
+    "scripts/start_baselines.sh",
     "scripts/run_experiment.py",
     "scripts/validate_baseline_numerics.py",
     "tests/validation_m4_numerics.py",
@@ -216,12 +217,14 @@ def validate_config(c):
 
 
 def runtime_state():
-    """Installed versions, not imports or CUDA initialization."""
-    names = ("numpy", "scipy", "torch", "gpytorch", "gymnasium")
-    return {
-        "python": platform.python_version(),
-        "packages": {name: importlib.metadata.version(name) for name in names},
-    }
+    """Installed versions without model imports; minimal-CI preparation is allowed."""
+    packages = {}
+    for name in ("numpy", "scipy", "torch", "gpytorch", "gymnasium"):
+        try:
+            packages[name] = importlib.metadata.version(name)
+        except importlib.metadata.PackageNotFoundError:
+            packages[name] = None
+    return {"python": platform.python_version(), "packages": packages}
 
 
 def execution_sources(root):
@@ -439,6 +442,11 @@ def check_live_plan(root, plan):
         )
     if plan.get("runtime") != runtime_state():
         raise PermissionError("Python/package versions differ from the approved plan")
+    required = {"numpy", "gymnasium"}
+    if any(job["device_kind"] == "gpu" for job in plan["jobs"]):
+        required |= {"torch", "gpytorch", "scipy"}
+    if any(plan["runtime"]["packages"].get(name) is None for name in required):
+        raise PermissionError("Required numerical dependencies are not installed")
     if execution_sources(root) != plan["execution_sources"]:
         raise PermissionError("Executable source differs from approved plan")
     for key, hkey in (
