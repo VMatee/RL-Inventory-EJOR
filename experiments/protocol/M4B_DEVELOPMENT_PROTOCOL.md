@@ -81,6 +81,23 @@ layout, still **not frozen or authorized to inspect**, is:
 | Validation | `[1009,1261)` | `1233` | Declared model/hyperparameter selection |
 | Final M5 test | `[1261,1942)` | `1485,1914` | Two disjoint 224+28 context/outcome blocks; only frozen evaluation |
 
+**Calendar order is NOT access/release order in this provisional layout.**
+Because the calibration outcomes `[757,1009)` are dated *before* the
+validation outcomes `[1009,1261)`, they must remain **sealed** while
+model/hyperparameter/policy selection uses development and the permitted
+validation outcomes. **Only after** the entire candidate-selection
+procedure and chosen policy are frozen may the separate calibration
+outcomes be opened for a predeclared calibration-only procedure; they
+must not be recycled for model ranking, architecture revision or
+hyperparameter tuning. Final M5 outcomes remain sealed until both
+selection and calibration are frozen. Calendar-time reversal may make
+calibration less representative under drift; at the M4c design lock,
+assess this risk with allowed metadata and consider a revised phase
+geometry (and corresponding M3 role-order constraints) instead of
+silently treating early calibration data as independent post-selection
+coverage evidence. This access ordering **does not itself guarantee
+selection-valid coverage**.
+
 For the illustrative final origins, history+outcome blocks are
 `[1261,1513)` and `[1690,1942)`. Neither later *history* may contain
 an earlier final *outcome*, even if the two outcome windows do not overlap.

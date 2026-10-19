@@ -47,7 +47,7 @@ def save(path, payload):
     path.write_text(json.dumps(payload, sort_keys=True), encoding="utf-8")
 
 
-def make_complete_synthetic_session(root):
+def make_complete_synthetic_session(root, *, zero_evaluation=False):
     """Fabricate a fully provenance-bound 16-job saved session, no training."""
     session = root / "results/runs/synthetic-test"
     session.mkdir(parents=True)
@@ -57,7 +57,7 @@ def make_complete_synthetic_session(root):
     config_dir.mkdir(parents=True)
     t0 = date(2011, 1, 29)
     origin, horizon = 225, 4
-    days = [0, 2, 1, 3]
+    days = [0, 0, 0, 0] if zero_evaluation else [0, 2, 1, 3]
     evaluator = dataset / "evaluation.json"
     save(
         evaluator,
@@ -230,7 +230,11 @@ def make_complete_synthetic_session(root):
         }
         fulfilled = 0
         for t, demand in enumerate(days):
-            order = (2 if model == "gp_rollout" else 1) if t == 0 else 0
+            order = (
+                (2 if model == "gp_rollout" else 1)
+                if t == 0 and not zero_evaluation
+                else 0
+            )
             step = transition(inventory_config, state, order, demand)
             trace.append(
                 {
@@ -265,7 +269,7 @@ def make_complete_synthetic_session(root):
             "our_proposed_method": False,
             "total_cost": sum(costs.values()),
             "cost_components": costs,
-            "fill_rate": fulfilled / sum(days),
+            "fill_rate": (fulfilled / sum(days)) if sum(days) else None,
             "total_seconds": 0.01,
             "selected_base_stock": 1,
             "base_stock_grid_upper_boundary_selected": False,
@@ -353,6 +357,82 @@ def make_complete_synthetic_session(root):
 
 
 class SyntheticFullAuditTests(unittest.TestCase):
+    def test_all_zero_future_costs_report_undefined_relative_ratios(self):
+        # Historical learner sales remain positive while the FUTURE evaluation
+        # has zero requests, stock, orders and cost for all compared policies.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            session = make_complete_synthetic_session(root, zero_evaluation=True)
+            audit = analyze_session(root, session)
+            self.assertEqual(audit["integrity"]["verified_jobs"], 16)
+            self.assertEqual(audit["integrity"]["independent_m1_transitions"], 64)
+            self.assertTrue(
+                all(value["total_cost"] == 0 for value in audit["methods"].values())
+            )
+            for other in METHODS:
+                if other == "gp_rollout":
+                    continue
+                self.assertIsNone(
+                    audit["paired_vs_gp_rollout"][other][
+                        "relative_pooled_cost_reduction"
+                    ]
+                )
+                self.assertIsNone(
+                    audit["paired_vs_gp_rollout_excluding_two_highest_request_series"][
+                        other
+                    ]
+                )
+                loo = audit["leave_one_series_relative_reduction_ranges"][other]
+                self.assertIsNone(loo["min_relative_reduction"])
+                self.assertIsNone(loo["max_relative_reduction"])
+                self.assertEqual(loo["valid_omissions"], 0)
+                self.assertEqual(loo["excluded_zero_denominator_omissions"], 0)
+                equal = audit["equal_series_average_relative_improvement"][other]
+                self.assertIsNone(equal["mean_relative_reduction"])
+                self.assertIsNone(equal["median_relative_reduction"])
+                self.assertEqual(equal["valid_series"], 0)
+                self.assertEqual(equal["excluded_zero_denominator_series"], 1)
+
+    def test_symlink_rejection_for_all_twelve_input_leaf_types(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            session = make_complete_synthetic_session(root)
+            saved_plan = json.loads((session / "plan.json").read_text())
+            first_job = saved_plan["jobs"][0]
+            saved_summary = json.loads((session / "session_summary.json").read_text())
+            first_entry = saved_summary["entries"][0]
+            candidates = {
+                "plan": session / "plan.json",
+                "approval": session / "approval.json",
+                "summary": session / "session_summary.json",
+                "aggregate": session / "aggregate_summary.json",
+                "csv": session / "baseline_results.csv",
+                "result": root / first_entry["output"] / "result.json",
+                "trace": (root / first_entry["output"] / "private_sales_replay.json"),
+                "wrapper": root / first_entry["wrapper_manifest"],
+                "evaluator": root / first_job["evaluator_file"],
+                "learner": root / first_job["learner_file"],
+                "configuration": root / saved_plan["config_path"],
+                "bundle_manifest": root / saved_plan["bundle_manifest"],
+            }
+            self.assertEqual(len(candidates), 12)
+            for label, leaf in candidates.items():
+                with self.subTest(input_leaf=label):
+                    # A symlink to the original valid bytes must still be
+                    # rejected BEFORE it is read, not merely by SHA256 failure.
+                    hidden_original = leaf.with_name(leaf.name + ".saved")
+                    leaf.rename(hidden_original)
+                    try:
+                        leaf.symlink_to(hidden_original)
+                        with self.assertRaisesRegex(ValueError, "Symlink/noncanonical"):
+                            analyze_session(root, session)
+                    finally:
+                        leaf.unlink()
+                        hidden_original.rename(leaf)
+            self.assertEqual(
+                analyze_session(root, session)["integrity"]["verified_jobs"], 16
+            )
+
     def test_complete_synthetic_session_and_inmemory_defect_regressions(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

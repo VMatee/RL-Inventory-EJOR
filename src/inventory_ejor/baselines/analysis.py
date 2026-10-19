@@ -560,9 +560,14 @@ def analyze_session(root: Path, session: Path) -> dict:
             for held in series
             if len(series) > 1
         ]
+        valid_leave = [v for v in leave_values if v is not None]
         leave_one_series_ranges[other] = {
-            "min_relative_reduction": min(leave_values) if leave_values else None,
-            "max_relative_reduction": max(leave_values) if leave_values else None,
+            "min_relative_reduction": min(valid_leave) if valid_leave else None,
+            "max_relative_reduction": max(valid_leave) if valid_leave else None,
+            "valid_omissions": len(valid_leave),
+            "excluded_zero_denominator_omissions": (
+                len(leave_values) - len(valid_leave)
+            ),
         }
         relative_items = []
         for s in series:
@@ -571,9 +576,14 @@ def analyze_session(root: Path, session: Path) -> dict:
             if a > 0:
                 relative_items.append((a - c) / a)
         equal_series_relative_improvement[other] = {
-            "mean_relative_reduction": statistics.mean(relative_items),
-            "median_relative_reduction": statistics.median(relative_items),
+            "mean_relative_reduction": (
+                statistics.mean(relative_items) if relative_items else None
+            ),
+            "median_relative_reduction": (
+                statistics.median(relative_items) if relative_items else None
+            ),
             "valid_series": len(relative_items),
+            "excluded_zero_denominator_series": (len(series) - len(relative_items)),
         }
 
     origins = sorted({j["origin"] for j in plan["jobs"]})

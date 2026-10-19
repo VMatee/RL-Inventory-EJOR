@@ -197,8 +197,15 @@ reconstructs known simulation-work formulas, binds unique job-indexed
 worker manifests, validates terminal metadata against an independent
 calendar oracle, and checks symlink/noncanonical files before opening.
 New synthetic adversarial tests exercise forged inputs, ledgers, wrapped
-jobs, terminal results and forbidden final-history overlap. The original
-192-run data were not altered or rerun.
+jobs, terminal results and forbidden final-history overlap. The independent
+Codex re-review at `eef0fd4` **APPROVED the scoped M4b audit**, without
+remaining blocking or major defects. Three remaining minor review points
+were author-remediated: zero-cost-safe relative ratios (`null` plus valid/
+excluded counts), calibration-only access occurring after policy selection
+with the earlier calendar window sealed, and tests for symlink rejection
+on 12 distinct input leaf types. This is *not* independent approval of
+those later minor amendments, nor a claim of selection-valid calibration.
+The original 192-run data were not altered or rerun.
 
 **Still open:** a scientifically frozen choice of chronological cutoffs,
 true inferential estimand, power/sample size, dependence structure,

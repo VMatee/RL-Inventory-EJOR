@@ -78,7 +78,37 @@ scientific and empirical pipeline is explicitly not yet publication-ready.
    Neither raw retailer financial savings nor paper acceptance can
    be inferred.
 
-## Re-review acceptance checklist
+## Independent re-review result and minor follow-ups
+
+The owner returned an independent **Codex GPT-6.1 Ultra follow-up** on
+commit `eef0fd40bc64a3db6f09bdb8a523b1d5bc80baac`: **APPROVE for
+scoped M4b audit**, zero remaining blocking or major M4b defects.
+The reviewer reproduced all earlier corruption counterexamples and
+confirmed the original 192 jobs, 5,376 periods, 4.10945% reduction,
+5.91803× simulated effort, and 336/407 first-arrival concentration.
+The review separately verified 633 selected protected input/run files
+against saved hashes (a narrower subset than the author's 640-file
+whole-study snapshot) and exercised a broader 12-input symlink matrix.
+
+Three reviewer-identified **minor** items were subsequently addressed:
+relative summaries now represent zero-denominator cases as JSON `null`
+with valid/excluded counts, rather than throwing `StatisticsError`;
+valid all-zero-request/cost synthetic full-session regression was added;
+12 synthetic input symlink types are checked through the actual auditor;
+and the proposed chronological data protocol now explicitly seals the
+earlier-dated calibration outcomes until after later validation-based
+model/policy selection is frozen. This unusual date/access order is **not**
+a scientifically validated solution to calibration drift or
+post-selection coverage; M4c must still prospectively freeze a defensible
+scheme before any withheld M5 outcomes are opened.
+
+The final three minor fixes are verified by authoring-account tests;
+they have **not** received an additional independent audit and are not
+represented as such. The Codex independent APPROVE covered the previous
+verified implementation plus a limited follow-up list; it did not
+approve EJOR publication readiness.
+
+## Re-review acceptance checklist (historical instructions, now completed for `eef0fd4`)
 
 The independent Codex reviewer (or an equally independent agent with
 read-only access) should rerun the **same previous in-memory corruption
