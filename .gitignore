@@ -21,6 +21,7 @@ data/processed/**
 !data/processed/.gitkeep
 results/runs/**
 !results/runs/.gitkeep
+results/analysis/**
 *.pt
 *.pth
 *.ckpt

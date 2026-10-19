@@ -38,17 +38,21 @@ The user authorized acquisition of both planned external datasets. All five M5 s
 
 **M3 scientific acceptance still pending:** verify access/redistribution terms; review/approve proposed SKU eligibility, treatment of zero sale records/censoring, chronological phases and real-data budgets; approve shared cross-series development, calibration/validation and pretraining rules. Favorita returns/fractional units need decisions after authorized access. Raw acquisition is not evaluation readiness. Favorita remains a prospective frozen external validation track.
 
-## M4a - Initial baseline run preparation [finalized; user launch pending]
+## M4a - Initial baseline preparation and run [completed 2026-10-18]
 
-The owner delegated final pre-run decisions and Git review/merge, retaining USER control of the real start command. Scope is fixed by `docs/BASELINE_RUN_PROTOCOL.md`: 12 M5 development series, four history budgets, four initial methods, one seed, 192 jobs; four GPU lanes plus two CPU lanes. This is not the final EJOR evaluation or our proposed method. The existing data/GP likelihood/scenario are disclosed as development assumptions.
+Original GitHub PR #9 merged at `5d01105`; four-GPU M5 development session `results/runs/m4-approved-yc4xtrp1/` completed 192/192 jobs, status `complete_and_hash_verified`, 93.659 s. The same 12 series/28,56,112,224-day historical budgets share a 28-day future window at d_225. This is **not** a publication experiment, and does not establish GP superiority, 28-day non-inferiority or retailer cost savings. Do not launch the one-shot campaign again. Preparation-only descriptions and the 2026-10-18 execution setup remain historical documentation.
 
-Kernel numerical checks passed on each GPU; real subprocess fault/timeout/source-integrity tests passed; the real scheduler, wrappers, workers, models and report generator completed 12 SYNTHETIC jobs using all four GPUs in an isolated clone. See `results/summaries/M4_RUN_READINESS_20261018.md`. Source/runtime/data hashes and an explicit delegated local authorization bind the user launch. No real M5 campaign is run in this preparation task; no further scientific-choice questionnaire is required for this scoped pilot.
+## M4b - Research-results audit and proposed development protocol [implemented; independent review pending]
 
-Start from local `code/` with `bash run_baselines.sh`; inspect only with `bash run_baselines.sh --check`. A one-shot marker avoids duplicate campaigns. M5 rows/processed files and outputs remain private/Git-ignored. After the campaign, inspect the automatically audited CSV/JSON summaries and all failed/capped cases before expanding the study.
+Use `scripts/analyze_m4_results.py` to read-only audit saved 192 jobs, provenance and learner hashes, rebuild aggregate values, independently replay 5,376 M1 transitions, report matched effects at the 12-series unit, relative/absolute cost components, startup unavoidable shortage and unequal compute budgets. Per-series artifacts under ignored `results/analysis/` must not be pushed. Source-anchored descriptive facts in `results/summaries/M4_BASELINE_RESULTS_AUDIT.md`. No model fitting/GPU execution or new evaluation data in M4b. M4b development protocol draft: `experiments/protocol/M4B_DEVELOPMENT_PROTOCOL.md`. The other-account GPT-6 Pro independent review is **not performed**; instructions are in `docs/M4B_INDEPENDENT_REVIEW_HANDOFF.md`. Authoring-account tests are not an independent paper review.
 
-## M4b - Strong learning baselines and validation [planned; separate approval required]
+## M4c - Later development data protocol lock [planned; no outcome access]
 
-After M4a review and numerical checks, separately authorize limited baseline pilots, then stronger GP+MPC/DCL and appropriate TED/HDPO reproductions or clearly labeled adaptations. Implement explicit likelihood/joint sampling, epistemic/aleatoric separation, comparable information access and declared compute. Final comparator roster and evaluation assumptions remain pending; do not assume GP superiority or start the proposed method without a separate specification.
+Choose/record chronological development/calibration/validation/final partitions, eligibility and common information allowances prospectively and without opening later outcomes. Preserve the examined d_225 pilot as development. Predefine initial stock/pipeline, cost/terminal scenarios and matched per-policy compute protocol; disclose sales censoring. Document treatment of dependent item-store/temporal observations and noninferiority-margin justification before final evaluation.
+
+## M4d - Stronger crossed baselines [planned; separate execution approval]
+
+Add Empirical + one-step rollout and Gamma–Poisson + one-step rollout to complete 3-demand-model × 2-controller matrix; recency-aware baseline and GP fixed-calendar-time-scale ablation. Then GP planning/DCL and appropriate TED/HDPO or explicit adaptations as feasible. Test forecast calibration, epistemic/aleatoric differences and matched data/compute. New versioned development-only runs need separate scope and authorization; original 192-job artifacts remain immutable.
 
 ## M5 - Decision-sensitive mechanism and analysis [planned]
 
