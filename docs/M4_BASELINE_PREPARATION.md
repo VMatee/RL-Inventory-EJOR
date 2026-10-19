@@ -1,4 +1,10 @@
-# M4a: data and GPU-ready baseline preparation - REVIEW BEFORE RUNNING
+# M4a: data and GPU-ready baseline preparation - historical handoff
+
+> Preparation-phase instructions below are an archival record. M4a was
+> subsequently launched and completed (192/192 jobs) on 2026-10-18.
+> Do not run that one-shot campaign again. For audited development results see
+> `results/summaries/M4_BASELINE_RESULTS_AUDIT.md`; for subsequent design see
+> `experiments/protocol/M4B_DEVELOPMENT_PROTOCOL.md`.
 
 **Scope authorized on 2026-10-18:** prepare data and baseline code, use the existing four GPUs in the *future execution design*, and stop for owner inspection. **No demand-model fit, baseline scoring, RL training, numerical GPU test, or experiment sweep is authorized by this preparation.**
 

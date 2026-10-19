@@ -1,5 +1,12 @@
 # M3 chronological evaluation and information protocol
 
+> **Historical M3 document.** Its statement that no GP fit/retail development
+> cost run has taken place was accurate at the M3 preparation stage only.
+> The subsequent d_225 M4 baseline development campaign completed 192/192
+> jobs on 2026-10-18; see `results/summaries/M4_BASELINE_RESULTS_AUDIT.md`.
+> The proposed later chronological phases and final holdout remain unopened.
+> The M4b proposal is `experiments/protocol/M4B_DEVELOPMENT_PROTOCOL.md`.
+
 Status: implemented engineering contracts; **proposed scientific protocol, pending
 owner review**. M3 authorizes bounded preparation only. No final holdout is frozen,
 no GP/RL fitting or inventory-cost experiment has run, and no retailer benefit is

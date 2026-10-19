@@ -21,7 +21,7 @@ The broader baselines below remain planned.
 
 Critical ablation: identical GP, DCL, data and compute; change **only** the proposed decision-sensitive safeguard. Compare known-model and data-limited DCL separately.
 
-## M4a preparation on 2026-10-18 (not run)
+## M4a preparation on 2026-10-18 (historical; later run complete)
 
 Source now exists for four initial development comparators in `src/inventory_ejor/baselines/`: `empirical_base_stock`, `gamma_poisson_base_stock`, `gp_base_stock`, and `gp_rollout`. The last is a one-step scenario rollout with fixed base-stock continuation, **not** a DCL/TED/HDPO reproduction or globally solved MPC. GP inference is exact conditional on fitted hyperparameters for a standardized log1p Gaussian surrogate, not an exact count-likelihood posterior. Real-data histories and all transformed statistics remain per-learner; the trusted scorer alone receives outcomes.
 
