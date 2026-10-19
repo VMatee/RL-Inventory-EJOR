@@ -18,9 +18,12 @@ policy safety guarantee, true-demand reconstruction or proof of novelty.
   `scripts/analyze_m4_results.py --session results/runs/m4-approved-yc4xtrp1`.
   It recomputes saved aggregate results, checks 192 wrapper/source/config/
   data-manifest hashes, 192 individual result hashes and 192 trace hashes,
-  verifies each result against the saved CSV, M3 learner hashes and consistent
-  future requests, and independently replays **5,376 M1 state transitions**.
-  No trained method, GPU job or test outcome is regenerated.
+  verifies each result against the saved CSV, the **pinned evaluator's
+  actual forward requests**, validated M3 learner histories, full access
+  ledgers/compute accounting, bound per-job wrapper commands and terminal
+  metadata. All **5,376 periods** are rechecked both against original M1
+  and an **independent calendar-list implementation**. No trained method,
+  GPU job or test outcome is regenerated.
 - The local ignored folder
   `results/analysis/m4b-original-20261019/` contains
   `audit_private.json` with per-series diagnostics and
@@ -30,6 +33,10 @@ policy safety guarantee, true-demand reconstruction or proof of novelty.
 The 192 successful jobs are 192 **model × budget × series** tasks, **not**
 192 statistically independent sales sequences. For each of 12 series, all
 16 method/budget combinations score the exact same future 28-day path.
+The study-wide M3 ledger disclosed **3,248 historical sales cells**:
+2,688 selected-history cells plus 560 additional excluded-candidate
+screening cells. The screen is design information, not an unreported
+extra set of independent demand observations for learners.
 
 ## 2. Baseline cost and service-level results
 
@@ -81,6 +88,13 @@ an observed GP-base-stock versus rollout pooled-cost reduction of **9.61%**
 among the other ten; this is *not* an externally valid trimmed estimator
 or an approved cohort-selection rule.
 
+For GP base-stock versus GP rollout, **leave-one-series-out pooled
+relative cost reductions** range from **3.26% to 8.01%** (12
+exploratory omissions). The **equal-series average of within-series
+relative reductions** is **7.74%** for the same comparator, unlike the
+4.11% pooled-cost ratio. These are different descriptive weightings,
+not interchangeable population estimands or confidence intervals.
+
 Three GP-rollout versus GP-base-stock budget/series pairs experienced
 a worse simulated cost. They must not be dropped. Identical outcomes
 in several sparse-demand pairs can reflect low policy discrimination,
@@ -123,14 +137,21 @@ Both raw-cost weighting and zero-demand sparsity strongly influence
 rankings. Stratify prospective cohorts by *historical*, not future,
 activity before the next trial.
 
-**B. Inherited startup lost requests.** With zero initial inventory,
-zero pipeline and positive lead time 3, the first three request
-periods are unfillable by any policy. Their shared lost-request penalty
-sums to **2,000** cost units across four histories, about
-**19.6–21.1%** of the displayed method totals. This is a common
-unavoidable component *under the pilot's initial-state assumption*.
-Investigate a predeclared warm-start comparator and preventable cost
-separately, without changing historic scores.
+**B. Inherited startup lost requests and first-arrival transient.** With
+zero initial inventory/pipeline and positive lead time 3, the first
+three request periods are unfillable. Their shared lost-request penalty
+sums to **2,000** across four histories, about **19.6–21.1%** of method
+totals. An independent reviewer further found, and the revised auditor
+recomputed, that **336/407 = 82.56% of the GP-rollout cost advantage
+occurs in periods 3–5** (the first three days replenishment can arrive)
+and **all 336 saved units are holding costs**. Periods 6–27 contribute
+a net 71 saved units. Despite a total holding-cost advantage, GP
+rollout finishes with **147 versus 119 total units of recorded
+end-of-horizon stock-before-receipt** over 48 matched series/budget
+paths. Thus a claim about a uniform reduction of leftover terminal
+inventory would be false. These initial-state/transient findings are
+exploratory and strongly motivate prespecified warm-start, terminal
+value and longer-horizon tests; preserve historic scores unchanged.
 
 **C. Nonmonotone information budgets.** For GP rollout, average
 28-day costs at histories 28/56/112/224 are
@@ -155,9 +176,36 @@ Gamma–Poisson were tested with base-stock only, so we do not yet
 know how much of rollout's benefit would occur under simpler
 demand models. Both compute-matched and native-budget comparisons
 are needed; GP+rollout is not DCL/MPC/RL and is not the paper's
-proposed new method.
+proposed new method. Its effective MC seed includes the history budget,
+so contrasts between n values also differ in optimizer random draws;
+and GP uses deterministic calendar features that iid comparators lack.
 
-## 6. Claim-register implications and next research gate
+## 6. Independent Codex review and closed/open obligations
+
+An independent **Codex GPT-6.1 Ultra** review supplied by the owner on
+2026-10-19 confirmed the original 4.10945% computation using an external
+calendar oracle without importing production M1. The review found two
+**blocking verifier defects** in the *first* PR #10 revision: it did not
+bind evaluator input to replay requests and trusted self-declared ledger
+and compute counts. It also found job-wrapper swapping, unchecked
+terminal metadata, premature symlink following and an impossible promise
+about independent final-origin histories.
+
+The follow-up revision now verifies evaluator and learner fingerprints
+and values, reconstructs full M3 access ledgers with `validate_ledger`,
+reconstructs known simulation-work formulas, binds unique job-indexed
+worker manifests, validates terminal metadata against an independent
+calendar oracle, and checks symlink/noncanonical files before opening.
+New synthetic adversarial tests exercise forged inputs, ledgers, wrapped
+jobs, terminal results and forbidden final-history overlap. The original
+192-run data were not altered or rerun.
+
+**Still open:** a scientifically frozen choice of chronological cutoffs,
+true inferential estimand, power/sample size, dependence structure,
+selection-valid uncertainty construction, strong competitive baselines,
+and established EJOR novelty. Software checks do not close these gates.
+
+## 7. Claim-register implications and next research gate
 
 - **H1 inventory-sensitive limited-data policy improvement:** **not
   established**; a decision-time GP rollout ablation is a useful existing
@@ -182,7 +230,7 @@ prior-art examination; only then run controlled synthetic and expanded
 retail-sale diagnostics. Favorita remains pending authorized original
 2017 Kaggle competition access.
 
-## 7. Exact reproduction (read-only default)
+## 8. Exact reproduction (read-only default)
 
 From the versioned Git root `github/`:
 
@@ -201,8 +249,11 @@ The second writes `audit_private.json` and `audit_public.json` into a
 new ignored directory only; it does not modify run artifacts or start
 baselines. The auditor fails closed for altered outputs, missing jobs,
 misaligned timestamps/requests, provenance/ledger inconsistencies,
-incorrect cost decompositions or unsupported scope. Automated pure
-tests reside in `tests/test_m4b_analysis.py`.
+incorrect cost decompositions or unsupported scope. Automated synthetic tests are in `tests/test_m4b_analysis.py` and
+`tests/test_m4b_review_fixes.py`. The second suite includes explicit corruption/embargo regressions.
+`tests/test_m4b_full_audit_synthetic.py` builds and accepts a complete
+synthetic 16-job end-to-end session and then verifies that forged receipt,
+ledger, terminal and evaluator data are refused after read-only checking.
 
 **Scientific boundary:** successful code checks validate only the
 reported computations and stock-flow replay for this one experiment.

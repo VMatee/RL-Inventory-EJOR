@@ -37,7 +37,7 @@ M4b now contributes read-only `scripts/analyze_m4_results.py`, strict source/out
 
 ## Next task
 
-Submit/independently review the M4b results-analysis implementation, protocol and tests through the M4b PR, using `docs/M4B_INDEPENDENT_REVIEW_HANDOFF.md` for the other GPT-6 Pro account (the separate review has **not** yet occurred). After accepted corrections, carry out **M4c prospective development protocol lock**, then M4d stronger crossed baselines. Do not access proposed calibration/validation/final M5 outcomes or start new GPU jobs from an analysis-only task. Formal M5/Favorita publication evaluation and novelty claims remain unproved.
+Independent **Codex GPT-6.1 Ultra** review of PR #10 was supplied on 2026-10-19 and requested changes: evaluator-input binding, full ledger/compute validation, job-specific wrapper binding, independent-calendar/terminal checks, symlink preflight, and a feasible nonadaptive final-history embargo. The follow-up implementation and tests address these findings. See `docs/M4B_CODEX_REVIEW_RESPONSE_20261019.md`. **Independent re-review of the fixed PR is pending**, and the other account's limited ChatGPT Web Pro quota remains unused. Do not merge PR #10 until the blocking review counterexamples have been independently rerun or the owner explicitly decides otherwise. The future M4c calendar windows and primary estimand are still proposed, not frozen; no later M5 outcomes or GPUs have been accessed by this analysis task. M4d stronger crossed baselines, M5/Favorita final evaluation and novelty claims remain open.
 
 ## Later publication work (not a blocker for this initial pilot)
 

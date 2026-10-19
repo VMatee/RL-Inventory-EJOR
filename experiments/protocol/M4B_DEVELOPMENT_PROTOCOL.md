@@ -57,21 +57,38 @@ non-inferiority of `n=28`, EJOR novelty or general-population performance.
 Selection uses a common 28-day positive-sale eligibility screen, which excludes
 some fully dormant histories, and metadata of a retrospectively known item
 roster. Screening access (including excluded candidates) is study information.
+M3 records **3,248 distinct historical sales cells** in this initial study:
+2,688 selected-history cells plus **560 additional excluded-candidate
+screening** cells; the historical access accounting cannot be advertised as
+merely `n=28/56/112/224` for every design decision. Methods receive only
+their declared learner observations, but cohort screening is shared design
+information and must be reported separately.
 
 ## 3. Chronological access firewall (proposed geometry)
 
 The original M5 source contains actual sales through `d_1941`.
-Use **half-open** day intervals and require each phase's
+Use **half-open** day intervals; require each phase's
 `[origin - 224, origin + 28)` to lie wholly within that phase.
-This possible geometry illustrates a conservative separation without reading
-proposed later outcomes; it is **not permission to evaluate** them:
+The earlier proposal allocated only 429 days to the final phase and could NOT
+accommodate two disjoint 224-day-history-plus-28-day-evaluation blocks
+(2×252=504 days). An independently reviewed **feasible illustrative**
+layout, still **not frozen or authorized to inspect**, is:
 
-| Phase | Proposed reserved day range | Illustrative origin(s) | Permitted use |
+| Phase | Proposed protected range | Illustrative origin(s) | Use |
 |---|---|---|---|
-| Development | `[1,1009)` | Existing `225`; future `477,729,981` | Method/debug/architecture search, all accesses recorded |
-| Calibration | `[1009,1261)` | `1233` | Only prespecified calibration operations |
-| Validation | `[1261,1513)` | `1485` | Declared method/hyperparameter selection |
-| Final M5 test | `[1513,1942)` | `1914` | Frozen model/process scoring once, no feedback tuning |
+| Development | `[1,757)` | Already inspected `225`; prospective `477,729` | Methods/debug/architecture, all accesses logged |
+| Calibration | `[757,1009)` | `981` | Prespecified post-selection calibration only |
+| Validation | `[1009,1261)` | `1233` | Declared model/hyperparameter selection |
+| Final M5 test | `[1261,1942)` | `1485,1914` | Two disjoint 224+28 context/outcome blocks; only frozen evaluation |
+
+For the illustrative final origins, history+outcome blocks are
+`[1261,1513)` and `[1690,1942)`. Neither later *history* may contain
+an earlier final *outcome*, even if the two outcome windows do not overlap.
+Because the 2016 M5 competition's final 28-day window is publicly known,
+`d_1914..d_1941` cannot be described as a truly unseen/private benchmark.
+This allocation is a **candidate geometry only**: calendar/seasonality,
+cohort counts and sample-size adequacy need metadata-only review, then an
+explicit prospective freeze before any new access.
 
 The preliminary `d_225` observation window has **already been inspected**.
 It must remain development forever. Do not silently promote it or another
@@ -81,12 +98,16 @@ a future disclosure must state its public-benchmark limitations.
 
 The phase boundaries/origins in this table are **candidates requiring a
 documented freeze before access**, not preapproved final scientific choices.
-Confirm calendar/seasonality, eligible sample counts and power *using allowed
-metadata only*. More than one final nonoverlapping window is desirable, but
-adding one must not train on another final window's observed outcomes unless
-a separate, explicitly declared online-adaptation protocol is designed.
-Use M3 `SplitPlan` to enforce windows/forbidden outcomes in code. **Never
-use all 1,941 days for both model development and final evaluation.**
+Confirm calendar/seasonality, eligible sample counts and power using *allowed
+metadata only*. M3 `SplitPlan.validate_origins()` currently prevents only
+**overlapping outcome windows**; it does not prevent a later history from
+including a prior evaluation outcome. Use `SplitPlan.windows` **and** the
+separate pure `validate_nonadaptive_origin_embargo()` helper, or an equivalent
+explicit `forbidden_outcomes` check, before any final-plan preparation.
+No final phase may reuse another final window's outcomes as learner history;
+online adaptation is a separate research protocol and cannot be assumed.
+The two candidate final origins are not proof of statistical independence.
+**Never use all 1,941 days for both model development and final evaluation.**
 
 For an eligible cohort, fix prospective metadata-only candidate selection and
 positive-history screening rule before opening its outcome period. Log the
@@ -113,8 +134,12 @@ allowed prior/pretraining access. Preserve original results; new jobs get new
 plan/config/versioned code identifiers.
 
 Add a **recency-aware** simple model (e.g. window-weighted empirical rates,
-prespecified decay) and a **GP time-feature normalization ablation** using
-fixed calendar-day units rather than division by `n-1`. The latter is critical:
+prespecified decay), a **seasonal non-GP control** (e.g. weekday-stratified
+empirical or count model with the same deterministic calendar), and a
+**GP time-feature normalization ablation** using fixed calendar-day units
+rather than division by `n-1`. Without a calendar-matched non-GP control,
+GP versus iid samplers confounds uncertainty representation with known
+weekday/time features. The GP scaling ablation is also critical:
 changing `n` presently changes both data volume and the GP feature scale/
 extrapolation geometry. Ensure each ablation is selected/tuned on development
 data, never on its comparison outcome.
@@ -157,8 +182,15 @@ a convergence certificate.
 Use common random numbers for *fair paired simulator comparisons* wherever
 the source of randomness is under experimental control. If methods are
 trained repeatedly, pin independent training seeds and matched evaluation
-streams. Do not count a second draw on the same M5 path as a second real
-evaluation window.
+streams. **The original M4 effective optimizer seed hashes `series:origin:
+budget:seed`**, so its nominal `seed=0` uses different MC streams between
+history budgets; this further confounds a naive data-sufficiency comparison.
+Future experiments should explicitly couple streams where valid, record
+independent training/MC seeds and convergence diagnostics, and distinguish
+fixed versus online-update GP controllers. The pilot GP **does not refit or
+condition on newly observed evaluation sales**: it updates inventory state
+only. Do not label this Bayesian posterior-adaptive inventory control.
+Do not count a second draw on the same M5 path as a second real evaluation.
 
 ## 6. Outcome definitions and descriptive statistics
 
@@ -167,7 +199,8 @@ For each eligible item-store `s`, origin `o`, history budget `n`, method
 
 ```text
 C(s,o,n,m,r,θ) = sum of M1 holding + lost-sales + order costs
-Δ(s,o,n,r,θ ; m,b) = C(s,o,n,m,r,θ) - C(s,o,n,b,r,θ)
+G(s,o,n,r,θ ; candidate,baseline) = C(baseline) - C(candidate)
+Positive G is a paired cost benefit of candidate versus baseline.
 ```
 
 Lower cost is preferred. Record total cost and components, order-cap frequency,
@@ -176,20 +209,36 @@ and pipeline, startup-inevitable exposure (when initial inventory/pipeline are
 zero and `lead_time > 0`), and model/decision computation.
 
 For this 12-series single-origin pilot, publish means and medians of matched
-costs, pair wins/ties/losses, item-store **clustered** average differences
-across four budgets, demand/scale-normalized descriptive costs, pooled fill
+costs, pair wins/ties/losses, within-item-store averages of differences
+across four budgets, exploratory demand/scale-normalized descriptive costs, pooled fill
 rates, and leave-one-series/two-highest-demand exclusions. Explicitly label
 the selection of the top two as exploratory sensitivity, not hypothesis
 testing. Distinguish aggregate-weighted improvement from equal-series
 average improvement. Do not attach p-values or confidence coverage claims to
 the 48 mechanically correlated pairs.
 
-For an eventual independent test, define primary estimand and statistical
-sampling unit in advance. Use hierarchical/cluster-aware uncertainty methods
-where justified by item/store and temporal dependence, with sufficiently many
-clusters/origins; sensitivity to cluster choice is mandatory. Seeds are
-repeatability factors, not independent demand units. Report distributional
-tails and baseline *harm* frequency rather than focusing only on average gain.
+**Candidate primary estimand to predeclare at M4c:** the equal-item-store
+average **paired 28-day simulated cost gain** `G` from the selected policy
+versus the strongest prespecified baseline at a fixed history budget, then
+aggregate across prospectively eligible origins and operational scenarios
+using explicit weights. Lower cost remains the objective; `G>0` favors the
+candidate. A scale-normalized secondary estimand and pooled demand-weighted
+service metric must be labeled separately. Item-store/origin is a repeated
+measure, **not** an independent sample. Treat store/geographic clustering and
+shared calendar shocks as potential dependencies and plan hierarchical or
+cluster-aware uncertainty estimation with adequate numbers of true clusters;
+with 12 series across eight stores and one common window, the pilot has no
+reliable confirmatory inference. Prespecify a future sampling/power plan,
+multiple truly distinct origins, method training/MC seeds, uncertainty
+intervals, harm frequency and error under severe misspecification *before*
+opening reserved outcomes. Counts/seeds/margins remain unapproved, not hidden
+implicit defaults. Seeds are repeatability factors, not new real demand paths.
+
+Calibration for a selected/adaptively tuned policy does **not** automatically
+retain pre-selection uncertainty coverage. A claimed T1 guarantee requires
+valid simultaneous/selection-aware calibration or independently separated
+post-selection calibration evidence, plus controlled known-law coverage tests;
+ordinary GP credible intervals alone do not imply coverage.
 
 A non-inferiority claim about a short history `n=28` versus `224` needs
 an **externally justified, prespecified cost margin** and a valid one-sided

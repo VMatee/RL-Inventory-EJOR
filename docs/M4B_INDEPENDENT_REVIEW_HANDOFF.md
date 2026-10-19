@@ -1,4 +1,14 @@
-# Independent GPT-6 Pro review handoff — M4b, 2026-10-19
+# Optional extra GPT-6 Pro review handoff — M4b, 2026-10-19
+
+> An independent Codex GPT-6.1 Ultra code/science review **has already been
+> completed** and supplied by the owner; it requested changes to PR #10.
+> The authoring account addressed those findings in a follow-up patch.
+> See `docs/M4B_CODEX_REVIEW_RESPONSE_20261019.md` for the exact accepted
+> findings and regression-test response. A **read-only re-review of that
+> patch is still required before merge**. The scarce Web GPT-6 Pro quota
+> has not been used; it is optional additional review, not a prerequisite
+> if a satisfactory independent Codex re-review is completed.
+
 
 **Purpose:** rigorous outside-the-author scientific and code audit of the
 M4b work, to be performed by the owner's **other ChatGPT account** using

@@ -13,6 +13,13 @@ import statistics
 from collections import Counter, defaultdict
 from pathlib import Path
 
+from inventory_ejor.baselines.audit_checks import (
+    bound_wrapper,
+    checked_leaf,
+    evaluate_job,
+    independent_calendar_replay,
+    reconstructed_ledger,
+)
 from inventory_ejor.baselines.planning import (
     check_approval,
     inside,
@@ -160,14 +167,18 @@ def analyze_session(root: Path, session: Path) -> dict:
     provenance or incomplete crossed comparisons.
     """
     root = Path(root).resolve()
-    session = Path(session).resolve()
+    raw_session = Path(session).absolute()
     require(
-        session.parent == (root / "results/runs").resolve(),
+        raw_session.parent == root / "results/runs",
         "Expected direct child of results/runs, not arbitrary file path",
     )
-    plan = read_json(session / "plan.json")
-    summary = read_json(session / "session_summary.json")
-    approval = read_json(session / "approval.json")
+    session = inside(root, str(raw_session.relative_to(root)), "results/runs")
+    require(session.is_dir(), "Missing or noncanonical saved session")
+    plan = read_json(checked_leaf(root, session / "plan.json", "results/runs"))
+    summary = read_json(
+        checked_leaf(root, session / "session_summary.json", "results/runs")
+    )
+    approval = read_json(checked_leaf(root, session / "approval.json", "results/runs"))
     check_approval(plan, approval)
     require(
         sha_file(inside(root, plan["config_path"])) == plan["config_sha256"],
@@ -200,13 +211,27 @@ def analyze_session(root: Path, session: Path) -> dict:
         "Session job counts inconsistent",
     )
 
+    # No aggregate generator may touch arbitrary or symlinked result leaves.
+    # Preflight ALL the stored file paths before invoking historical reporting.
+    for entry in summary["entries"]:
+        location = root / entry["output"]
+        require(location.parent == session, "Results belong to another session")
+        checked_leaf(root, location / "result.json", "results/runs")
+        checked_leaf(root, location / "private_sales_replay.json", "results/runs")
+        checked_leaf(root, root / entry["wrapper_manifest"], "results/runs")
+    checked_leaf(root, session / "baseline_results.csv", "results/runs")
     generated = summarize_session(root, session, write=False)
     require(
-        generated == read_json(session / "aggregate_summary.json"),
+        generated
+        == read_json(
+            checked_leaf(root, session / "aggregate_summary.json", "results/runs")
+        ),
         "Saved aggregate does not match independent checksum-verifying regeneration",
     )
 
-    with (session / "baseline_results.csv").open(newline="", encoding="utf-8") as file:
+    with checked_leaf(root, session / "baseline_results.csv", "results/runs").open(
+        newline="", encoding="utf-8"
+    ) as file:
         listed = list(csv.DictReader(file))
     csv_rows = {row["job"]: row for row in listed}
     require(
@@ -244,6 +269,9 @@ def analyze_session(root: Path, session: Path) -> dict:
     costs_by_method = defaultdict(lambda: Counter())
     runtime_by_method: dict[str, list[float]] = defaultdict(list)
     gp_losses: dict = {}
+    evaluations: dict = {}
+    used_manifests: set[str] = set()
+    job_positions = {job["id"]: idx for idx, job in enumerate(plan["jobs"])}
     for entry in entries:
         job = job_index[entry["job"]]
         require(entry["exit_code"] == 0, "Nonzero job status")
@@ -253,22 +281,8 @@ def analyze_session(root: Path, session: Path) -> dict:
         ):
             path = inside(root, str(Path(entry["output"]) / name), "results/runs")
             require(sha_file(path) == entry[key], "Modified result/trace checksum")
-        wrap_file = inside(root, entry["wrapper_manifest"], "results/runs")
-        require(
-            sha_file(wrap_file) == entry["wrapper_manifest_sha256"],
-            "Modified provenance wrapper",
-        )
-        wrap = read_json(wrap_file)
-        require(
-            wrap.get("status") == "succeeded"
-            and wrap.get("source_unchanged") is True
-            and wrap.get("clean_source") is True
-            and wrap.get("source_commit") == plan["git"]["commit"]
-            and wrap.get("config_sha256") == plan["config_sha256"]
-            and wrap.get("data_manifest", {}).get("sha256")
-            == plan["bundle_manifest_sha256"]
-            and wrap.get("seed") == job["seed"],
-            "Invalid wrapper provenance",
+        bound_wrapper(
+            root, session, plan, job_positions[entry["job"]], job, entry, used_manifests
         )
 
         output = inside(root, entry["output"], "results/runs")
@@ -283,7 +297,9 @@ def analyze_session(root: Path, session: Path) -> dict:
             result["job"] == entry["job"]
             and result["source_commit"] == plan["git"]["commit"]
             and result["rl_training"] is False
-            and result["our_proposed_method"] is False,
+            and result["our_proposed_method"] is False
+            and result["execution_source_hashes"] == plan["execution_sources"]
+            and result["status"] == "completed_development_baseline_requires_review",
             "Misidentified development result",
         )
         require(len(trace) == job["horizon"], "Missing replay periods")
@@ -296,8 +312,16 @@ def analyze_session(root: Path, session: Path) -> dict:
         initial = InventoryState(
             config["initial_on_hand"], tuple(config["initial_pipeline"])
         )
+        evaluate_job(root, job, trace, evaluations)
         requests, fulfilled, total_cost, cost_components = recheck_trace(
             m1_config, initial, trace, job["origin"]
+        )
+        calendar_requests, calendar_filled, _ = independent_calendar_replay(
+            config, job, trace, result
+        )
+        require(
+            (requests, fulfilled) == (calendar_requests, calendar_filled),
+            "Independent calendar and M1 replay disagree",
         )
         require(
             close(total_cost, result["total_cost"])
@@ -341,10 +365,11 @@ def analyze_session(root: Path, session: Path) -> dict:
             else result["fill_rate"] is None,
             "Wrong saved fill rate",
         )
+        learner_observations, effort = reconstructed_ledger(root, plan, job, result)
         require(
-            result["information_ledger"]["synthetic_transitions"] > 0
-            and result["information_ledger"]["optimization_trials"] > 0,
-            "Invalid declared compute accounting",
+            result["information_ledger"]["synthetic_transitions"]
+            == effort["synthetic_transitions"],
+            "Reconstructed compute budget mismatch",
         )
         series_key = (job["series"], job["origin"], job["budget"])
         method_key = (job["series"], job["budget"], job["method"])
@@ -373,25 +398,10 @@ def analyze_session(root: Path, session: Path) -> dict:
             )
 
         if series_key not in history:
-            learner = inside(root, job["learner_file"], "data/processed")
-            require(
-                sha_file(learner) == job["learner_sha256"],
-                "Development learner artifact changed since run",
-            )
-            h = read_json(learner)["history"]
-            observations = h["observations"]
-            require(
-                h["series"] == job["series"]
-                and h["origin"] == job["origin"]
-                and len(observations) == job["budget"]
-                and [o["day"] for o in observations]
-                == list(range(job["origin"] - job["budget"], job["origin"])),
-                "Learner history chronology mismatch",
-            )
             history[series_key] = {
-                "sum_sales": sum(o["sales"] for o in observations),
-                "positive_days": sum(o["sales"] > 0 for o in observations),
-                "zero_days": sum(o["sales"] == 0 for o in observations),
+                "sum_sales": sum(o.sales for o in learner_observations),
+                "positive_days": sum(o.sales > 0 for o in learner_observations),
+                "zero_days": sum(o.sales == 0 for o in learner_observations),
             }
         if job["method"] == "gp_base_stock":
             losses = result["model"]["marginal_likelihood_losses"]
@@ -473,10 +483,15 @@ def analyze_session(root: Path, session: Path) -> dict:
     gp_same_model = gp_same_tuned_level = gp_same_tuning_costs = 0
     changed_actions = periods = 0
     startup_cost = 0.0
+    arrival_window_saving = later_window_saving = 0.0
+    arrival_window_holding_saving = 0.0
+    terminal_gp_stock = terminal_rollout_stock = 0
     for s in series:
         for b in budgets:
             left = by_case[s, b, "gp_base_stock"]
             right = by_case[s, b, "gp_rollout"]
+            terminal_gp_stock += left["terminal"]["ending_stock_before_receipt"]
+            terminal_rollout_stock += right["terminal"]["ending_stock_before_receipt"]
             gp_same_model += left["model"] == right["model"]
             gp_same_tuned_level += (
                 left["selected_base_stock"] == right["selected_base_stock"]
@@ -496,6 +511,14 @@ def analyze_session(root: Path, session: Path) -> dict:
                 changed_actions += a["order"] != c["order"]
                 if t < config["lead_time"]:
                     startup_cost += a["lost_units"] * config["costs"]["lost_sales"]
+                elif t < min(2 * config["lead_time"], len(traces[s, b, "gp_rollout"])):
+                    arrival_window_saving += a["cost"] - c["cost"]
+                    arrival_window_holding_saving += (
+                        (a["on_hand"] - a["fulfilled"])
+                        - (c["on_hand"] - c["fulfilled"])
+                    ) * config["costs"]["holding"]
+                else:
+                    later_window_saving += a["cost"] - c["cost"]
 
     sales_by_series = {
         s: sum(
@@ -513,13 +536,45 @@ def analyze_session(root: Path, session: Path) -> dict:
     )
     gp_rollout_total = aggregate["gp_rollout"]["total_cost"]
     paired_top2_removed = {}
+    leave_one_series_ranges = {}
+    equal_series_relative_improvement = {}
     for other in METHODS:
         if other == "gp_rollout":
             continue
         subset = [s for s in series if s not in exclude_top2]
-        paired_top2_removed[other] = paired_summary(
-            by_case, subset, budgets, other, "gp_rollout"
-        )["relative_pooled_cost_reduction"]
+        paired_top2_removed[other] = (
+            paired_summary(by_case, subset, budgets, other, "gp_rollout")[
+                "relative_pooled_cost_reduction"
+            ]
+            if subset
+            else None
+        )
+        leave_values = [
+            paired_summary(
+                by_case,
+                [x for x in series if x != held],
+                budgets,
+                other,
+                "gp_rollout",
+            )["relative_pooled_cost_reduction"]
+            for held in series
+            if len(series) > 1
+        ]
+        leave_one_series_ranges[other] = {
+            "min_relative_reduction": min(leave_values) if leave_values else None,
+            "max_relative_reduction": max(leave_values) if leave_values else None,
+        }
+        relative_items = []
+        for s in series:
+            a = math.fsum(by_case[s, b, other]["total_cost"] for b in budgets)
+            c = math.fsum(by_case[s, b, "gp_rollout"]["total_cost"] for b in budgets)
+            if a > 0:
+                relative_items.append((a - c) / a)
+        equal_series_relative_improvement[other] = {
+            "mean_relative_reduction": statistics.mean(relative_items),
+            "median_relative_reduction": statistics.median(relative_items),
+            "valid_series": len(relative_items),
+        }
 
     origins = sorted({j["origin"] for j in plan["jobs"]})
     require(len(origins) == 1, "M4b initial-run audit expects one origin")
@@ -555,6 +610,10 @@ def analyze_session(root: Path, session: Path) -> dict:
         "paired_vs_gp_rollout_excluding_two_highest_request_series": (
             paired_top2_removed
         ),
+        "leave_one_series_relative_reduction_ranges": leave_one_series_ranges,
+        "equal_series_average_relative_improvement": (
+            equal_series_relative_improvement
+        ),
         "budgets_compared_to_224": budget_deltas,
         "gp_controlled_ablation": {
             "same_fitted_model_pairs": gp_same_model,
@@ -573,6 +632,17 @@ def analyze_session(root: Path, session: Path) -> dict:
             ),
             "gp_loss_paths_checked": len(gp_losses),
             "gp_optimizer_convergence_not_established": True,
+            "first_receivable_window_saving_periods": [
+                config["lead_time"],
+                min(2 * config["lead_time"], plan["jobs"][0]["horizon"]) - 1,
+            ],
+            "first_receivable_window_cost_saving": arrival_window_saving,
+            "first_receivable_window_holding_cost_saving": (
+                arrival_window_holding_saving
+            ),
+            "later_window_cost_saving": later_window_saving,
+            "ending_stock_before_receipt_gp_base_sum": terminal_gp_stock,
+            "ending_stock_before_receipt_gp_rollout_sum": terminal_rollout_stock,
         },
         "data_diagnostics": {
             "distinct_development_series": len(series),
