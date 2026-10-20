@@ -74,6 +74,7 @@ def check_freeze(config, freeze):
 
 
 def check_selection(config, freeze, selection):
+    """Check an attestation's structure/bindings, NOT persisted evidence."""
     _record(
         selection,
         "selection_lock",
@@ -108,6 +109,7 @@ def check_selection(config, freeze, selection):
 
 
 def check_calibration(config, freeze, selection, calibration):
+    """Check the attested lock chain; authorize_task also verifies its files."""
     _record(
         calibration,
         "calibration_lock",
@@ -165,7 +167,7 @@ def release_template(config, phase, origin, budget, capability, cohort_sha256):
     }
 
 
-def authorize_task(
+def check_task_attestation(
     config,
     freeze,
     release,
@@ -178,7 +180,7 @@ def authorize_task(
     selection=None,
     calibration=None,
 ):
-    """Validate the complete metadata/record chain BEFORE any data callback."""
+    """Metadata-only attestation validation. This does NOT authorize value IO."""
     task = task_for(
         config, phase, origin, budget if budget is not None else max(config["budgets"])
     )
@@ -250,4 +252,52 @@ def authorize_task(
             release["calibration_sha256"] is None and calibration is None,
             "Only final tasks may consume a calibration lock",
         )
+    return task
+
+
+def authorize_task(
+    config,
+    freeze,
+    release,
+    *,
+    phase,
+    origin,
+    budget,
+    capability,
+    cohort_sha256,
+    selection=None,
+    calibration=None,
+    evidence=None,
+    cohort=None,
+):
+    """Authorize value IO: attested releases AND persisted prerequisite evidence.
+
+    Evidence demonstrates byte identity and declared access coverage, not honest
+    ownership, correct model selection or an authenticated event chronology.
+    """
+    task = check_task_attestation(
+        config,
+        freeze,
+        release,
+        phase=phase,
+        origin=origin,
+        budget=budget,
+        capability=capability,
+        cohort_sha256=cohort_sha256,
+        selection=selection,
+        calibration=calibration,
+    )
+    if phase in ("calibration", "final_test"):
+        from .evidence import EvidenceStore, verify_calibration, verify_selection
+
+        require(
+            type(evidence) is EvidenceStore, "Persisted selection evidence required"
+        )
+        require(
+            type(cohort) is tuple and fingerprint(list(cohort)) == cohort_sha256,
+            "Evidence requires the exact fixed cohort",
+        )
+        verify_selection(config, freeze, selection, cohort, evidence)
+        if phase == "final_test":
+            verify_calibration(config, freeze, selection, calibration, cohort, evidence)
     return task

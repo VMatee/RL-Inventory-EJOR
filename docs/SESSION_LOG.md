@@ -1,5 +1,22 @@
 # Session handoff log
 
+## 2026-10-20 - PR #11 critical firewall follow-up
+
+Verified clean branch `feat/m4c-protocol-access-firewall`, local/remote head
+`4d9a777cd8f8e07b39e33df2bd120676b5c593ec`, PR #11 open/unmerged and matching
+base main. Reused and verified the 1,611-file protected snapshot before edits.
+Reproduced direct adapter reads with no records/missing specification and
+calibration access under hash-only selection locks using temporary synthetic
+data. Added per-read adapter authorization, persisted typed evidence/receipts,
+complete validation/calibration coverage checks and legacy protected-phase guards.
+Updated trust limits, scientific cautions and the mandatory future M4d contract.
+
+Full repository suite: 218/218 passed in 15.466 s (17 added follow-up tests).
+Scoped strict Ruff/format and project checks passed. Original M4 audit JSON is
+identical to the preceding M4c audit. Final preservation and publication details:
+`results/summaries/M4C_FIREWALL_FOLLOWUP_20261020.md`. No additional M5 values,
+fitting, GPU jobs, baseline execution or final release. No automatic merge.
+
 ## 2026-10-20 - M4c proposal and staged access firewall (engineering only)
 
 Published [PR #11](https://github.com/VMatee/RL-Inventory-EJOR/pull/11),

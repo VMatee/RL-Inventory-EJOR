@@ -44,6 +44,19 @@ and after each read. Full-source byte hashing is trusted provenance work, not
 parsing withheld sales into predictors. Only the requested window is interpreted
 as observations. These adapters were exercised only on temporary synthetic CSVs.
 
+**PR #11 follow-up correction:** the original adapter methods did not themselves
+perform authorization. Direct reads could bypass the preparer even with a missing
+specification. Every supported read now requires a complete `authorization`
+mapping: `config`, `freeze`, `release`, `catalog`, `phase`, `origin`, `budget`,
+`selection`, `calibration`, and `evidence`. The adapter revalidates task, cohort,
+exact window, capability, records, evidence, live code/specification and source on
+**each call**. Calling `verify_freeze` never arms later unscoped reads. The private
+window method also enforces the adapter's capability. Production reads require an
+`EvidenceStore`; access metadata is persisted before values return. Staged APIs
+supply this context and return `access_receipt_sha256`. Custom in-memory/test
+readers remain trusted callbacks and now accept the `authorization` keyword;
+historical M3 APIs are unchanged.
+
 ## Record chain
 
 Records use strict keys and canonical JSON fingerprints. A template is always
@@ -73,12 +86,61 @@ using calibration/final outcomes is not. The field named
 including validation**, and its study-wide distinct-cell union. It is not proof
 that the whole research effort used only n observations.
 
-Opaque lock hashes are trusted evidence references, not proof that model files
-exist or that a scientific calculation was performed correctly. The M4d runner
-must pin and verify actual procedure/checkpoint and calibration artifacts, persist
-these returned receipts, and bind model/source/config/runtime before scoring.
-The M4c API does not automatically persist a chronological event journal or mark
-a release as consumed. Repeated scoring cannot be treated as a fresh holdout.
+`check_selection`, `check_calibration` and `check_task_attestation` are explicitly
+**metadata/attestation validators**, not permission to read values. `authorize_task`
+additionally requires a persisted evidence store for calibration/final access.
+Hash-shaped strings and `selection_frozen=true` alone no longer suffice.
+
+### Persisted evidence and its precise limits
+
+`EvidenceStore(directory)` uses canonical `<sha256>.json` files, bounded to 1 MiB,
+with exclusive writes and verified reuse of identical records. The directory must
+already exist, be canonical, and be outside protected raw/processed/run trees.
+Symlink leaves/directories are refused before contents are opened. Reads hash and
+parse the **same bytes**, require canonical JSON, and validate strict record keys,
+kind and frozen identities. No path embedded in a record is followed. Use a private
+ignored directory such as `results/analysis/<new-study>/access/`; never publish
+private receipts or model-selection payloads in a PR.
+
+Calibration requires these persisted records:
+
+- Four `procedure_specification` records: candidate, baseline, search specification
+  and calibration rule. Each binds its role, protocol/freeze and a nonempty
+  `specification` object to the lock hash. These are actual specification bytes,
+  **not verified executable models or recursively checked dependencies**.
+- `selection_evidence`, referenced by the historical field
+  `development_access_log_sha256`, pins procedures, access receipts and a
+  `selection_result`. It may inventory development access and must cover every
+  declared validation origin, selected series, n-history and scorer outcome path.
+- Each `staged_access_receipt` binds phase/origin/n/capability/series/window,
+  protocol/freeze/source/cohort and an actual persisted approved release. Duplicate,
+  wrong-phase and incomplete prerequisite coverage is refused.
+- `selection_result` pins the same procedures and exact validation receipt set.
+  Its nonempty `result` object is an attested result payload, not an independently
+  recomputed or scientifically validated selection analysis.
+
+Final access additionally requires `calibration_evidence` covering all declared
+calibration histories/outcome paths and a `calibration_result` linking that exact
+receipt set to the frozen selection. References are verified anew; changed bytes,
+missing tasks or updating only untrusted manifests are refused. Planning caps each
+prerequisite inventory at 10,000 receipt identities so its list fits the evidence
+bound. This is an engineering capacity limit.
+
+| Level | What is established |
+|---|---|
+| Trusted owner attestation | Named owner/decision, approval flag and frozen record chain; no identity authentication |
+| Verified persisted evidence | Matching actual JSON bytes, typed links, approved release records and declared access coverage |
+| Scientific/execution validity | **Not established:** honest chronology, complete investigator access inventory, actual model comparison, correct selection/calibration, model dependency closure, or valid inference |
+
+Dependencies establish declared logical order, not authenticated wall clock order.
+Supported adapter calls persist receipts after successful reads; privileged local
+writers can fabricate files or call persistence helpers. Interrupted reads or
+failed persistence may expose values without a success receipt and must be
+reported as exposure, never retried as fresh blind tests. There is no consumed
+release marker or authenticated append-only journal. Repeated scoring is not a
+new holdout. M4d must verify actual execution outputs/model dependencies, complete
+method/seed grids and analysis procedures: access receipts do not demonstrate
+that validation was conducted.
 
 ## Cohort and strict information scope
 
@@ -110,6 +172,11 @@ run before numerical imports. Existing M3 schemas and M4b auditing are unchanged
 The legacy planner intentionally cannot consume staged protected bundles. Future
 M4d integration must use separate learner/scorer artifacts and explicit releases;
 do not make it accept a new status string and then hash every evaluator artifact.
+Legacy workers also reject explicit nondevelopment `phase` values before model
+imports or artifact reads. Real M5 future origins remain refused if phase is
+omitted. No M4d executor exists here; its future safety cannot be certified in
+advance. Its mandatory contract is in `experiments/protocol/M4D_READINESS.md`,
+section 7.
 
 ## Operational and security limits
 

@@ -60,6 +60,12 @@ readiness are documented, not scientifically frozen. Review
 Actual M4d runner integration, owner choices, new observation releases and
 execution remain separate gates. No new real observations or models were used.
 
+PR #11 follow-up hardens direct production adapter calls and requires persisted
+selection/calibration evidence before protected reads. Evidence covers declared
+series/origin/history/outcome access, not actual model/seed execution or scientific
+validity. See `results/summaries/M4C_FIREWALL_FOLLOWUP_20261020.md`; the strict M4d
+integration contract is mandatory before enabling a new executor.
+
 ## M4d - Stronger crossed baselines [planned; separate execution approval]
 
 Add Empirical + one-step rollout and Gamma–Poisson + one-step rollout to complete 3-demand-model × 2-controller matrix; recency-aware baseline and GP fixed-calendar-time-scale ablation. Then GP planning/DCL and appropriate TED/HDPO or explicit adaptations as feasible. Test forecast calibration, epistemic/aleatoric differences and matched data/compute. New versioned development-only runs need separate scope and authorization; original 192-job artifacts remain immutable.

@@ -2,6 +2,19 @@
 
 2026-10-20 M4c engineering decisions (the older rows remain historical):
 
+- PR #11 critical follow-up: treat unguarded direct adapter access as an actual
+  supported-API defect; reauthorize each exact read and persist metadata receipts
+  before returning values. Do not use a reusable armed-source flag.
+- Separate metadata attestation validation from value authorization. Require
+  actual canonical specification/result/access artifacts for calibration/final;
+  refuse placeholder hashes, substituted files and incomplete phase coverage.
+  Unsigned records remain trusted attestations, not proof of execution, owner
+  identity or scientific validity. M4d must verify model dependencies and complete
+  actual validation/calibration execution before enabling protected experiments.
+- Preserve candidate A/B/C and all owner scientific gates. Clarify conditional
+  finite-catalog interpretation, limited temporal replication and warm-state
+  continuation tuning; no new real data or empirical conclusions are introduced.
+
 - Preserve legacy M3/M4 schemas; confine real-M5 legacy preparation/execution
   to exposed d_225. A separate staged API checks metadata and owner records
   before observation callbacks. Old planners cannot silently accept new stages.

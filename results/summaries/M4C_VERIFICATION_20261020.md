@@ -1,5 +1,12 @@
 # M4c engineering verification — 2026-10-20 Asia/Bangkok
 
+**Historical first-pass record.** Independent PR #11 follow-up found that direct
+adapter calls bypassed the preparer and selection locks verified only metadata.
+The corrections, updated test counts and precise remaining trust limits are in
+`M4C_FIREWALL_FOLLOWUP_20261020.md`. The 201-test evidence below is preserved as
+the earlier validation record, not evidence that those later counterexamples
+were already rejected.
+
 Scope: candidate scientific protocol, metadata compiler and staged preparation
 firewall. Base main is `bea7dcb5ad82c457e81f75b6965179d725acae45` (merged PR #10).
 Branch: `feat/m4c-protocol-access-firewall`. See the PR head for the final commit.

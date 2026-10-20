@@ -1,8 +1,8 @@
 """Trusted bounded M5 reader adapters for staged preparation.
 
-Constructors read no files. Only the trusted staged preparer receives these
-adapters; the returned LearnerView has no reader. Direct raw-reader use remains
-outside this accidental-leakage API, as in M3 (no OS isolation is claimed).
+Constructors read no files. Every supported read, including a direct adapter
+call, validates a complete per-request authorization before raw IO. The returned
+LearnerView has no reader. No OS isolation or hostile-Python sandbox is claimed.
 """
 
 from __future__ import annotations
@@ -12,9 +12,12 @@ import hashlib
 import subprocess
 from pathlib import Path
 
+from .contracts import Window, exact_keys
+from .evidence import EvidenceStore, access_receipt
 from .m5 import ReadLimits, load_calendar, load_observations
 from .protocol import M5_VERSION, plan_protocol, recognized_m5_source, require
 from .provenance import fingerprint, verify_inputs
+from .releases import check_freeze
 
 
 class _WindowSource:
@@ -31,6 +34,11 @@ class _WindowSource:
 
     def verify_freeze(self, config, freeze):
         """Bind live clean code and actual analysis-spec bytes before data IO."""
+        check_freeze(config, freeze)
+        require(
+            self.manifest_sha256 == freeze["source_manifest_sha256"],
+            "Reader source manifest differs from scientific freeze",
+        )
         if recognized_m5_source(self._root, self._manifest):
             require(
                 config["dataset_version"] == M5_VERSION,
@@ -54,7 +62,56 @@ class _WindowSource:
             "Analysis specification changed after approval",
         )
 
-    def _read(self, series, window):
+    def _read(self, series, window, *, capability=None, authorization=None):
+        # No reusable 'armed' flag or stale grant: validate this exact read.
+        from .staged import _authorize
+
+        require(type(authorization) is dict, "Complete per-read authorization required")
+        exact_keys(
+            authorization,
+            (
+                "config",
+                "freeze",
+                "release",
+                "catalog",
+                "phase",
+                "origin",
+                "budget",
+                "selection",
+                "calibration",
+                "evidence",
+            ),
+            "source authorization",
+        )
+        require(capability == self._capability, "Cross-capability source access")
+        a = authorization
+        task, _ = _authorize(
+            a["config"],
+            a["freeze"],
+            a["release"],
+            a["catalog"],
+            series,
+            a["phase"],
+            a["origin"],
+            a["budget"],
+            capability,
+            a["selection"],
+            a["calibration"],
+            a["evidence"],
+        )
+        require(
+            type(a["evidence"]) is EvidenceStore,
+            "Production reads require persisted access receipts",
+        )
+        require(
+            type(window) is Window
+            and window
+            == Window(
+                **task["history" if capability == "learner_history" else "evaluation"]
+            ),
+            "Window differs from authorized source task",
+        )
+        self.verify_freeze(a["config"], a["freeze"])
         limits = ReadLimits(max_seconds=100, max_selected=1024)
         # Validate every path BEFORE provenance hashing or CSV interpretation.
         for name in (
@@ -81,21 +138,34 @@ class _WindowSource:
             before == verify_inputs(self._root, self._manifest, limits),
             "Source changed during staged preparation",
         )
+        # Persist before returning values. An interrupted/failed read may have
+        # exposed data without a success receipt; it must not be retried as blind.
+        access_receipt(
+            a["config"], a["freeze"], a["release"], series, window, a["evidence"]
+        )
         return result
 
 
 class M5HistorySource(_WindowSource):
     """Trusted history adapter; no public evaluator method."""
 
-    def read_history(self, series, window):
-        return self._read(series, window)
+    _capability = "learner_history"
+
+    def read_history(self, series, window, *, authorization=None):
+        return self._read(
+            series, window, capability=self._capability, authorization=authorization
+        )
 
 
 class M5EvaluatorSource(_WindowSource):
     """Trusted scorer adapter, supplied only to the separate scorer API."""
 
-    def read_evaluation(self, series, window):
-        return self._read(series, window)
+    _capability = "evaluation_outcomes"
+
+    def read_evaluation(self, series, window, *, authorization=None):
+        return self._read(
+            series, window, capability=self._capability, authorization=authorization
+        )
 
 
 def _live_code():

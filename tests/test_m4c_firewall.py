@@ -21,6 +21,7 @@ from inventory_ejor.data.contracts import (
     Observation,
     Window,
 )
+from inventory_ejor.data.evidence import PROCEDURES, EvidenceStore
 from inventory_ejor.data.preparation import parse_config, prepare
 from inventory_ejor.data.protocol import (
     M5_EVALUATION_SHA256,
@@ -96,7 +97,7 @@ class MemorySource:
             for day in window.days
         )
 
-    def read_history(self, series, window):
+    def read_history(self, series, window, *, authorization=None):
         return self._observations("history", series, window)
 
     def verify_freeze(self, config, freeze):
@@ -104,7 +105,7 @@ class MemorySource:
         if self.manifest_sha256 != freeze["source_manifest_sha256"]:
             raise ValueError("synthetic manifest mismatch")
 
-    def read_evaluation(self, series, window):
+    def read_evaluation(self, series, window, *, authorization=None):
         return self._observations("evaluation", series, window)
 
 
@@ -144,12 +145,129 @@ def synthetic_records(cfg):
     return freeze, selection, calibration
 
 
+def persisted_records(cfg, freeze, catalog, store):
+    """Persist synthetic procedure/result examples and REAL synthetic API reads.
+
+    These fixtures establish the evidence mechanics, not scientific selection.
+    No real dataset or fitted model participates.
+    """
+    _, selection, calibration = synthetic_records(cfg)
+    base = dict(
+        schema_version=1,
+        protocol_sha256=fingerprint(cfg),
+        freeze_sha256=fingerprint(freeze),
+    )
+    for field in PROCEDURES:
+        selection[field] = store.put(
+            {
+                **base,
+                "kind": "procedure_specification",
+                "role": field.removesuffix("_sha256"),
+                "specification": {"fixture": "SYNTHETIC ONLY"},
+            }
+        )
+    selection["freeze_sha256"] = fingerprint(freeze)
+    source = MemorySource()
+    source.manifest_sha256 = freeze["source_manifest_sha256"]
+    cohort = select_cohort(cfg, catalog)
+
+    def read_phase(phase, selected):
+        receipts = set()
+        origins = next(p["origins"] for p in cfg["phases"] if p["role"] == phase)
+        for origin in origins:
+            for series in cohort:
+                for capability, budget in [
+                    ("learner_history", b) for b in cfg["budgets"]
+                ] + [("evaluation_outcomes", None)]:
+                    release = release_template(
+                        cfg,
+                        phase,
+                        origin,
+                        budget,
+                        capability,
+                        fingerprint(list(cohort)),
+                    )
+                    release.update(
+                        approved=True,
+                        approved_by_owner="SYNTHETIC TEST ONLY",
+                        decision_record="synthetic:evidence",
+                        freeze_sha256=fingerprint(freeze),
+                        selection_sha256=fingerprint(selected) if selected else None,
+                    )
+                    args = dict(
+                        catalog=catalog,
+                        series=series,
+                        phase=phase,
+                        origin=origin,
+                        source=source,
+                        selection=selected,
+                        evidence=store,
+                    )
+                    if budget is not None:
+                        _, receipt = prepare_learner(
+                            cfg, freeze, release, budget=budget, **args
+                        )
+                    else:
+                        _, receipt = prepare_evaluation(cfg, freeze, release, **args)
+                    receipts.add(receipt["access_receipt_sha256"])
+        return sorted(receipts)
+
+    validation = read_phase("validation", None)
+    procedures = {field: selection[field] for field in PROCEDURES}
+    result = store.put(
+        {
+            **base,
+            "kind": "selection_result",
+            **procedures,
+            "validation_receipt_sha256s": validation,
+            "result": {"fixture": "SYNTHETIC ONLY; no scientific selection claimed"},
+        }
+    )
+    selection["development_access_log_sha256"] = store.put(
+        {
+            **base,
+            "kind": "selection_evidence",
+            **procedures,
+            "receipt_sha256s": validation,
+            "selection_result_sha256": result,
+        }
+    )
+    calibrated = read_phase("calibration", selection)
+    calibration.update(
+        freeze_sha256=fingerprint(freeze), selection_sha256=fingerprint(selection)
+    )
+    calibration["calibration_result_sha256"] = store.put(
+        {
+            **base,
+            "kind": "calibration_result",
+            "selection_sha256": fingerprint(selection),
+            "calibration_receipt_sha256s": calibrated,
+            "result": {"fixture": "SYNTHETIC ONLY; no coverage claimed"},
+        }
+    )
+    calibration["access_log_sha256"] = store.put(
+        {
+            **base,
+            "kind": "calibration_evidence",
+            "selection_sha256": fingerprint(selection),
+            "receipt_sha256s": calibrated,
+        }
+    )
+    return selection, calibration
+
+
 class FirewallTests(unittest.TestCase):
     def setUp(self):
         self.cfg = configuration()
         self.catalog = ("A", "B", "C")
         self.series = select_cohort(self.cfg, self.catalog)[0]
         self.freeze, self.selection, self.calibration = synthetic_records(self.cfg)
+        temp = tempfile.TemporaryDirectory(prefix="m4c-evidence-")
+        self.addCleanup(temp.cleanup)
+        self.evidence = EvidenceStore(temp.name)
+        self.selection, self.calibration = persisted_records(
+            self.cfg, self.freeze, self.catalog, self.evidence
+        )
         self.source = MemorySource()
 
     def grant(
@@ -185,6 +303,7 @@ class FirewallTests(unittest.TestCase):
             source=self.source,
             selection=self.selection,
             calibration=self.calibration,
+            evidence=self.evidence,
         )
         args.update(overrides)
         return prepare_learner(self.cfg, self.freeze, release or self.grant(), **args)
@@ -360,6 +479,7 @@ class FirewallTests(unittest.TestCase):
             source=self.source,
             selection=self.selection,
             calibration=self.calibration,
+            evidence=self.evidence,
         )
         with self.assertRaises(ValueError):
             prepare_evaluation(self.cfg, self.freeze, self.grant(), **args)
@@ -375,12 +495,12 @@ class FirewallTests(unittest.TestCase):
 
     def test_future_observation_and_indirect_targets_in_history_rejected(self):
         original = self.source.read_history
-        self.source.read_history = lambda series, window: original(
+        self.source.read_history = lambda series, window, **kwargs: original(
             series, Window(window.start + 1, window.stop + 1)
         )
         with self.assertRaises(ValueError):
             self.learner()
-        self.source.read_history = lambda series, window: EvaluationTargets(
+        self.source.read_history = lambda series, window, **kwargs: EvaluationTargets(
             "x", series, window, original(series, window)
         )
         with self.assertRaises(ValueError):
@@ -458,6 +578,7 @@ class FirewallTests(unittest.TestCase):
             source=self.source,
             selection=self.selection,
             calibration=self.calibration,
+            evidence=self.evidence,
         )
         self.assertEqual(sum(o.sales for o in target.observations), 0)
 

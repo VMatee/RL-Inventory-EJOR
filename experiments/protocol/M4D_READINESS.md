@@ -57,6 +57,9 @@ use L-1 copies of r. This is a feasible prescribed initial state, not a sample
 from a demonstrated stationary distribution. Freeze or replace the rule before
 viewing comparison outcomes. Use the same state across methods and budgets;
 never initialize n=28 using 224-day information. Log initialization access.
+Reuse the fitted demand model, but tune the continuation under the declared
+initial state/objective; transplanting a cold-tuned continuation into the warm
+panel would confound controller and initialization effects.
 
 At the candidate two budgets and three seeds, this targeted warm GP pair adds
 144 policy evaluations. Report cold and warm effects separately, including
@@ -125,3 +128,59 @@ variation. Neither new seeds nor four history budgets create new real series.
   isolated synthetic fixtures; no retail training is needed for this gate.
 - Obtain a separate development execution allowance. Keep calibration,
   validation, final outcomes, RL, and external-dataset access outside that scope.
+
+## 7. Mandatory executor integration contract — not implemented or authorized
+
+M4c's legacy planner rejects staged manifests before artifact hashing. Its worker
+rejects explicit validation/calibration/final phases before model imports and
+real-M5 protected origins even if a phase is omitted. Do not relax these guards
+or route a protected task through a combined M3 bundle. No new executor exists
+here; passing M4c tests cannot establish safety of future code. Implement and
+independently review this contract before enabling M4d:
+
+1. **Trusted dispatcher, learner-only input.** Require an exact typed staged
+   learner manifest independent of the old schema-2 bundle. Bind protocol,
+   scientific freeze, history release, series/origin/n, actual learner bytes and
+   persisted access receipt. Give fitting/controller code only `LearnerView` or
+   its pinned payload. Do not pass raw readers, authorization objects, release/
+   evidence stores, evaluator manifests/paths/targets or full-source hashes.
+   Planning/preflight must never hash evaluator files.
+2. **Immutable execution provenance.** A separately authorized execution plan
+   must pin the learner manifest, all executable procedure/config dependencies,
+   expected model/controller matrix, fit/tuning/decision seeds, code/source/
+   environment and resource allowances. Bind state, pipeline, L, action bounds,
+   costs, horizon and terminal convention. Verify every file actually loaded,
+   including checkpoint/normalizer dependencies; a specification containing
+   mutable paths is insufficient. Write exclusively; bind fitted-model/actions/
+   outputs and effort counters to this task. No silent repair, dropped cases or
+   favorable retries.
+3. **Independent scorer release.** History permission never opens outcomes. The
+   scorer must revalidate the independent outcome grant, exact task/window,
+   selection/calibration evidence and frozen execution-output chain before
+   `prepare_evaluation`. Learner code receives no scorer reference. Obtain a
+   separate final-outcome authorization; metadata preparation is not permission.
+   Persist the scorer receipt before publishing scores, then independently
+   replay stock-flow, costs and terminal state.
+4. **Execution evidence before stage transitions.** M4c verifies specification/
+   result JSON and declared access coverage, not executed model selection. M4d
+   must bind actual complete validation outputs/audits and selection analysis to
+   the frozen candidate family, search rule and receipts before calibration;
+   similarly bind actual calibration computation and fallback/stop before final.
+   Method/seed/output coverage is additional to M4c's series/origin/history/window
+   coverage. Arbitrary nonempty result objects cannot satisfy this execution
+   gate. Owner attestation must inventory all historical selection access,
+   including legacy exposed data and failed reads. Ordinary raw-file access
+   remains outside automated detection.
+5. **Required synthetic attacks.** Refuse legacy combined manifests, changed
+   learner/procedure/checkpoint/calibration bytes, rich-n normalizers transplanted
+   to short n, wrong seeds/states/L/objectives/terminal conventions, swapped
+   receipts, incomplete method grids and tampered outputs even after untrusted
+   hashes are refreshed. Spies must prove zero evaluator opens/hashes during
+   planning, fitting and unreleased scoring. Receipt-persistence failure must
+   stop delivery; partial reads count as exposures.
+
+The actual analysis specification must fix primary n/baseline, finite benchmark
+versus population target, cohort, weights, seed ensemble, inference, multiplicity
+and failure handling. SHA256 of an arbitrary file does not prove completeness.
+Scientific choices, run authorization and final releases remain **PENDING OWNER
+APPROVAL**.

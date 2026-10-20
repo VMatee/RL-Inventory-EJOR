@@ -19,6 +19,7 @@ from .contracts import (
     Window,
     fit_normalization,
 )
+from .evidence import access_receipt
 from .m5 import rank_candidates
 from .protocol import plan_protocol, require, task_for
 from .provenance import fingerprint
@@ -57,6 +58,7 @@ def _authorize(
     capability,
     selection,
     calibration,
+    evidence=None,
 ):
     cohort = select_cohort(config, catalog)
     require(series in cohort, "Series outside fixed metadata cohort; no replacement")
@@ -71,6 +73,8 @@ def _authorize(
         cohort_sha256=fingerprint(list(cohort)),
         selection=selection,
         calibration=calibration,
+        evidence=evidence,
+        cohort=cohort,
     )
     return task, cohort
 
@@ -150,6 +154,7 @@ def prepare_learner(
     source,
     selection=None,
     calibration=None,
+    evidence=None,
 ):
     """Return (learner view, trusted access receipt), reading only one n-history.
 
@@ -168,6 +173,7 @@ def prepare_learner(
         "learner_history",
         selection,
         calibration,
+        evidence,
     )
     require(
         source.manifest_sha256 == freeze["source_manifest_sha256"],
@@ -175,7 +181,19 @@ def prepare_learner(
     )
     source.verify_freeze(config, freeze)
     window = Window(**task["history"])
-    observations = source.read_history(series, window)
+    authorization = dict(
+        config=config,
+        freeze=freeze,
+        release=release,
+        catalog=catalog,
+        phase=phase,
+        origin=origin,
+        budget=budget,
+        selection=selection,
+        calibration=calibration,
+        evidence=evidence,
+    )
+    observations = source.read_history(series, window, authorization=authorization)
     require(
         type(observations) is tuple
         and all(type(o) is Observation for o in observations),
@@ -196,6 +214,11 @@ def prepare_learner(
         "ledger": info,
         "validated_counts": counts,
         "information_track": config["information_track"],
+        "access_receipt_sha256": access_receipt(
+            config, freeze, release, series, window, evidence
+        )
+        if evidence is not None
+        else None,
     }
 
 
@@ -211,6 +234,7 @@ def prepare_evaluation(
     source,
     selection=None,
     calibration=None,
+    evidence=None,
 ):
     """Trusted scorer only. Independent outcome release, no learner reference."""
     task, cohort = _authorize(
@@ -225,6 +249,7 @@ def prepare_evaluation(
         "evaluation_outcomes",
         selection,
         calibration,
+        evidence,
     )
     require(
         source.manifest_sha256 == freeze["source_manifest_sha256"],
@@ -232,7 +257,19 @@ def prepare_evaluation(
     )
     source.verify_freeze(config, freeze)
     window = Window(**task["evaluation"])
-    observations = source.read_evaluation(series, window)
+    authorization = dict(
+        config=config,
+        freeze=freeze,
+        release=release,
+        catalog=catalog,
+        phase=phase,
+        origin=origin,
+        budget=None,
+        selection=selection,
+        calibration=calibration,
+        evidence=evidence,
+    )
+    observations = source.read_evaluation(series, window, authorization=authorization)
     require(
         type(observations) is tuple
         and all(type(o) is Observation for o in observations),
@@ -257,6 +294,11 @@ def prepare_evaluation(
         "window": asdict(window),
         "selection_sha256": release["selection_sha256"],
         "calibration_sha256": release["calibration_sha256"],
+        "access_receipt_sha256": access_receipt(
+            config, freeze, release, series, window, evidence
+        )
+        if evidence is not None
+        else None,
     }
 
 

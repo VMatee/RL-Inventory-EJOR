@@ -63,3 +63,16 @@ positive real release exists. All new M5 values and M4d execution remain closed.
 The next task is independent PR review and owner scientific choices, followed
 by a separately scoped M4d implementation/execution decision. Verification and
 preserved-artifact evidence are in `results/summaries/M4C_VERIFICATION_20261020.md`.
+
+### PR #11 critical follow-up
+
+The independent review found a real direct-adapter authorization bypass and
+hash-only selection evidence. Reproduced both on synthetic fixtures at `4d9a777`.
+Adapters now authorize each exact read and persist receipts; calibration/final
+also require actual typed specification/result files and complete prerequisite
+access coverage. Legacy workers reject explicit protected phases. This verifies
+declared persisted evidence, not executed or scientifically valid selection.
+M4d executor/model dependency checks remain mandatory future gates. Chronology,
+estimand, cohort and inference choices remain PENDING OWNER APPROVAL. Follow-up
+commands, limitations and preservation evidence:
+`results/summaries/M4C_FIREWALL_FOLLOWUP_20261020.md`.

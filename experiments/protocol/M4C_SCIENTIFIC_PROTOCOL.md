@@ -133,6 +133,11 @@ rule, identity normalization and any store/category strata before sales access.
 Hash-ranked item-store IDs may come from the known ex-post M5 catalog. This
 catalog is not a reconstructed historical assortment; survivor/assortment bias
 remains. Publish selection/exclusion rules and counts as aggregate metadata.
+Fixed-seed hash ranking defines a reproducible finite-catalog subset; it does not
+by itself supply a randomized probability sample. Default interpretation must
+remain conditional on the selected item-stores and calendar contexts. Population
+inference needs an explicit sampling/randomization argument or other justified
+transport assumptions, still PENDING OWNER APPROVAL.
 Include all valid candidate histories, including all-zero histories. Do not
 replace dormant, difficult, failed, or poor-performing cases after outcomes.
 The required candidate count, seed and allocation are not set by this document.
@@ -182,6 +187,11 @@ count 32/seed 0 and the pinned existing metadata frame; these values remain
 PENDING OWNER APPROVAL. Supported preparation checks are implemented, while
 scientific approval, staged experiment execution, actual model-artifact binding
 at scoring and an operational access journal remain distinct future gates.
+The PR #11 follow-up adds adapter-local authorization and persisted prerequisite
+specification/result/access records. Those records establish actual bytes and
+declared validation/calibration coverage, not actual scientifically valid model
+selection or authenticated chronology. M4d must separately verify execution
+evidence and analysis completeness before enabling protected experiments.
 
 ## 7. Estimands and reporting: choose the target before selecting a test
 
@@ -217,6 +227,12 @@ not create more independent stores. Two or three final origins are few time unit
 Plan store/item and temporal dependence sensitivity; do not call item-store-only
 clustering sufficient without an argument. Report per-origin and store-level
 results even when a justified confirmatory interval is unavailable.
+Under A/B, at most two final common-calendar contexts are scored; C gives three.
+Increasing series, budgets or optimizer seeds cannot supply missing temporal
+replication. Retain A as an engineering candidate, not a statistically preferred
+design: no outcome-free evidence supplied here ranks A/B/C by power or seasonal
+representativeness. Any confirmatory interpretation needs independent pilot
+dependence evidence or a differently justified design, not nominal sample counts.
 For weighted repeated units i, `Var(sum_i w_i G_i)=sum_i sum_j w_i w_j Cov(G_i,G_j)`.
 Dropping off-diagonal covariance or using the 48 pilot budget pairs as independent
 units is unjustified. Training seeds measure algorithm repeatability separately.

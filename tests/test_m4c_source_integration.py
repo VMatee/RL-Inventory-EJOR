@@ -11,8 +11,9 @@ from pathlib import Path
 from unittest.mock import patch
 
 from m3_fixtures import fixture_manifest, make_fixture, write_csv
-from test_m4c_firewall import configuration, synthetic_records
+from test_m4c_firewall import configuration, persisted_records, synthetic_records
 
+from inventory_ejor.data.evidence import EvidenceStore
 from inventory_ejor.data.protocol import M5_EVALUATION_SHA256
 from inventory_ejor.data.provenance import canonical, fingerprint
 from inventory_ejor.data.releases import release_template
@@ -34,6 +35,9 @@ class StagedSourceIntegrationTests(unittest.TestCase):
         self.manifest = make_fixture(self.raw)
         self.spec = root / "analysis.txt"
         self.spec.write_text("synthetic prespecified analysis only\n")
+        evidence_dir = root / "evidence"
+        evidence_dir.mkdir()
+        self.evidence = EvidenceStore(evidence_dir)
         self.catalog = tuple(f"FOODS_1_00{i}_CA_1" for i in range(1, 4))
         self.cfg = configuration()
         self.cfg["cohort"]["catalog_sha256"] = fingerprint(sorted(self.catalog))
@@ -42,10 +46,8 @@ class StagedSourceIntegrationTests(unittest.TestCase):
             source_manifest_sha256=fingerprint(self.manifest),
             analysis_spec_sha256=hashlib.sha256(self.spec.read_bytes()).hexdigest(),
         )
-        self.selection["freeze_sha256"] = fingerprint(self.freeze)
-        self.calibration.update(
-            freeze_sha256=fingerprint(self.freeze),
-            selection_sha256=fingerprint(self.selection),
+        self.selection, self.calibration = persisted_records(
+            self.cfg, self.freeze, self.catalog, self.evidence
         )
         self.series = select_cohort(self.cfg, self.catalog)[0]
 
@@ -84,6 +86,7 @@ class StagedSourceIntegrationTests(unittest.TestCase):
             source=source,
             selection=self.selection,
             calibration=self.calibration,
+            evidence=self.evidence,
         )
 
     def test_actual_csv_learner_and_scorer_paths_are_separate(self):
@@ -105,6 +108,7 @@ class StagedSourceIntegrationTests(unittest.TestCase):
                 source=self.source(M5EvaluatorSource),
                 selection=self.selection,
                 calibration=self.calibration,
+                evidence=self.evidence,
             )
             self.assertEqual([o.day for o in target.observations], [23, 24])
             self.assertEqual(
@@ -159,12 +163,13 @@ class StagedSourceIntegrationTests(unittest.TestCase):
             if entry["filename"] == "sales_train_evaluation.csv":
                 entry["sha256"] = M5_EVALUATION_SHA256
         source = M5HistorySource(self.raw, manifest, analysis_spec_path=self.spec)
+        freeze = dict(self.freeze, source_manifest_sha256=fingerprint(manifest))
         with patch(
             "inventory_ejor.data.staged_source.verify_inputs",
             side_effect=AssertionError("unsafe raw read"),
         ) as spy:
             with self.assertRaisesRegex(ValueError, "masquerade"):
-                source.verify_freeze(self.cfg, self.freeze)
+                source.verify_freeze(self.cfg, freeze)
             spy.assert_not_called()
 
     def test_raw_leaf_symlink_and_mutation_refused(self):
@@ -202,10 +207,8 @@ class StagedSourceIntegrationTests(unittest.TestCase):
             # and data still must not depend on this withheld sales cell.
             self.manifest = fixture_manifest(self.raw)
             self.freeze["source_manifest_sha256"] = fingerprint(self.manifest)
-            self.selection["freeze_sha256"] = fingerprint(self.freeze)
-            self.calibration.update(
-                freeze_sha256=fingerprint(self.freeze),
-                selection_sha256=fingerprint(self.selection),
+            self.selection, self.calibration = persisted_records(
+                self.cfg, self.freeze, self.catalog, self.evidence
             )
             after, new_receipt = self.prepare_history(self.source())
             self.assertEqual(

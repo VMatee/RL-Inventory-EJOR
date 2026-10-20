@@ -16,6 +16,7 @@ from .embargo import validate_nonadaptive_origin_embargo
 from .provenance import fingerprint
 
 ACCESS_ORDER = ("development", "validation", "calibration", "final_test")
+MAX_EVIDENCE_RECEIPTS = 10_000
 M5_VERSION = "m5-accuracy-zenodo-10203108-v1"
 M5_EVALUATION_SHA256 = (
     "4b4a47c44c38380d2a9168216fea8c9ff2f31b1ddb772f8a0995952a038b8aa0"
@@ -173,6 +174,18 @@ def plan_protocol(config):
     integer(cohort["count"], "cohort count")
     integer(cohort["seed"], "cohort seed", 0)
     require(cohort["count"] <= 1024, "Cohort exceeds planning bound")
+    # A canonical list of <=10,000 SHA256 IDs fits the 1 MiB evidence bound.
+    # Do not compile a plan whose prerequisite access inventory cannot be saved.
+    for roles in (("development", "validation"), ("calibration",)):
+        receipts = (
+            cohort["count"]
+            * (len(budgets) + 1)
+            * sum(len(origins_by_role[role]) for role in roles)
+        )
+        require(
+            receipts <= MAX_EVIDENCE_RECEIPTS,
+            "Plan exceeds persisted evidence capacity",
+        )
     require(
         type(config["features"]) is list
         and len(set(config["features"])) == len(config["features"])
@@ -275,6 +288,10 @@ def guard_legacy_bundle(manifest):
 
 
 def guard_legacy_job(job, plan):
+    require(
+        job.get("phase", "development") == "development",
+        "Legacy workers cannot execute staged protected phases",
+    )
     guard_legacy_development(
         {
             "dataset_version": job.get("dataset_version"),
