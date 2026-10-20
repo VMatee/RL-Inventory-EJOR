@@ -138,14 +138,19 @@ def verify_synthetic_reference_trace(
             "variable_order": c.variable_order * q,
             "fixed_order": c.fixed_order if q else 0.0,
         }
+        # Match the specified M1 arithmetic, not a regrouped mathematical sum.
+        # Component products and chronological accumulation also have the same
+        # operation order as the pinned scorer, so no scale tolerance is needed.
+        period_cost = (
+            current["holding"] + current["lost_sales"] + current["variable_order"]
+        ) + current["fixed_order"]
         require(
             type(recorded["cost"]) in (int, float)
             and math.isfinite(recorded["cost"])
+            and math.isfinite(period_cost)
             and recorded["fulfilled"] == fulfilled
             and recorded["lost_units"] == lost
-            and math.isclose(
-                recorded["cost"], sum(current.values()), rel_tol=1e-12, abs_tol=1e-9
-            ),
+            and recorded["cost"] == period_cost,
             "Saved reference transition/cost differs",
         )
         _bounded_int(stock + arrivals.get(t + 1, 0), "next stock", 2**53)
@@ -158,13 +163,8 @@ def verify_synthetic_reference_trace(
     ]
     total = math.fsum(costs.values())
     require(
-        all(
-            math.isclose(
-                costs[k], score["cost_components"][k], rel_tol=1e-12, abs_tol=1e-9
-            )
-            for k in costs
-        )
-        and math.isclose(total, score["total_cost"], rel_tol=1e-12, abs_tol=1e-9)
+        all(costs[k] == score["cost_components"][k] for k in costs)
+        and total == score["total_cost"]
         and score["fulfilled"] == served
         and score["requests"] == requests
         and score["ending_stock"] == stock

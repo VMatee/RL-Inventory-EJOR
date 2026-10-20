@@ -21,13 +21,25 @@ from .provenance import canonical, read_json
 PRIVATE_MAX_BYTES = 8 * 1024 * 1024
 
 
+class PendingArtifactCleanupError(OSError):
+    """Owned temporary deletion failed; the chained cause is the OS error."""
+
+    def __init__(self, path):
+        self.pending_path = path
+        super().__init__(
+            f"Private artifact cleanup failed for {path}; stop retries and recover "
+            "only after all store writers are quiescent"
+        )
+
+
 class PrivateExecutionStore:
     """User-owned 0700 store outside Git worktrees, rechecked at every access.
 
     Failed pre-publication writes leave no final artifact. A failure after link
     may leave correct final bytes, but is never success; a retry synchronizes
-    them again. Process death may leave .pending-* files: they are not artifacts
-    and must only be removed by an owner after confirming no writer is active.
+    them again. Process death or failed cleanup may leave .pending-* files:
+    they are not artifacts and must only be removed by an owner after confirming
+    no writer is active. Repeated cleanup failures can accumulate these orphans.
     Hostile same-user writers and hardware that lies about fsync are out of scope.
     """
 
@@ -117,6 +129,12 @@ class PrivateExecutionStore:
             require(self._bytes(fd) == data, "Existing artifact content changed")
             os.fsync(fd)
 
+    def _remove_pending(self, directory, temporary):
+        try:
+            os.unlink(temporary, dir_fd=directory)
+        except OSError as exc:
+            raise PendingArtifactCleanupError(self.root / temporary) from exc
+
     def put(self, value):
         data = canonical(value)
         require(len(data) <= PRIVATE_MAX_BYTES, "Oversized private artifact")
@@ -127,15 +145,13 @@ class PrivateExecutionStore:
                 self._sync_existing(directory, name, data)
             except FileNotFoundError:
                 temporary = ".pending-" + secrets.token_hex(16)
-                created = False
+                fd = os.open(
+                    temporary,
+                    os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_NOFOLLOW,
+                    0o600,
+                    dir_fd=directory,
+                )
                 try:
-                    fd = os.open(
-                        temporary,
-                        os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_NOFOLLOW,
-                        0o600,
-                        dir_fd=directory,
-                    )
-                    created = True
                     try:
                         # Enforce the artifact contract even under a restrictive umask.
                         os.fchmod(fd, 0o600)
@@ -158,11 +174,16 @@ class PrivateExecutionStore:
                         )
                     except FileExistsError:
                         self._sync_existing(directory, name, data)
-                    os.unlink(temporary, dir_fd=directory)
-                    created = False
-                finally:
-                    if created:
-                        os.unlink(temporary, dir_fd=directory)
+                except BaseException as primary:
+                    # Preserve cancellation and the original persistence error.
+                    # Cleanup is attempted once, only for this call's own file.
+                    try:
+                        self._remove_pending(directory, temporary)
+                    except PendingArtifactCleanupError as cleanup:
+                        raise primary from cleanup
+                    raise
+                else:
+                    self._remove_pending(directory, temporary)
             # Required even for identical existing bytes or a failed prior call.
             os.fsync(directory)
         return digest

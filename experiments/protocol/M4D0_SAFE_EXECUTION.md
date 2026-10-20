@@ -7,6 +7,10 @@ scientific decisions, candidate 28-day schedule, source access approvals,
 primary estimand, statistical power and future M4d-1 GPU campaigns remain
 **PENDING OWNER APPROVAL**.
 
+Independent re-review approved the scoped implementation at `e9698b0`.
+The final cost-verification/cleanup hardening described below is newly
+author-tested; that earlier approval is not attributed to these later edits.
+
 ## Motivation
 
 M4c established separate `prepare_learner()` and `prepare_evaluation()`
@@ -67,6 +71,35 @@ outstanding is the final transition's `outstanding_after_order`, of length
 zero salvage. No terminal disposal charge, shortage backlog or salvage value
 is introduced.
 
+### Defined floating-point cost representation
+
+The reference uses finite nonnegative binary floating-point scenario costs,
+not exact decimal accounting. Its reproducible evidence format specifies:
+
+- Period cost is left-associated `((holding + lost_sales) + variable_order)
+  + fixed_order`, matching M1 `StepCosts.total`.
+- Each component total uses chronological `+=` starting at `0.0`.
+- The saved total equals `math.fsum(saved_component_totals.values())` exactly.
+
+The independent arrival-calendar audit reconstructs the same coefficient/count
+products and specified addition order under the pinned runtime. Therefore
+saved period costs and components can be compared exactly; a scale-relative
+or fixed absolute tolerance is unnecessary for these evidence identities.
+The shared score validator also checks the exact internal total/components
+identity and rejects invalid, nonfinite or overflowing totals. Rehashing
+`5e15` to `5e15+100`, changing one representable unit, or adjusting components
+and total coherently must not pass merely because costs are large or tiny.
+
+This does **not** require the total to equal `math.fsum(period_costs)`: that
+regroups rounding operations. For 64 periods with stock 3, no requests/orders
+and holding coefficient 0.1, the valid component-based total is
+19.200000000000024, while `fsum(period_costs)` is 19.200000000000003. The audit
+accepts that legitimate difference. Alternative arithmetic algorithms or
+runtime environments need a new reviewed contract; this is neither numerical
+perfection nor general tolerance-free comparison of independent algorithms.
+Underflow follows float semantics; a proposed edit that rounds back to the
+identical numeric value is not a distinct stored cost discrepancy.
+
 `PrivateExecutionStore` uses a pre-existing, user-owned mode-0700 directory
 **outside every Git worktree**, content-addressed bounded JSON, and rechecks
 directory ownership/mode/canonical location at every access. Artifact reads
@@ -79,14 +112,36 @@ Successful `put()` means exclusive same-directory temporary creation, a
 complete write, file `fsync`, atomic no-overwrite hard-link publication,
 temporary unlink and directory `fsync` have succeeded. An existing matching
 artifact is read/verified and **file- and directory-synchronized again**.
-Pre-publication failures remove the temporary file and leave no final name.
+Pre-publication failures leave no final name and attempt owned temporary
+cleanup once. If deletion also fails, the original persistence exception
+remains primary, chained from `PendingArtifactCleanupError` (with
+`pending_path`) and the original OS cleanup error. A cleanup-only failure
+raises that diagnostic; neither case returns success.
 A directory-sync failure after publication may leave complete final bytes,
-but raises; retry cannot bypass synchronization. Process death can leave
-`.pending-*` files, which are never recognized as artifacts. Only an owner
-who has confirmed no writer is active should clean those orphans. This
+but raises; retry cannot bypass synchronization. Process death **or failed
+cleanup** can leave partial or complete `.pending-*` files. These names are
+never recognized as artifacts; reading their content hash does not promote
+them. Normal retries do not prune or reuse pending files. Persistent cleanup
+failures can accumulate one orphan per attempted new publication: no global
+disk-usage bound is claimed. Stop retries and recover explicitly. This
 assumes POSIX local storage honoring `fsync`/atomic hard links, not network
 filesystem semantics or a hostile same-user writer. It does not add these
 durability properties to the existing M4c EvidenceStore.
+
+Owner-controlled orphan recovery is deliberately not automatic:
+
+1. Stop and quiesce **all** processes allowed to write that private store.
+   File age, PID labels or an `lsof` snapshot alone do not prove inactivity.
+2. Reconfirm the canonical caller-owned mode-0700 root outside Git worktrees.
+   Inspect only explicitly reviewed `.pending-[0-9a-f]{32}` names as regular
+   caller-owned files, without following symlinks.
+3. Remove those reviewed pending files, never `<SHA256>.json` final artifacts
+   or files belonging to active writers. Synchronize the directory with
+   `fsync` after deletion. If deletion or synchronization fails, report failure
+   and stop; do not announce successful recovery or continue an automatic loop.
+
+Each `put` cleans only its own newly created temporary file. There is no age
+heuristic, background collector or cleanup API that can race an active writer.
 
 The consumed dependency manifest hashes **all local
 `src/inventory_ejor/**/*.py` files**, including this auditor and store;
@@ -212,7 +267,7 @@ PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src:tests \
   src/inventory_ejor/data/m4d0_store.py \
   src/inventory_ejor/data/m4d0_io.py \
   scripts/check_m4d0_io.py tests/test_m4d0_execution.py \
-  tests/test_m4d0_review_regressions.py
+  tests/test_m4d0_review_regressions.py tests/test_m4d0_final_hardening.py
 ```
 
 A four-period synthetic case also demonstrates positive replenishment,
@@ -231,6 +286,11 @@ test-only rational arithmetic/arrival-calendar oracle, rehashed/relinked
 invalid evidence graphs and file/write/fsync/publication/retry fault injection.
 These tests validate the bounded reference implementation, not general
 numerical optimality or learned policy quality.
+
+`test_m4d0_final_hardening.py` adds full-lifecycle cost forgeries, valid
+zero/subnormal/noninteger/large-cost representations, combined persistence and
+cleanup failures, pending-file ineligibility, explicit quiescent-owner recovery,
+unchanged unrelated pending files and four actual concurrent publishers.
 
 Do not run `scripts/run_baselines.py` or `scripts/start_baselines.py` as
 part of M4d-0. Existing `results/runs/m4-approved-yc4xtrp1/` is immutable.

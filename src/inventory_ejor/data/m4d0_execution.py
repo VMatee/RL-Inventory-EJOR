@@ -646,11 +646,19 @@ def validate_score_record(score, plan_digest, fit_digest, plan, inv, approval):
         ("holding", "lost_sales", "variable_order", "fixed_order"),
         "score costs",
     )
-    for value in (*score["cost_components"].values(), score["total_cost"]):
-        require(
-            type(value) in (int, float) and math.isfinite(value) and value >= 0,
-            "Invalid finite nonnegative score cost",
-        )
+    try:
+        for value in (*score["cost_components"].values(), score["total_cost"]):
+            require(
+                type(value) in (int, float) and math.isfinite(value) and value >= 0,
+                "Invalid finite nonnegative score cost",
+            )
+        component_total = math.fsum(score["cost_components"].values())
+    except OverflowError as exc:
+        raise ValueError("Score cost exceeds finite floating-point range") from exc
+    require(
+        score["total_cost"] == component_total,
+        "Saved total cost differs from math.fsum of saved components",
+    )
     require(
         score["fill_rate"] is None
         if score["requests"] == 0

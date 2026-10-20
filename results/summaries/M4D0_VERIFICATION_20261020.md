@@ -4,6 +4,50 @@
 **Scope:** CPU-only synthetic engineering. No real M5/M4d-1 baseline execution,
 new outcome release, EJOR result, new research method or scientific freeze.
 
+## Final cost/cleanup hardening after independently approved e9698b0
+
+The independent re-review approved M4d-0 at `e9698b0`. The subsequent two
+minor corrections are **newly author-tested**, not attributed to that earlier
+approval. Entry feature checkout and remote PR matched that clean head.
+
+- Reproduced rehashed total `5e15+100` being accepted. Shared validation now
+  requires the exact saved `total == math.fsum(components)` identity. Independent
+  replay checks exact chronological component totals and the defined
+  left-associated period arithmetic. Zero/subnormal/noninteger/large finite
+  cases pass; representably changed totals/components/periods fail. Legitimate
+  differences from regrouping period costs are preserved, not treated as errors.
+- Reproduced file-fsync plus unlink failure masking the primary error. Cleanup
+  now preserves that primary exception, chains an explicit pending-path/OS
+  diagnostic, and attempts owned cleanup once. Rejection is not cleanup:
+  failed deletion can leave orphans. Owner recovery requires quiescent writers,
+  reviewed pending-file removal and directory synchronization. No auto-pruning.
+- Added `tests/test_m4d0_final_hardening.py`: **13 new methods**. Existing B1
+  and C1–C4 regression cases remain passing without redesigning those fixes.
+
+| Final check | Result |
+|---|---|
+| Complete feature-source repository tests | **268/268 passed**, 28.682 s |
+| Synthetic-only M4d-0 tests | **50/50 passed**, 12.974 s |
+| Strict scoped Ruff E,F,I,B,UP / format | Passed / eight Python files formatted |
+| Project structure / Git diff | Passed |
+| Original protected SHA256/size and full path set | **1,611 unchanged**, zero new/missing paths |
+| New reserved values parsed, real fitting/baselines or GPUs | None |
+
+Separate authoring self-audits accepted 60 fresh synthetic lifecycles/rejected
+360 rehashed numerical changes, passed 55 combined storage checks and rejected
+36 fresh original-provenance/interaction corruptions. No new
+scoped blocking/major defect was found. These are not independent peer review.
+Exact commands, code/test references, remaining limitations and the original
+snapshot identity are in
+[`M4D0_CODEX_REVIEW_RESPONSE_20261020.md`](../../docs/M4D0_CODEX_REVIEW_RESPONSE_20261020.md).
+
+**Author assessment: technically merge-ready, APPROVE TO MERGE within
+synthetic-only M4d-0.** PR #12 must remain open/unmerged until the owner acts.
+M4d-1 real-data execution and EJOR publication readiness remain **NOT READY**.
+No new scientific freeze, selection-valid coverage or novelty is established.
+
+## Historical first-pass and B1/C1–C4 verification
+
 **Superseded first-pass verification below:** the independent adversarial
 review of `ff05c5b` found B1/C1–C4 despite 233 passing tests. Those tests did
 not establish the claimed complete provenance or numerical correctness.
@@ -12,7 +56,7 @@ The correction report is
 It records strict audit context/validation, exact fitting, terminal correction,
 independent stock-flow replay, durable publication, **255/255 repository
 tests / 37 M4d-0 tests passed**, and **1,611/1,611 original files unchanged**.
-External independent re-review remains required; the historical first-pass
+At that report stage external re-review remained required; the historical first-pass
 description/counts are retained below rather than silently rewritten.
 
 ## Implemented

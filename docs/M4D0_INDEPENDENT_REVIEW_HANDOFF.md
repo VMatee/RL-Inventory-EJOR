@@ -1,6 +1,37 @@
 # M4d-0 independent adversarial review handoff
 
-**Status:** Pending independent read-only review before merging. This PR is a synthetic-only CPU reference learner/scorer implementation. It is NOT permission for M5, Kaggle/Favorita, calibration, validation/final release, real baselines or a GP/RL run.
+**Status:** Independent re-review APPROVED the scoped implementation at
+`e9698b0896fcb0c55c20bd3c43c6b5648ed1cc62`. Final cost and cleanup changes
+are newly author-tested, not covered by that earlier independent approval.
+The author recommends the completed scoped PR for merge after the checks in
+the updated verification report. No merge is performed automatically.
+This is synthetic-only CPU reference infrastructure, not permission for M5,
+Kaggle/Favorita, protected phases, real baselines or GP/RL execution.
+
+## Final two-issue repeat checklist
+
+Review the current head against `e9698b0`; see the final-hardening section of
+`docs/M4D0_CODEX_REVIEW_RESPONSE_20261020.md` and
+`tests/test_m4d0_final_hardening.py`.
+
+1. Complete a valid synthetic lifecycle with total 5,000,000,000,000,000,
+   verify it, change only saved total by +100 and rehash. Audit must reject.
+   Also alter a component and recompute total coherently, make balanced
+   component changes, or relink a modified period cost. Check one representable
+   increment at zero, subnormal, small and very large scales.
+2. Preserve valid rounding: the scorer uses chronological component sums,
+   `fsum` for total, and left-associated period addition. The valid total need
+   not equal `fsum(period_costs)`; do not certify a regrouped period sum instead.
+3. Combine file-fsync/write/publication failure with failed temporary unlink.
+   The exact primary exception must remain primary; its explicit cleanup
+   cause must identify the pending path and original OS cleanup error. Cleanup
+   is attempted once. A cleanup-only failure must raise, not return a digest.
+4. Verify partial/complete pending files are never accepted as completed
+   evidence; repeated failures can leave orphans. Normal retry synchronizes
+   valid final bytes and does not silently delete those or another writer's
+   pending files. Recovery requires quiescent writers and explicit owner action.
+5. Repeat B1/C1–C4 below. Do not infer M4d-1 readiness, actual scientific
+   selection execution, raw-byte authenticity, calibration coverage or novelty.
 
 ## Ready-to-paste reviewer request
 
@@ -13,6 +44,7 @@ Act as an independent and adversarial research software reviewer for RL-Inventor
 - scripts/check_m4d0_io.py
 - tests/test_m4d0_execution.py
 - tests/test_m4d0_review_regressions.py
+- tests/test_m4d0_final_hardening.py
 - Existing M4c data/views.py, staged.py, staged_source.py, releases.py and evidence.py.
 
 Verify with synthetic fixtures, without modifying repository code:

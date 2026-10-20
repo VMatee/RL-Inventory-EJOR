@@ -1,5 +1,29 @@
 # Session handoff log
 
+## 2026-10-20 - Finish M4d-0 cost and cleanup hardening
+
+Verified clean feature worktree/remote/PR at `e9698b0`, independently approved
+for synthetic-only M4d-0. Reproduced both subsequent minor counterexamples:
+rehashed 5e15 total +100 accepted through relative tolerance, and combined
+fsync/unlink failure masking the primary error. Fixed exact defined cost
+identities and single-attempt owned cleanup with explicit chained diagnostics;
+documented quiescent owner recovery instead of unsafe automatic pruning.
+
+Added 13 synthetic regression methods. **50/50 M4d-0** and **268/268 full
+repository tests** passed, scoped Ruff/format and project checks passed, and
+all **1,611 protected artifacts** retain original SHA256/size and path set.
+Authoring self-audits checked 60 fresh lifecycles/360 numerical corruptions
+and 55 combined storage assertions, plus 36 original-provenance/interaction
+corruptions rejected. These are not independent peer review;
+the prior independent approval applies to e9698b0, not the new source bytes.
+
+Root was the sole writer in the separate feature worktree. No main edits,
+new M5 values, baseline reruns, GP/RL/GPU work, historical approval changes or
+scientific freeze. Author verdict: APPROVE TO MERGE the scoped infrastructure;
+push to existing PR #12 only, leave it open and unmerged. M4d-1/EJOR remain
+NOT READY. Full counterexamples/commands: final section at the start of
+`docs/M4D0_CODEX_REVIEW_RESPONSE_20261020.md`.
+
 ## 2026-10-20 - PR #12 independent-review corrections
 
 Entered the clean `feat/m4d0-safe-executor` worktree at local/remote/PR head

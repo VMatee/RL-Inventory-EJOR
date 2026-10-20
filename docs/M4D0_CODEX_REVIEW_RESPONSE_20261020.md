@@ -3,9 +3,156 @@
 **Date:** 2026-10-20, Asia/Bangkok. **Original reviewed head:**
 `ff05c5b9b6272bb87eba6db7f2cc08cda2950977`; merged M4c base:
 `4d21c19371f0abaf089f194be685a21026c00999`.
-**Status:** corrections implemented and author-tested; external independent
-re-review pending. PR #12 must remain open and unmerged. No new real M5
+**Status:** independent re-review APPROVED the scoped implementation at
+`e9698b0896fcb0c55c20bd3c43c6b5648ed1cc62`. The two final changes below are
+newly author-tested, not covered by that earlier approval. PR #12 remains
+open and unmerged; the author recommends the completed scoped PR for merge.
+No new real M5
 observations, training, GPU execution or M4d-1 campaign were authorized or run.
+
+## Final two-issue hardening after e9698b0
+
+Entry checkout/remote/PR head matched `e9698b0` on
+`feat/m4d0-safe-executor`, base `4d21c193`, with a clean tree. Root was the
+only writer. Changes are confined to three M4d-0 source files, one new
+synthetic test module and relevant protocol/verification/handoff documents.
+Status/session updates record the actual review stage; original source,
+datasets, approvals and run artifacts remain untouched.
+
+### A. Scale-relative cost tolerance
+
+**Reproduced before editing:** a complete synthetic lifecycle with correct
+cost 5,000,000,000,000,000 audited successfully after changing only the saved
+total to 5,000,000,000,000,100 and recomputing its SHA256. Relative tolerance
+allowed a representably different +100 result and no internal component-total
+identity was enforced.
+
+**Correction:** `m4d0_execution.py:649` validates finite nonnegative numeric
+costs and rejects overflow, then requires exact
+`total_cost == math.fsum(cost_components.values())`. The independent audit
+at `m4d0_audit.py:141` checks the explicit left-associated M1 period sum and
+at `:164` checks the independently reconstructed chronological component
+totals exactly. Adjusting a component and total together, balancing components,
+or relinking a changed period trace cannot exploit scale-relative tolerance.
+
+Exact comparison is justified here by the **specified producer arithmetic**:
+same pinned runtime, float coefficients, integer stock/request/order values,
+same component products and chronological `+=`, same period addition order,
+and final `math.fsum`. Independent stock-flow representation remains separate
+from M1. This is not a blanket rule for independently regrouped computations.
+In particular, 64 periods at stock 3 and holding coefficient 0.1 legitimately
+produce component-based total 19.200000000000024 while `fsum(period_costs)`
+is 19.200000000000003. The valid original record is accepted; the test does
+not impose the false identity between those two reductions. A second case
+checks the rounding distinction between left-associated period sums and fsum.
+
+Six cost regression methods in `tests/test_m4d0_final_hardening.py:127`
+through `:212` cover the original +100 attack, one-ULP and balanced-component
+attacks, changed periods, zero/subnormal/tiny/noninteger/large finite costs,
+valid accumulation differences, invalid types, NaN/Inf and overflow. Canonical
+JSON rejects nonfinite values before persistence; the score validator also
+rejects them directly. These are binary floating-point evidence identities,
+not exact real-valued money. An edit rounded back to the same float is not
+a distinct stored numeric value; underflow retains ordinary float semantics.
+
+### B. Persistence failure plus failed temporary cleanup
+
+**Reproduced before editing:** injecting primary file-fsync failure and
+secondary unlink failure raised the secondary error, not the original
+persistence error; one pending file and no final file remained.
+
+**Correction:** `m4d0_store.py:24` defines `PendingArtifactCleanupError` with
+the exact `pending_path`. Cleanup (`:132`) is attempted once for this call's
+own exclusively created file. If persistence/cancellation and cleanup both
+fail, the exact primary exception remains primary, chained from the cleanup
+diagnostic and its original OS cause (`:177`). Cleanup-only failure also
+raises. File and directory fsync and no-overwrite publication remain required
+before any successful return. A creation failure does not trigger deletion
+of a file this call did not create.
+
+Seven cleanup regression methods at
+`tests/test_m4d0_final_hardening.py:262` through `:401` cover combined fsync
+and cleanup failure, partial pending bytes, pending evidence ineligibility,
+post-publication cleanup failure, synchronized retry of existing final bytes,
+three bounded repeated failures, quiescent owner recovery, preservation of
+another writer's pending file, repeated directory-sync failure and four actual
+concurrent identical publishers. Existing create/write/fsync/publication,
+symlink, short-write and retry regressions also remain passing.
+
+Recovery is **not automatic**. OS refusal can leave partial or complete
+pending files, and repeated failed attempts can accumulate them. Diagnostics
+instruct the caller to stop retries. The protocol requires all writers to be
+quiescent before explicit reviewed pending-file removal and directory fsync.
+No age/PID heuristic can safely infer inactivity; final artifacts are never
+deleted by cleanup. Rejection, successful cleanup and successful recovery are
+distinct outcomes. No cleanup-success or bounded-total-disk guarantee is made.
+
+### Final verification and authoring self-audit
+
+| Check | Result |
+|---|---|
+| M4d-0 suite | **50/50 passed**, 12.974 s; 13 added regression methods |
+| Complete repository suite | **268/268 passed**, 28.682 s |
+| Strict scoped Ruff E,F,I,B,UP / format | Passed / eight Python files formatted |
+| Structure / Git diff checks | Passed; not literature, TeX or scientific validation |
+| Original protected SHA256 + size | **1,611/1,611 unchanged**; zero added/removed paths |
+| New real observations, GP/RL training, GPU/baseline execution | None |
+
+Exact commands from the feature worktree:
+
+```bash
+PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src:tests CUDA_VISIBLE_DEVICES= \
+  timeout 300s ../../.venv/bin/python -B -m unittest discover \
+  -s tests -p 'test_m4d0*.py' -v
+PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src:tests CUDA_VISIBLE_DEVICES= \
+  timeout 300s ../../.venv/bin/python -B -m unittest discover -s tests -v
+```
+
+Use the scoped Ruff/format commands recorded below, including the new
+`tests/test_m4d0_final_hardening.py`, then `scripts/check_project.py` and
+`git diff --check`. Entry and final integrity checks stream SHA256/size
+against the original snapshot described below; the final check also compares
+the complete protected path set in the original `github/` checkout.
+
+Final logs and the bounded integrity script are retained outside Git under
+`code/backups/m4d0-final-hardening-20261020-gq9a342j/` (directory 0700,
+files 0600). Exact integrity command from this feature worktree:
+
+```bash
+../../.venv/bin/python -B \
+  ../../backups/m4d0-final-hardening-20261020-gq9a342j/verify_protected.py
+```
+
+A separate authoring-account adversarial pass accepted 60 fresh complete
+synthetic lifecycles (seed 20261022, coefficients from zero/subnormal through
+1e300) and rejected 360 representably distinct, rehashed total/component/period
+changes. Another pass checked 55 storage assertions, including cancellation
+and concurrent-duplicate publication combined with fsync and cleanup failure.
+An additional regression pass rejected 36 fresh original-provenance and
+cost/provenance-interaction corruptions, including physically missing approval
+and unapproved seed/scenario changes at all applicable stage boundaries.
+All fixtures were temporary and cleaned. These are authoring-account
+self-tests, **not independent peer review**; they do not extend the earlier
+independent approval to unreviewed source bytes.
+
+Representative original B1/C1–C4 cases remain passing regression checks:
+nonexistent release/receipt, missing persisted approval, failed fit and false
+training/retail claims; dependency/runtime/method/seed/scenario inconsistency;
+target 29 and cost 209.4; terminal outstanding [5,0,0]; repeated failed syncs.
+Their implementation was not redesigned. No new BLOCKING or MAJOR defect
+was found in the bounded final authoring pass.
+
+**Final author recommendation: APPROVE TO MERGE the scoped M4d-0 PR.**
+M4d-1 real-data execution and EJOR publication remain NOT READY, and all
+owner scientific decisions remain pending. No merge or new data release is
+performed by this correction.
+
+## Historical B1/C1–C4 response and evidence at e9698b0
+
+The remaining sections preserve the earlier response, commands, counts and
+source line references **at e9698b0**. Their pending-review statements are
+historical; the completed independent re-review and final author-tested
+hardening status are recorded above.
 
 The independent review was correct: 233 passing tests missed real audit,
 numerical and persistence defects. The earlier verification report is retained
@@ -169,14 +316,16 @@ PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src:tests CUDA_VISIBLE_DEVICES= \
   src/inventory_ejor/data/m4d0_audit.py \
   src/inventory_ejor/data/m4d0_store.py \
   src/inventory_ejor/data/m4d0_io.py scripts/check_m4d0_io.py \
-  tests/test_m4d0_execution.py tests/test_m4d0_review_regressions.py
+  tests/test_m4d0_execution.py tests/test_m4d0_review_regressions.py \
+  tests/test_m4d0_final_hardening.py
 
 ../../.venv/bin/python -B -m ruff format --check --no-cache \
   src/inventory_ejor/data/m4d0_execution.py \
   src/inventory_ejor/data/m4d0_audit.py \
   src/inventory_ejor/data/m4d0_store.py \
   src/inventory_ejor/data/m4d0_io.py scripts/check_m4d0_io.py \
-  tests/test_m4d0_execution.py tests/test_m4d0_review_regressions.py
+  tests/test_m4d0_execution.py tests/test_m4d0_review_regressions.py \
+  tests/test_m4d0_final_hardening.py
 
 ../../.venv/bin/python -B scripts/check_project.py
 git diff --check

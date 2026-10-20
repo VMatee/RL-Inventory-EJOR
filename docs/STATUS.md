@@ -2,7 +2,19 @@
 
 Updated: 2026-10-20 (Asia/Bangkok). See Git history and SESSION_LOG for validation.
 
-## PR #12 corrections awaiting independent re-review
+## PR #12 final M4d-0 merge readiness
+
+Independent re-review APPROVED the scoped implementation at `e9698b0`.
+The final two minor fixes now enforce the defined floating-point cost
+identities and preserve primary persistence errors when temporary cleanup
+also fails. They are newly author-tested, not covered by the earlier approval.
+Current checks: **268/268 repository tests**, **50/50 M4d-0 tests**, scoped
+lint/format/structure checks, and **1,611/1,611 unchanged protected artifacts**.
+The author recommends **APPROVE TO MERGE** for synthetic-only M4d-0; PR #12
+remains open/unmerged. M4d-1 and EJOR readiness remain NOT READY.
+Details: `docs/M4D0_CODEX_REVIEW_RESPONSE_20261020.md`.
+
+### Earlier B1/C1–C4 correction record
 
 The independent review of `ff05c5b` requested changes despite 233 passing
 tests. The follow-up corrects B1 and C1–C4: strict shared artifact/evidence
