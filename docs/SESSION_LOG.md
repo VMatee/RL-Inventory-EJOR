@@ -2,6 +2,10 @@
 
 ## 2026-10-20 - M4c proposal and staged access firewall (engineering only)
 
+Published [PR #11](https://github.com/VMatee/RL-Inventory-EJOR/pull/11),
+implementation commit `e9c15de6c40c058b141cfc23312ff3b412069297`.
+PR remains open and unmerged; final PR head includes the handoff-only update.
+
 Started from clean main `bea7dcb5ad82c457e81f75b6965179d725acae45`, verified
 origin/main, no active baseline processes, and created
 `feat/m4c-protocol-access-firewall`. Snapshotted 1,611 protected files externally

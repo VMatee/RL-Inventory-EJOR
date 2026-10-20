@@ -45,6 +45,9 @@ Interpret development results and failures, design the inventory-sensitive contr
 
 ## M4c implementation prepared for review — 2026-10-20
 
+Review PR: [#11](https://github.com/VMatee/RL-Inventory-EJOR/pull/11), open and
+unmerged on `feat/m4c-protocol-access-firewall`.
+
 M4b was merged as PR #10 at `bea7dcb5ad82c457e81f75b6965179d725acae45`.
 The M4c feature branch implements metadata-only planning, complete phase/history
 embargo checks, staged learner/scorer preparation, hash-bound owner releases,

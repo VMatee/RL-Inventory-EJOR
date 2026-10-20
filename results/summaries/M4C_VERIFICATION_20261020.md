@@ -3,6 +3,9 @@
 Scope: candidate scientific protocol, metadata compiler and staged preparation
 firewall. Base main is `bea7dcb5ad82c457e81f75b6965179d725acae45` (merged PR #10).
 Branch: `feat/m4c-protocol-access-firewall`. See the PR head for the final commit.
+Published review PR: [#11](https://github.com/VMatee/RL-Inventory-EJOR/pull/11).
+Implementation commit: `e9c15de6c40c058b141cfc23312ff3b412069297`;
+the subsequent handoff-only commit records this verified PR link.
 No scientific freeze, positive real release, new demand observation, model fit,
 GPU experiment, baseline campaign or final evaluation was performed.
 
