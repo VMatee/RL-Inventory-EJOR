@@ -1,5 +1,48 @@
 # Session handoff log
 
+## 2026-10-20 - PR #11 critical firewall follow-up
+
+Verified clean branch `feat/m4c-protocol-access-firewall`, local/remote head
+`4d9a777cd8f8e07b39e33df2bd120676b5c593ec`, PR #11 open/unmerged and matching
+base main. Reused and verified the 1,611-file protected snapshot before edits.
+Reproduced direct adapter reads with no records/missing specification and
+calibration access under hash-only selection locks using temporary synthetic
+data. Added per-read adapter authorization, persisted typed evidence/receipts,
+complete validation/calibration coverage checks and legacy protected-phase guards.
+Updated trust limits, scientific cautions and the mandatory future M4d contract.
+
+Full repository suite: 218/218 passed in 15.466 s (17 added follow-up tests).
+Scoped strict Ruff/format and project checks passed. Original M4 audit JSON is
+identical to the preceding M4c audit. Final preservation and publication details:
+`results/summaries/M4C_FIREWALL_FOLLOWUP_20261020.md`. No additional M5 values,
+fitting, GPU jobs, baseline execution or final release. No automatic merge.
+
+## 2026-10-20 - M4c proposal and staged access firewall (engineering only)
+
+Published [PR #11](https://github.com/VMatee/RL-Inventory-EJOR/pull/11),
+implementation commit `e9c15de6c40c058b141cfc23312ff3b412069297`.
+PR remains open and unmerged; final PR head includes the handoff-only update.
+
+Started from clean main `bea7dcb5ad82c457e81f75b6965179d725acae45`, verified
+origin/main, no active baseline processes, and created
+`feat/m4c-protocol-access-firewall`. Snapshotted 1,611 protected files externally
+before edits. Implemented pure metadata planning, complete phase/origin embargo,
+known-exposure preservation, pinned metadata cohort, hash-bound scientific and
+stage releases, actual code/spec/source binding, separate learner/scorer APIs,
+strict fitting ledgers/views, and legacy bypass/symlink guards before reads.
+Documented chronology alternatives, inference/power requirements, and M4d controls.
+
+Internal parallel read-only adversarial review found and corrected additional
+view-validation, actual-split, source-alias and symlink gaps. Final checks:
+201/201 repository tests (33 new), 250 fixed-seed paired boundary cases, scoped
+Ruff lint/format, project structure and diff checks passed. All 1,611 protected
+files match entry hashes/sizes; original 192-job/5,376-period audit reproduces.
+No additional M5 observation values, model fits, GPUs or campaigns were used.
+No scientific freeze or real release was issued. See
+`results/summaries/M4C_VERIFICATION_20261020.md` for commands and limitations.
+Next: independent PR review, owner scientific choices, then separately authorized
+M4d implementation and development access/execution. No automatic merge.
+
 ## 2026-10-19 - Codex independent review of M4b and authoring fixes (no new model execution)
 
 Owner supplied an independent Codex GPT-6.1 Ultra “Request changes” review of PR #10, head `3fe9eec`. Its independent 5,376-step calendar oracle confirmed the original cost arithmetic and identified two *actual blocking verifier gaps*: absent evaluator-to-trace matching and incomplete/unchecked real-information/compute ledgers. It also demonstrated job receipt reassignment, unchecked terminal state and symlinked input opens, and infeasible assumptions about multiple final-origin histories. The authoring agent accepted rather than downplayed the findings. Implemented strict audit helpers, evaluator/source-plan binding, read-only M3 learner+ledger reconstruction and MC effort formulas, unique job-indexed wrapper checks, an independent calendar/terminal oracle, safe path leaf checks, synthetic adversarial tests and a separate nonadaptive origin-history embargo. The future chronological geometry was revised to a **candidate**, explicitly non-authorized layout; no future outcomes were opened. Additional temporal diagnostics verified **336/407 units** of GP rollout improvement on first-arrival days 3–5, and terminal stock GPbase/rollout totals **119/147**. An isolated synthetic 16-job session now exercises successful full `analyze_session()` and refuses forged wrapper, ledger, terminal and evaluator inputs. Full ordinary suite **166/166 passed**, scoped Ruff strict lint/format and static project checks passed, and the real 192-job read-only audit reproduced **5,376 original M1 and separate calendar steps** plus unchanged 407/9904 reduction. Full matrix/statistical/novelty gates remain unresolved. Reviewer-response summary in `docs/M4B_CODEX_REVIEW_RESPONSE_20261019.md`. An external re-review of the fixes remains pending. No GP/RL fitting or M5 baseline session was started.

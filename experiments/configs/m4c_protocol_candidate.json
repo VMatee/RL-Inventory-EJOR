@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "status": "proposal_pending_owner_approval",
+  "dataset_version": "m5-accuracy-zenodo-10203108-v1",
+  "first_date": "2011-01-29",
+  "source_window": {"start": 1, "stop": 1942},
+  "horizon": 28,
+  "budgets": [28, 56, 112, 224],
+  "phases": [
+    {"role": "development", "start": 1, "stop": 757, "origins": [225, 477, 729]},
+    {"role": "calibration", "start": 757, "stop": 1009, "origins": [981]},
+    {"role": "validation", "start": 1009, "stop": 1261, "origins": [1233]},
+    {"role": "final_test", "start": 1261, "stop": 1942, "origins": [1485, 1914]}
+  ],
+  "cohort": {
+    "rule": "metadata_hash_without_sales", "count": 32, "seed": 0,
+    "catalog_sha256": "81eb7ed6da92ba6af8694c0bbee7614497e485c271415bd687629d17def2f592"
+  },
+  "features": ["month", "weekday"],
+  "information_track": "per_series_with_shared_development"
+}

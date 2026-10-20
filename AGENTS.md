@@ -34,6 +34,15 @@ The owner subsequently delegated finalization of all pre-run decisions and reque
 
 ## Local execution
 
+**2026-10-20 M4c scope:** The owner explicitly authorized implementation,
+synthetic CPU testing, a feature-branch commit/push and a PR for the scientific
+protocol/access firewall. This supersedes the historical M4b read-only editing
+restriction for that scoped engineering work. No additional M5 observation
+values, model fitting, GPU campaigns or final releases are authorized. New real
+origins must use the staged preparation records in `docs/M4C_ACCESS_FIREWALL.md`;
+the legacy real-M5 demo is confined to the already exposed d_225 window.
+Candidate chronology and passing tests are not a scientific freeze or release.
+
 From the Git checkout (`github/`), use `../code/.venv/bin/python` (Python 3.10.12). The owner explicitly approved installing the project's Python dependencies inside that isolated environment; do not use global pip or alter NVIDIA drivers, system CUDA or OS packages. Later upgrades, data downloads, paid APIs and long GPU jobs require separate explicit approval and resource scope. Do not print secret environment variables or authentication files.
 
 Serena shell calls must be short, synchronous and noninteractive. Do not start interactive Codex, a server, detached training or an unattended job there. The user may run approved long jobs from a terminal/tmux. Later calls may inspect logs, but do not promise background monitoring.

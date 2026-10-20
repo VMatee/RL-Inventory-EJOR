@@ -18,6 +18,11 @@ from pathlib import Path
 
 from inventory_ejor.data.budgets import SourcePolicy, validate_ledger
 from inventory_ejor.data.contracts import Window
+from inventory_ejor.data.protocol import (
+    guard_legacy_bundle,
+    guard_legacy_job,
+    metadata_config_path,
+)
 from inventory_ejor.data.views import load_learner
 
 METHODS = {
@@ -250,27 +255,25 @@ def git_state(root):
 def build_plan(root, config_path):
     """Validate already prepared M3 data; construct jobs, never run them."""
     root = Path(root).resolve()
-    config_path = Path(config_path).resolve()
+    config_path = metadata_config_path(config_path, root)
     if root not in config_path.parents:
         raise ValueError("Config must be inside the Git repository")
     cfg = validate_config(read_json(config_path))
     bundle = inside(root, cfg["prepared_bundle"], "data/processed")
-    manifest_path = bundle / "manifest.json"
+    manifest_path = inside(
+        root, str((bundle / "manifest.json").relative_to(root)), "data/processed"
+    )
     m = read_json(manifest_path)
     if m.get("schema_version") != 2 or m.get("status") != "prepared_development_demo":
         raise ValueError("Only corrected M3 schema-2 development bundles are allowed")
     if m["config"]["mode"] != "development_demo":
         raise ValueError("No access to final or external holdout is allowed")
-    for name, entry in m["artifacts"].items():
-        if Path(name).name != name:
-            raise ValueError("Unsafe artifact name")
-        p = inside(root, str((bundle / name).relative_to(root)), "data/processed")
-        if p.stat().st_size != entry["bytes"] or sha_file(p) != entry["sha256"]:
-            raise ValueError(f"Prepared artifact integrity mismatch: {name}")
+    guard_legacy_bundle(m)
     splits = {x["token"]: x for x in m["splits"]}
     information = {x["token"]: x for x in m["information_budgets"]}
     if (
-        len(splits) != len(m["splits"])
+        not splits
+        or len(splits) != len(m["splits"])
         or len(information) != len(m["information_budgets"])
         or set(splits) != set(information)
         or set(splits) != set(m["learner_dispatch"])
@@ -278,6 +281,12 @@ def build_plan(root, config_path):
         raise ValueError(
             "Duplicate or inconsistent split/ledger/learner task identities"
         )
+    for name, entry in m["artifacts"].items():
+        if Path(name).name != name:
+            raise ValueError("Unsafe artifact name")
+        p = inside(root, str((bundle / name).relative_to(root)), "data/processed")
+        if p.stat().st_size != entry["bytes"] or sha_file(p) != entry["sha256"]:
+            raise ValueError(f"Prepared artifact integrity mismatch: {name}")
     jobs = []
     for token, filename in sorted(m["learner_dispatch"].items()):
         entry = information[token]
@@ -435,6 +444,8 @@ def check_approval(plan, approval):
 
 def check_live_plan(root, plan):
     validate_config(plan["config"])
+    for job in plan["jobs"]:
+        guard_legacy_job(job, plan)
     now = git_state(root)
     if now["dirty"] or plan["git"]["dirty"] or now["commit"] != plan["git"]["commit"]:
         raise PermissionError(

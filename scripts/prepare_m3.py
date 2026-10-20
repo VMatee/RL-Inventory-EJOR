@@ -12,6 +12,7 @@ import time
 from pathlib import Path
 
 from inventory_ejor.data.preparation import parse_config, prepare
+from inventory_ejor.data.protocol import metadata_config_path
 from inventory_ejor.data.provenance import (
     canonical,
     code_provenance,
@@ -31,7 +32,7 @@ def main(argv=None):
     args = parser.parse_args(argv)
     started = time.monotonic()
     try:
-        raw = args.config.read_bytes()
+        raw = metadata_config_path(args.config, ROOT).read_bytes()
         cfg, _, _ = parse_config(raw)
         if args.seed != cfg["seed"]:
             raise ValueError("CLI seed must equal the consumed config selection seed")

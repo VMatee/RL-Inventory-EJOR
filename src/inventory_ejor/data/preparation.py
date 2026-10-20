@@ -36,6 +36,7 @@ from .m5 import (
     load_observations,
     rank_candidates,
 )
+from .protocol import guard_legacy_development, recognized_m5_source
 from .provenance import fingerprint, read_json, verify_inputs
 
 
@@ -103,11 +104,17 @@ def parse_config(raw: bytes):
         or cfg["candidate_count"] > limits.max_selected
     ):
         raise ValueError("M3 demonstration memory/work bounds exceeded")
+    guard_legacy_development(cfg)
     return cfg, plan, limits
 
 
 def prepare(raw_dir: Path, input_manifest, raw_config: bytes):
     cfg, plan, limits = parse_config(raw_config)
+    # Legacy demos cannot relabel reserved real-M5 outcomes as development.
+    # Check metadata before hashing or opening any raw source.
+    guard_legacy_development(
+        cfg, real_source=recognized_m5_source(raw_dir, input_manifest)
+    )
     before = verify_inputs(raw_dir, input_manifest, limits)
     # A full-source hash includes withheld outcomes. It must never enter a
     # learner artifact, task filename or predictor, even as an opaque identifier.

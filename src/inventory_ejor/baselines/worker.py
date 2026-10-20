@@ -24,6 +24,9 @@ ROOT = Path(__file__).resolve().parents[3]
 
 
 def execute_job(root, plan, job, output, device_kind):
+    from inventory_ejor.data.protocol import guard_legacy_job
+
+    guard_legacy_job(job, plan)
     # Numerical imports occur only after main() has checked owner approval.
     from inventory_ejor.data.budgets import SourcePolicy, access, validate_ledger
     from inventory_ejor.data.contracts import Window
