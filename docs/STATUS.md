@@ -2,6 +2,18 @@
 
 Updated: 2026-10-20 (Asia/Bangkok). See Git history and SESSION_LOG for validation.
 
+## PR #12 corrections awaiting independent re-review
+
+The independent review of `ff05c5b` requested changes despite 233 passing
+tests. The follow-up corrects B1 and C1–C4: strict shared artifact/evidence
+validation, exact integer reference fitting, correct terminal outstanding
+batches, an independent numerical replay and atomic, synchronized private
+publication. The expanded suite passes **255/255**, including **37 M4d-0
+tests**; original protected SHA256/size checks remain **1,611/1,611 unchanged**.
+See `docs/M4D0_CODEX_REVIEW_RESPONSE_20261020.md` for counterexamples,
+commands and remaining limits. PR #12 remains open for independent review;
+no merge, real M5 access, M4d-1 execution or scientific freeze is authorized.
+
 ## Research
 
 - Active scope: limited-demand-data, GP-informed, decision-sensitive inventory policy learning. The research direction has not changed.

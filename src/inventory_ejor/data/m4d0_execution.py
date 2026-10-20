@@ -13,14 +13,16 @@ from __future__ import annotations
 
 import hashlib
 import math
-import os
 import sys
 from dataclasses import asdict
+from importlib.metadata import version
 from pathlib import Path
 
+from inventory_ejor.data.budgets import access, ledger
 from inventory_ejor.data.contracts import EvaluationTargets, Window, exact_keys
-from inventory_ejor.data.evidence import EvidenceStore
-from inventory_ejor.data.protocol import M5_VERSION, require
+from inventory_ejor.data.evidence import RECEIPT_KEYS, EvidenceStore
+from inventory_ejor.data.m4d0_store import PrivateExecutionStore
+from inventory_ejor.data.protocol import M5_VERSION, require, sha256_id
 from inventory_ejor.data.provenance import canonical, fingerprint, read_json
 from inventory_ejor.data.releases import authorize_task
 from inventory_ejor.data.staged import (
@@ -38,115 +40,16 @@ from inventory_ejor.envs import (
 )
 
 METHOD = "synthetic_empirical_base_stock_reference"
-EXPECTED_FILES = (
-    "src/inventory_ejor/data/m4d0_execution.py",
-    "src/inventory_ejor/data/views.py",
-    "src/inventory_ejor/data/staged.py",
-    "src/inventory_ejor/data/releases.py",
-    "src/inventory_ejor/data/evidence.py",
-    "src/inventory_ejor/data/contracts.py",
-    "src/inventory_ejor/data/provenance.py",
-    "src/inventory_ejor/envs/lost_sales.py",
-)
-PRIVATE_MAX_BYTES = 8 * 1024 * 1024
-
-
-class PrivateExecutionStore:
-    """Exclusive content-addressed outputs outside versioned Git checkouts.
-
-    Neither the original source nor a released evaluation artifact is a valid
-    destination. Refuses symlinked roots and files. NOT tamper-proof against an
-    untrusted local OS user with arbitrary filesystem access.
-    """
-
-    def __init__(self, directory):
-        self.root = Path(directory).absolute()
-        require(
-            self.root.is_dir() and self.root == self.root.resolve(),
-            "Pre-existing canonical private execution directory required",
-        )
-        require(
-            self.root.stat().st_uid == os.getuid()
-            and (self.root.stat().st_mode & 0o077) == 0,
-            "Private execution directory must be owned by caller with mode 0700",
-        )
-        # Refuse ALL Git checkouts, including sibling worktrees, not just
-        # the checkout containing this module.
-        require(
-            not any(
-                (parent / ".git").exists() for parent in (self.root, *self.root.parents)
-            ),
-            "Private M4d0 artifacts cannot be written into a Git worktree",
-        )
-
-    def _path(self, digest):
-        require(
-            isinstance(digest, str)
-            and len(digest) == 64
-            and all(c in "0123456789abcdef" for c in digest),
-            "Invalid content hash",
-        )
-        require(self.root == self.root.resolve(), "Private store root changed")
-        path = self.root / (digest + ".json")
-        require(
-            path.parent == self.root and not path.is_symlink(),
-            "Private store symlink/path substitution refused",
-        )
-        return path
-
-    def put(self, value):
-        data = canonical(value)
-        require(len(data) <= PRIVATE_MAX_BYTES, "Oversized private artifact")
-        digest = hashlib.sha256(data).hexdigest()
-        path = self._path(digest)
-        if path.exists():
-            require(path.read_bytes() == data, "Existing artifact content changed")
-        else:
-            # Exclusive creation; a partial failure cannot be reported as success.
-            descriptor = os.open(
-                path,
-                os.O_CREAT | os.O_EXCL | os.O_WRONLY | os.O_NOFOLLOW,
-                0o600,
-            )
-            with os.fdopen(descriptor, "wb") as output:
-                output.write(data)
-                output.flush()
-                os.fsync(output.fileno())
-        return digest
-
-    def read(self, digest, *, kind=None):
-        path = self._path(digest)
-        require(
-            path.is_file() and path.stat().st_size <= PRIVATE_MAX_BYTES,
-            "Missing or oversized private execution artifact",
-        )
-        raw = path.read_bytes()
-        require(
-            hashlib.sha256(raw).hexdigest() == digest
-            and raw == canonical(read_json(raw)),
-            "Private execution artifact modified or noncanonical",
-        )
-        item = read_json(raw)
-        require(
-            type(item) is dict and (kind is None or item.get("kind") == kind),
-            "Wrong execution artifact kind",
-        )
-        return item
-
-    def file(self, digest):
-        """For the existing bounded, checksum-verifying load_learner() only."""
-        self.read(digest)
-        return self._path(digest)
 
 
 def source_hashes():
-    """Pin every implementation byte used by this bounded reference run."""
+    """Pin the complete local inventory_ejor Python source snapshot, not binaries."""
     checkout = Path(__file__).resolve().parents[3]
     hashes = {}
-    for relative in EXPECTED_FILES:
-        path = checkout / relative
+    for path in sorted((checkout / "src/inventory_ejor").rglob("*.py")):
+        relative = str(path.relative_to(checkout))
         require(
-            path.is_file() and not path.is_symlink(),
+            path.is_file() and path == path.resolve(),
             "Missing or symlinked execution dependency",
         )
         hashes[relative] = hashlib.sha256(path.read_bytes()).hexdigest()
@@ -200,15 +103,50 @@ def scenario_contract(scenario):
     return config, state
 
 
+def exact_reference_target(total_sales, budget, lead_time, max_order):
+    """Exact integer ceiling; Python integers avoid roundoff before the cap."""
+    for name, value, low, high in (
+        ("total", total_sales, 0, 3660 * 2**53),
+        ("budget", budget, 1, 3660),
+        ("lead", lead_time, 1, 10),
+        ("max_order", max_order, 0, 100),
+    ):
+        require(
+            type(value) is int and low <= value <= high,
+            f"Invalid bounded integer reference {name}",
+        )
+    require(total_sales <= budget * 2**53, "Historical count bound exceeded")
+    return min(
+        max_order * (lead_time + 1),
+        (total_sales * (lead_time + 1) + budget - 1) // budget,
+    )
+
+
+def runtime_versions():
+    return {
+        "python": sys.version,
+        "numpy": version("numpy"),
+        "gymnasium": version("gymnasium"),
+    }
+
+
 def _reference_target(view, inventory, budget):
     require(
         type(view) is LearnerView and len(view.history.observations) == budget,
         "Reference fitting requires exactly n learner observations",
     )
-    mean = math.fsum(o.sales for o in view.history.observations) / budget
-    return min(
-        inventory.max_order * (inventory.lead_time + 1),
-        math.ceil(mean * (inventory.lead_time + 1)),
+    require(
+        all(
+            type(o.sales) is int and 0 <= o.sales <= 2**53
+            for o in view.history.observations
+        ),
+        "Historical count bound exceeded",
+    )
+    return exact_reference_target(
+        sum(o.sales for o in view.history.observations),
+        budget,
+        inventory.lead_time,
+        inventory.max_order,
     )
 
 
@@ -254,6 +192,18 @@ def _receipt(
 ):
     require(isinstance(digest, str), "Persisted receipt identity required")
     value = evidence.read(digest)
+    exact_keys(value, RECEIPT_KEYS, "staged access receipt")
+    require(
+        type(value["schema_version"]) is int and value["schema_version"] == 1,
+        "Unsupported receipt version",
+    )
+    require(
+        type(value["origin"]) is int
+        and (value["budget"] is None or type(value["budget"]) is int),
+        "Receipt task requires integer types",
+    )
+    exact_keys(value["window"], ("start", "stop"), "receipt window")
+    Window(**value["window"])
     require(
         value["kind"] == "staged_access_receipt"
         and value["protocol_sha256"] == fingerprint(config)
@@ -380,6 +330,7 @@ def publish_learner_only_plan(
         "scenario_sha256": fingerprint(scenario),
         "dependency_sha256s": source_hashes(),
         "python": sys.version.split()[0],
+        "runtime": runtime_versions(),
         "initial_stock": state.on_hand,
     }
     require(
@@ -413,6 +364,7 @@ def _verify_execution_approval(approval, plan_digest):
         ),
         "reference execution approval",
     )
+
     require(
         type(approval["schema_version"]) is int
         and approval["schema_version"] == 1
@@ -427,39 +379,291 @@ def _verify_execution_approval(approval, plan_digest):
     )
 
 
-def execute_synthetic_reference(private_store, plan_digest, approval):
-    """Learner-only CPU execution. No scorer/targets/raw-reader parameters."""
-    _verify_execution_approval(approval, plan_digest)
-    plan = private_store.read(plan_digest, kind="synthetic_reference_execution_plan")
-    approval_sha = private_store.put(approval)
+PLAN_FIELDS = (
+    "dataset series phase origin budget seed method protocol_sha256 freeze_sha256 "
+    "history_release_sha256 history_receipt_sha256 learner_sha256 information_track "
+    "scenario scenario_sha256 dependency_sha256s python runtime initial_stock"
+).split()
+FIT_FIELDS = (
+    "plan_sha256 execution_approval_sha256 learner_sha256 dependency_sha256s "
+    "scenario_sha256 seed method status base_stock_target sum_training_sales "
+    "real_history_observations optimizer_steps simulated_transitions "
+    "trained_gp trained_rl"
+).split()
+SCORE_FIELDS = (
+    "plan_sha256 fit_sha256 execution_approval_sha256 evaluation_release_sha256 "
+    "evaluation_receipt_sha256 trace_sha256 scenario_sha256 source_code_sha256s "
+    "cost_components total_cost fulfilled requests fill_rate ending_stock "
+    "ending_pipeline "
+    "simulation_periods trained_gp trained_rl status"
+).split()
+TRACE_ROW_FIELDS = (
+    "period day on_hand pipeline order observed_sales_as_requests "
+    "fulfilled lost_units cost"
+).split()
+
+
+def _schema(value, kind, fields):
+    exact_keys(value, ("schema_version", "kind", *fields), kind)
     require(
-        approval_sha == fingerprint(approval),
-        "Persisted execution approval identity mismatch",
+        type(value["schema_version"]) is int
+        and value["schema_version"] == 1
+        and value["kind"] == kind,
+        "Unsupported execution artifact schema",
     )
+
+
+def _bounded_int(value, label, maximum, minimum=0):
+    require(
+        type(value) is int and minimum <= value <= maximum,
+        f"Invalid bounded integer {label}",
+    )
+
+
+def validated_plan(store, digest):
+    """Same consumed-plan contract at execution, scoring and audit boundaries."""
+    require(
+        type(store) is PrivateExecutionStore, "Private M4d0 artifact store required"
+    )
+    plan = store.read(digest, kind="synthetic_reference_execution_plan")
+    _schema(plan, "synthetic_reference_execution_plan", PLAN_FIELDS)
     require(
         plan["dependency_sha256s"] == source_hashes()
-        and plan["python"] == sys.version.split()[0],
+        and plan["python"] == sys.version.split()[0]
+        and plan["runtime"] == runtime_versions(),
         "Execution code/runtime differs from pinned plan",
     )
-    scenario, _ = scenario_contract(plan["scenario"])
     require(
-        plan["method"] == METHOD
-        and plan["scenario_sha256"] == fingerprint(plan["scenario"])
+        type(plan["dataset"]) is str
         and plan["dataset"].startswith("synthetic-")
+        and type(plan["series"]) is str
+        and bool(plan["series"])
+        and plan["method"] == METHOD
         and plan["phase"] == "development"
-        and scenario.horizon <= 128,
+        and plan["information_track"] == "per_series_with_shared_development",
         "Unsupported or altered prototype plan",
     )
-    # Existing load_learner verifies exact M3 history/normalizer/calendar
-    # schema and SHA256 without giving the algorithm any evaluator handle.
+    _bounded_int(plan["seed"], "seed", 2**31 - 1)
+    _bounded_int(plan["origin"], "origin", 100000, 1)
+    _bounded_int(plan["budget"], "history budget", 3660, 1)
+    for field in (
+        "protocol_sha256",
+        "freeze_sha256",
+        "history_release_sha256",
+        "history_receipt_sha256",
+        "learner_sha256",
+        "scenario_sha256",
+    ):
+        sha256_id(plan[field], field)
+    inv, state = scenario_contract(plan["scenario"])
+    require(
+        plan["scenario_sha256"] == fingerprint(plan["scenario"])
+        and type(plan["initial_stock"]) is int
+        and plan["initial_stock"] == state.on_hand,
+        "Plan scenario identity mismatch",
+    )
     view = load_learner(
-        private_store.file(plan["learner_sha256"]),
+        store.file(plan["learner_sha256"]),
         sha256=plan["learner_sha256"],
         dataset=plan["dataset"],
         series=plan["series"],
         origin=plan["origin"],
         budget=plan["budget"],
     )
+    _reference_target(view, inv, plan["budget"])
+    return plan, inv, state, view
+
+
+def validated_fit(store, plan_digest, fit_digest, plan, inv, view, approval=None):
+    fit = store.read(fit_digest, kind="synthetic_reference_fit_result")
+    _schema(fit, "synthetic_reference_fit_result", FIT_FIELDS)
+    saved = store.read(
+        fit["execution_approval_sha256"], kind="synthetic_reference_run_approval"
+    )
+    _verify_execution_approval(saved, plan_digest)
+    require(approval is None or saved == approval, "Pinned execution approval differs")
+    for field in (
+        "seed",
+        "base_stock_target",
+        "sum_training_sales",
+        "real_history_observations",
+        "optimizer_steps",
+        "simulated_transitions",
+    ):
+        _bounded_int(fit[field], field, 3660 * 2**53)
+    require(
+        fit["plan_sha256"] == plan_digest
+        and fit["learner_sha256"] == plan["learner_sha256"]
+        and fit["scenario_sha256"] == plan["scenario_sha256"]
+        and fit["dependency_sha256s"] == plan["dependency_sha256s"] == source_hashes()
+        and fit["method"] == plan["method"] == METHOD
+        and fit["seed"] == plan["seed"]
+        and fit["status"] == "completed_synthetic_cpu_reference",
+        "Scorer/auditor cannot accept an unbound or modified fit",
+    )
+    require(
+        fit["base_stock_target"] == _reference_target(view, inv, plan["budget"])
+        and fit["sum_training_sales"] == sum(o.sales for o in view.history.observations)
+        and fit["real_history_observations"] == plan["budget"]
+        and fit["optimizer_steps"] == fit["simulated_transitions"] == 0
+        and fit["trained_gp"] is False
+        and fit["trained_rl"] is False,
+        "Scorer/auditor rejects fabricated reference policy/fit evidence",
+    )
+    return fit, saved
+
+
+def validate_history_context(plan, view, evidence, config, freeze, catalog):
+    require(
+        type(evidence) is EvidenceStore, "Persisted authorization evidence required"
+    )
+    require(
+        plan["dataset"] == config["dataset_version"]
+        and plan["protocol_sha256"] == fingerprint(config)
+        and plan["freeze_sha256"] == fingerprint(freeze),
+        "Plan/context identity mismatch",
+    )
+    release = evidence.read(plan["history_release_sha256"])
+    task, cohort = _task(
+        config,
+        catalog,
+        plan["phase"],
+        plan["origin"],
+        plan["budget"],
+        plan["series"],
+        release,
+        freeze,
+        evidence,
+    )
+    _receipt(
+        evidence,
+        plan["history_receipt_sha256"],
+        release,
+        config=config,
+        freeze=freeze,
+        cohort=cohort,
+        series=plan["series"],
+        phase=plan["phase"],
+        origin=plan["origin"],
+        budget=plan["budget"],
+        capability="learner_history",
+        window=Window(**task["history"]),
+    )
+    info = ledger(view.history, METHOD, tuple(config["features"]))
+    for purpose in ("normalization", "demand_model_fitting"):
+        info["access"][purpose] = [access(view.history)]
+    validate_task_ledger(
+        config, plan["phase"], plan["origin"], plan["budget"], view, info
+    )
+    return task, cohort
+
+
+def validate_outcome_context(
+    plan, evidence, config, freeze, catalog, release, receipt_digest, targets
+):
+    require(
+        type(targets) is EvaluationTargets, "Scorer-only EvaluationTargets required"
+    )
+    cohort = select_cohort(config, catalog)
+    require(plan["series"] in cohort, "Scorer cohort mismatch")
+    task = authorize_task(
+        config,
+        freeze,
+        release,
+        phase=plan["phase"],
+        origin=plan["origin"],
+        budget=None,
+        capability="evaluation_outcomes",
+        cohort_sha256=fingerprint(list(cohort)),
+        cohort=cohort,
+        evidence=evidence,
+    )
+    _score_receipt(
+        evidence,
+        receipt_digest,
+        config=config,
+        freeze=freeze,
+        release=release,
+        cohort=cohort,
+        series=plan["series"],
+        phase=plan["phase"],
+        origin=plan["origin"],
+        task=task,
+    )
+    require(
+        (targets.dataset, targets.series) == (plan["dataset"], plan["series"])
+        and targets.window == Window(**task["evaluation"]),
+        "Scorer targets do not match separately released task",
+    )
+    from datetime import date, timedelta
+
+    first = date.fromisoformat(config["first_date"])
+    require(
+        all(
+            o.date == (first + timedelta(days=o.day - 1)).isoformat()
+            and 0 <= o.sales <= 2**53
+            for o in targets.observations
+        ),
+        "Evaluator dates/counts differ from bounded source contract",
+    )
+    return task
+
+
+def validate_score_record(score, plan_digest, fit_digest, plan, inv, approval):
+    _schema(score, "synthetic_reference_score_evidence", SCORE_FIELDS)
+    for field in (
+        "evaluation_release_sha256",
+        "evaluation_receipt_sha256",
+        "trace_sha256",
+    ):
+        sha256_id(score[field], field)
+    require(
+        score["plan_sha256"] == plan_digest
+        and score["fit_sha256"] == fit_digest
+        and score["execution_approval_sha256"] == fingerprint(approval)
+        and score["scenario_sha256"] == plan["scenario_sha256"]
+        and score["source_code_sha256s"]
+        == plan["dependency_sha256s"]
+        == source_hashes()
+        and score["trained_gp"] is False
+        and score["trained_rl"] is False
+        and score["status"] == "synthetic_only_not_retail_evidence",
+        "Score execution identities/status differ",
+    )
+    for field in ("fulfilled", "requests", "ending_stock", "simulation_periods"):
+        _bounded_int(score[field], field, inv.horizon * 2**53)
+    require(
+        score["simulation_periods"] == inv.horizon
+        and score["fulfilled"] <= score["requests"]
+        and type(score["ending_pipeline"]) is list
+        and len(score["ending_pipeline"]) == inv.lead_time,
+        "Invalid score counts/terminal shape",
+    )
+    for count in score["ending_pipeline"]:
+        _bounded_int(count, "terminal batch", 2**53)
+    exact_keys(
+        score["cost_components"],
+        ("holding", "lost_sales", "variable_order", "fixed_order"),
+        "score costs",
+    )
+    for value in (*score["cost_components"].values(), score["total_cost"]):
+        require(
+            type(value) in (int, float) and math.isfinite(value) and value >= 0,
+            "Invalid finite nonnegative score cost",
+        )
+    require(
+        score["fill_rate"] is None
+        if score["requests"] == 0
+        else type(score["fill_rate"]) in (int, float) and 0 <= score["fill_rate"] <= 1,
+        "Invalid score fill rate",
+    )
+
+
+def execute_synthetic_reference(private_store, plan_digest, approval):
+    """Learner-only CPU execution. No scorer/targets/raw-reader parameters."""
+    _verify_execution_approval(approval, plan_digest)
+    plan, scenario, _, view = validated_plan(private_store, plan_digest)
+    private_store.put(approval)
     threshold = _reference_target(view, scenario, plan["budget"])
     result = {
         "schema_version": 1,
@@ -522,49 +726,22 @@ def score_synthetic_reference(
         "Scorer-only EvaluationTargets and receipt required",
     )
     _verify_execution_approval(approval, plan_digest)
-    plan = private_store.read(plan_digest, kind="synthetic_reference_execution_plan")
-    fit = private_store.read(fit_digest, kind="synthetic_reference_fit_result")
-    require(
-        private_store.read(
-            fit["execution_approval_sha256"],
-            kind="synthetic_reference_run_approval",
-        )
-        == approval,
-        "Pinned execution approval evidence is missing or changed",
+    plan, inv, state, pinned_view = validated_plan(private_store, plan_digest)
+    fit, _ = validated_fit(
+        private_store, plan_digest, fit_digest, plan, inv, pinned_view, approval
     )
-    require(
-        fit["plan_sha256"] == plan_digest
-        and fit["execution_approval_sha256"] == fingerprint(approval)
-        and fit["learner_sha256"] == plan["learner_sha256"]
-        and fit["scenario_sha256"] == plan["scenario_sha256"]
-        and fit["dependency_sha256s"] == source_hashes()
-        and fit["method"] == METHOD
-        and fit["seed"] == plan["seed"]
-        and fit["status"] == "completed_synthetic_cpu_reference",
-        "Scorer cannot accept an unbound or modified fit",
+    _, cohort = validate_history_context(
+        plan, pinned_view, evidence, config, freeze, catalog
     )
-    require(
-        plan["dataset"] == config["dataset_version"]
-        and plan["protocol_sha256"] == fingerprint(config)
-        and plan["freeze_sha256"] == fingerprint(freeze)
-        and plan["scenario_sha256"] == fingerprint(plan["scenario"])
-        and plan["phase"] == "development"
-        and plan["dataset"].startswith("synthetic-"),
-        "Scorer plan/context mismatch or real dataset forbidden",
-    )
-    cohort = select_cohort(config, catalog)
-    require(plan["series"] in cohort, "Scorer cohort mismatch")
-    task = authorize_task(
+    validate_outcome_context(
+        plan,
+        evidence,
         config,
         freeze,
+        catalog,
         evaluation_release,
-        phase=plan["phase"],
-        origin=plan["origin"],
-        budget=None,
-        capability="evaluation_outcomes",
-        cohort_sha256=fingerprint(list(cohort)),
-        cohort=cohort,
-        evidence=evidence,
+        scorer_receipt["access_receipt_sha256"],
+        targets,
     )
     require(
         scorer_receipt["protocol_sha256"] == fingerprint(config)
@@ -572,45 +749,7 @@ def score_synthetic_reference(
         and scorer_receipt["cohort_sha256"] == fingerprint(list(cohort)),
         "Scorer receipt metadata differs from evaluation release",
     )
-    _score_receipt(
-        evidence,
-        scorer_receipt["access_receipt_sha256"],
-        config=config,
-        freeze=freeze,
-        release=evaluation_release,
-        cohort=cohort,
-        series=plan["series"],
-        phase=plan["phase"],
-        origin=plan["origin"],
-        task=task,
-    )
-    require(
-        (targets.dataset, targets.series) == (plan["dataset"], plan["series"])
-        and targets.window == Window(**task["evaluation"]),
-        "Scorer targets do not match separately released task",
-    )
-    inv, state = scenario_contract(plan["scenario"])
     require(inv.horizon == len(targets.observations), "Evaluation horizon mismatch")
-    # The independent scorer may verify the pinned learner artifact, but
-    # never returns its newly obtained outcome values to the learner.
-    pinned_view = load_learner(
-        private_store.file(plan["learner_sha256"]),
-        sha256=plan["learner_sha256"],
-        dataset=plan["dataset"],
-        series=plan["series"],
-        origin=plan["origin"],
-        budget=plan["budget"],
-    )
-    require(
-        fit["base_stock_target"] == _reference_target(pinned_view, inv, plan["budget"])
-        and fit["sum_training_sales"]
-        == sum(o.sales for o in pinned_view.history.observations)
-        and fit["real_history_observations"] == plan["budget"]
-        and fit["simulated_transitions"] == fit["optimizer_steps"] == 0
-        and fit["trained_gp"] is False
-        and fit["trained_rl"] is False,
-        "Scorer rejects fabricated reference policy/fit evidence",
-    )
     limit = fit["base_stock_target"]
     require(
         type(limit) is int and 0 <= limit <= inv.max_order * (inv.lead_time + 1),
@@ -674,12 +813,13 @@ def score_synthetic_reference(
         "fulfilled": served,
         "requests": requests,
         "fill_rate": (served / requests if requests else None),
-        "ending_stock": trace[-1]["on_hand"] - trace[-1]["fulfilled"],
-        "ending_pipeline": list(state.pipeline),
+        "ending_stock": outcome.ending_on_hand,
+        "ending_pipeline": list(outcome.outstanding_after_order),
         "simulation_periods": len(trace),
         "trained_gp": False,
         "trained_rl": False,
         "status": "synthetic_only_not_retail_evidence",
     }
+    validate_score_record(record, plan_digest, fit_digest, plan, inv, approval)
     # No score is returned until both local trace and score evidence are durable.
     return private_store.put(record)

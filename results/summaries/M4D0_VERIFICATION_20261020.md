@@ -4,6 +4,17 @@
 **Scope:** CPU-only synthetic engineering. No real M5/M4d-1 baseline execution,
 new outcome release, EJOR result, new research method or scientific freeze.
 
+**Superseded first-pass verification below:** the independent adversarial
+review of `ff05c5b` found B1/C1–C4 despite 233 passing tests. Those tests did
+not establish the claimed complete provenance or numerical correctness.
+The correction report is
+[`docs/M4D0_CODEX_REVIEW_RESPONSE_20261020.md`](../../docs/M4D0_CODEX_REVIEW_RESPONSE_20261020.md).
+It records strict audit context/validation, exact fitting, terminal correction,
+independent stock-flow replay, durable publication, **255/255 repository
+tests / 37 M4d-0 tests passed**, and **1,611/1,611 original files unchanged**.
+External independent re-review remains required; the historical first-pass
+description/counts are retained below rather than silently rewritten.
+
 ## Implemented
 
 - src/inventory_ejor/data/m4d0_execution.py: separate learner-only plan and

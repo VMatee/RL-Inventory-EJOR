@@ -216,7 +216,15 @@ class M4d0ReferenceTests(unittest.TestCase):
             score_sha, self.score(plan_sha, fit_sha, approval, targets, outcome_receipt)
         )
         verified = verify_synthetic_reference_trace(
-            self.private, plan_sha, fit_sha, score_sha, targets
+            self.private,
+            plan_sha,
+            fit_sha,
+            score_sha,
+            targets,
+            evidence=self.evidence,
+            config=self.config,
+            freeze=self.freeze,
+            catalog=self.catalog,
         )
         self.assertEqual(verified["status"], "independent_synthetic_replay_verified")
         self.assertEqual(verified["periods"], 2)
@@ -255,7 +263,15 @@ class M4d0ReferenceTests(unittest.TestCase):
         self.assertGreater(evidence["total_cost"], 0)
         self.assertEqual(
             verify_synthetic_reference_trace(
-                self.private, plan_sha, fit_sha, score_sha, targets
+                self.private,
+                plan_sha,
+                fit_sha,
+                score_sha,
+                targets,
+                evidence=self.evidence,
+                config=self.config,
+                freeze=self.freeze,
+                catalog=self.catalog,
             )["periods"],
             4,
         )
@@ -419,7 +435,15 @@ class M4d0ReferenceTests(unittest.TestCase):
         forged_score_sha = self.private.put(score)
         with self.assertRaisesRegex(ValueError, "Saved action"):
             verify_synthetic_reference_trace(
-                self.private, plan_sha, fit_sha, forged_score_sha, targets
+                self.private,
+                plan_sha,
+                fit_sha,
+                forged_score_sha,
+                targets,
+                evidence=self.evidence,
+                config=self.config,
+                freeze=self.freeze,
+                catalog=self.catalog,
             )
 
     def test_zero_requests_and_nonzero_initial_stock(self):
@@ -465,9 +489,20 @@ class M4d0IoTests(unittest.TestCase):
         self.assertEqual(data["scorer_windows"], 224)
         self.assertEqual(data["logical_processed_bytes"], 1_145_518_701_600)
         with self.assertRaisesRegex(ValueError, "exceeds authorized"):
-            require_preparation_budget(data, maximum_logical_bytes=8 * (2**30))
+            require_preparation_budget(
+                data,
+                maximum_logical_bytes=8 * (2**30),
+                config=config,
+                input_file_bytes=M5_BYTE_SIZES_METADATA_ONLY,
+            )
         self.assertIs(
-            require_preparation_budget(data, maximum_logical_bytes=2 * (2**40)), data
+            require_preparation_budget(
+                data,
+                maximum_logical_bytes=2 * (2**40),
+                config=config,
+                input_file_bytes=M5_BYTE_SIZES_METADATA_ONLY,
+            ),
+            data,
         )
 
     def test_projection_never_opens_raw_data(self):
@@ -480,7 +515,12 @@ class M4d0IoTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Expected the five"):
             project_naive_preparation_io(config, {"not_an_input": 1})
         with self.assertRaisesRegex(ValueError, "positive"):
-            require_preparation_budget(estimate, maximum_logical_bytes=0)
+            require_preparation_budget(
+                estimate,
+                maximum_logical_bytes=0,
+                config=config,
+                input_file_bytes={k: 32 for k in M5_BYTE_SIZES_METADATA_ONLY},
+            )
 
     def test_cli_metadata_gate_fails_closed_without_reading_source(self):
         root = Path(__file__).resolve().parents[1]

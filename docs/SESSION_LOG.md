@@ -1,5 +1,28 @@
 # Session handoff log
 
+## 2026-10-20 - PR #12 independent-review corrections
+
+Entered the clean `feat/m4d0-safe-executor` worktree at local/remote/PR head
+`ff05c5b9b6272bb87eba6db7f2cc08cda2950977`, base `4d21c193`; PR open/unmerged.
+Root was the only writer; three read-only reviewers challenged provenance,
+storage and numerics using disposable synthetic fixtures. Addressed blocking
+B1 and major C1–C4 plus five minor comments; see
+`docs/M4D0_CODEX_REVIEW_RESPONSE_20261020.md` for the point-by-point response.
+
+**Final authoring checks:** 255/255 repository tests passed,
+including 37 M4d-0 tests and 120 fixed-seed full numerical lifecycles. Strict
+scoped Ruff/format and project structure checks passed. Original protected
+snapshot: 1,611/1,611 SHA256/size unchanged, zero added/removed protected files.
+One initial full-suite invocation omitted PYTHONPATH and failed two imports;
+the explicit feature-source invocation passed. Internal read-only supplemental
+checks rejected 41 provenance attacks and passed 19 storage checks, 10,000
+exact-target comparisons and 110 additional numerical lifecycles. These
+internal checks do not replace the requested external independent re-review.
+
+No real M5 observations, baselines, GP/RL training, GPUs or scientific freeze.
+PR #12 is to remain open and unmerged for independent re-review. Real M4d-1
+execution and EJOR publication readiness remain **NOT READY**.
+
 ## 2026-10-20 - M4d-0 synthetic-only executor and execution evidence
 
 After M4c PR #11 was independently reviewed and merged at `4d21c193`,

@@ -42,8 +42,11 @@ Existing M4c trusted preparer (synthetic, approved history release)
      - sequentially chooses an order BEFORE consuming each request
      - M1 stock-flow/cost replay and private, hashed score+trace persistence
   -> independent read-only verify_synthetic_reference_trace(...)
+     - mandatory persisted M4c history/outcome release and receipt context
+     - same strict plan, approval, fitted-result and score schema validators
      - derive base-stock from the pinned history again
-     - independently recheck each saved transition and score metadata
+     - separate absolute-arrival stock-flow oracle (does not call M1 transition)
+     - recheck every saved transition, terminal batch and score metadata
 ```
 
 The implemented controller is **only** `synthetic_empirical_base_stock_reference`:
@@ -53,17 +56,65 @@ six-method M4d baseline or the proposed research contribution. It is used to
 prove that learner-only dispatch and independent scorer release can be made
 reproducible with exact artifact/code/seed/scenario links.
 
+For integer historical total `s`, history length `n`, lead `L` and order cap
+`Q`, the target is exactly `min(Q*(L+1), (s*(L+1)+n-1)//n)`; no floating-point
+mean or ceiling is used. Each count is a nonnegative integer bounded by
+`2**53`; `n <= 3660`, `L <= 10`, `Q <= 100` and horizon `T <= 128` bound this
+prototype. An order at period `t` is suppressed when `t+L >= T`. Terminal
+stock is after the last request, **before** any next-period receipt. Terminal
+outstanding is the final transition's `outstanding_after_order`, of length
+`L` (arrival dates `T` through `T+L-1`); these batches are reported even with
+zero salvage. No terminal disposal charge, shortage backlog or salvage value
+is introduced.
+
 `PrivateExecutionStore` uses a pre-existing, user-owned mode-0700 directory
-**outside every Git worktree**, content-addressed bounded JSON and exclusive
-writes. The synthetic test harness uses `TemporaryDirectory`; observational
-records and private traces are never committed. Source/runtime dependencies
-are pinned by SHA256 of the reference executor, existing M4c staging/security
-modules, view validator and M1 kernel, and the Python version.
+**outside every Git worktree**, content-addressed bounded JSON, and rechecks
+directory ownership/mode/canonical location at every access. Artifact reads
+use a bounded regular-file descriptor with `O_NOFOLLOW`, require mode 0600
+and verify canonical bytes and SHA256. The synthetic test harness uses
+`TemporaryDirectory`; observational records and private traces are never
+committed.
+
+Successful `put()` means exclusive same-directory temporary creation, a
+complete write, file `fsync`, atomic no-overwrite hard-link publication,
+temporary unlink and directory `fsync` have succeeded. An existing matching
+artifact is read/verified and **file- and directory-synchronized again**.
+Pre-publication failures remove the temporary file and leave no final name.
+A directory-sync failure after publication may leave complete final bytes,
+but raises; retry cannot bypass synchronization. Process death can leave
+`.pending-*` files, which are never recognized as artifacts. Only an owner
+who has confirmed no writer is active should clean those orphans. This
+assumes POSIX local storage honoring `fsync`/atomic hard links, not network
+filesystem semantics or a hostile same-user writer. It does not add these
+durability properties to the existing M4c EvidenceStore.
+
+The consumed dependency manifest hashes **all local
+`src/inventory_ejor/**/*.py` files**, including this auditor and store;
+executor, scorer and auditor require the same current snapshot. Runtime
+identity includes full Python build/version and installed NumPy/Gymnasium
+versions. This is not a hermetic pin of native binaries, operating system,
+import loader, external distribution contents or every transitive dependency.
+Source mutation while a lifecycle is running is unsupported and fails
+subsequent snapshot comparison; real M4d-1 needs an immutable runtime image.
 
 The prototype is **not** a sandbox against a malicious user with access to the
 filesystem or Python interpreter. A trusted caller could still create
 fabricated stage/evidence files. Results from arbitrary GP/NN methods cannot
 use this deterministic reference path.
+
+Audit success now requires actual persisted, correctly linked release,
+receipt, approval, plan, learner, fit, trace and score records. Rehashing and
+relinking invalid records does not bypass schema, identity, current runtime,
+status, method, exact policy or numerical checks. The audit API requires
+`evidence`, `config`, `freeze` and `catalog` keyword context; there is no
+numerical-only fallback with the same success status. Its explicit
+`authorization_attestations_verified=true` means structural/persisted
+authorization consistency, **not authenticated owner identity or executed
+scientific model selection**. `scientific_selection_execution_verified` and
+`raw_observation_bytes_verified` are both false. A trusted owner can still
+fabricate a coherent authorized synthetic evidence graph; M4c receipts do
+not bind the actual returned evaluation bytes. Replaying supplied targets
+and saved traces cannot establish otherwise.
 
 ## Implemented I/O performance admission gate (not an optimization)
 
@@ -71,6 +122,12 @@ use this deterministic reference path.
 work and refuses a campaign that exceeds an explicit logical-byte allowance.
 The CLI `scripts/check_m4d0_io.py` requires only a bounded JSON of five
 source file sizes and the M4c protocol configuration, never an observations CSV.
+The public allowance helper also requires this configuration and size context
+and recomputes the complete projection before comparison. A caller-supplied
+reduced total, omitted field or stale projection is rejected. Source sizes
+remain declared metadata; this is not a live call meter or authenticated
+proof of file sizes. Any future executor with repeated method/seed reads
+must account for those calls separately and enforce the bound at dispatch.
 
 Under the existing source-adapter behavior (all five source files hashed
 twice per read, one sales CSV scan and one calendar read), the current
@@ -108,7 +165,7 @@ caching unrestricted M5 arrays in learner processes is prohibited.
    base-stock/rollout controller plus seasonal, recency, compute-matched and
    warm-start comparators are future M4d-1 work.
 3. **Execution-verified validation -> selection -> calibration**: existing
-   M4c signed-like hash records attest to user-supplied metadata; they do not
+   M4c hash-linked owner attestations record user-supplied metadata; they do not
    verify that validation policies were actually fitted/scored. M4d-1 must
    bind complete method/seed/outcome coverage, actual model checkpoints,
    scorer audits, causal chronology and selection/computation evidence before
@@ -142,16 +199,20 @@ From the feature worktree, with its own source on `PYTHONPATH`:
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src:tests \
-  ../../.venv/bin/python -B -m unittest discover -s tests -p 'test_m4d0_execution.py' -v
+  CUDA_VISIBLE_DEVICES= timeout 300s ../../.venv/bin/python -B \
+  -m unittest discover -s tests -p 'test_m4d0*.py' -v
 
 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src:tests \
-  ../../.venv/bin/python -B -m unittest discover -s tests -q
+  CUDA_VISIBLE_DEVICES= timeout 300s ../../.venv/bin/python -B \
+  -m unittest discover -s tests -v
 
-../../.venv/bin/python -m ruff check --select E,F,I,B,UP \
+../../.venv/bin/python -B -m ruff check --no-cache --select E,F,I,B,UP \
   src/inventory_ejor/data/m4d0_execution.py \
   src/inventory_ejor/data/m4d0_audit.py \
+  src/inventory_ejor/data/m4d0_store.py \
   src/inventory_ejor/data/m4d0_io.py \
-  scripts/check_m4d0_io.py tests/test_m4d0_execution.py
+  scripts/check_m4d0_io.py tests/test_m4d0_execution.py \
+  tests/test_m4d0_review_regressions.py
 ```
 
 A four-period synthetic case also demonstrates positive replenishment,
@@ -162,6 +223,14 @@ stage releases, wrong window and scenarios, absent or forged approvals,
 tampered learner bytes/symlinks, altered fit/score traces even when their
 untrusted hashes are recomputed, zero-request fill rates, persistence
 failure and per-task method/seed/code dependency bindings.
+
+The correction suite adds the historical `116/28, L=6` rounding
+counterexample (target 29, independent total cost 209.4), terminal initial
+pipeline `[4,5]` at `L=3,T=2`, 120 fixed-seed full lifecycles checked by a
+test-only rational arithmetic/arrival-calendar oracle, rehashed/relinked
+invalid evidence graphs and file/write/fsync/publication/retry fault injection.
+These tests validate the bounded reference implementation, not general
+numerical optimality or learned policy quality.
 
 Do not run `scripts/run_baselines.py` or `scripts/start_baselines.py` as
 part of M4d-0. Existing `results/runs/m4-approved-yc4xtrp1/` is immutable.

@@ -8,6 +8,7 @@ snapshot reuse is a separate M4d-1 gate with its own correctness tests.
 from __future__ import annotations
 
 from inventory_ejor.data.protocol import plan_protocol, require
+from inventory_ejor.data.provenance import canonical
 
 EXPECTED_FILES = frozenset(
     {
@@ -75,11 +76,14 @@ def project_naive_preparation_io(config, input_file_bytes):
     }
 
 
-def require_preparation_budget(projection, *, maximum_logical_bytes):
+def require_preparation_budget(
+    projection, *, maximum_logical_bytes, config, input_file_bytes
+):
     """Fail closed instead of launching an unapproved terabyte-scale sweep."""
     require(
         type(projection) is dict
-        and projection.get("kind") == "m4d0_metadata_io_projection",
+        and canonical(projection)
+        == canonical(project_naive_preparation_io(config, input_file_bytes)),
         "Valid metadata-only projection required",
     )
     require(

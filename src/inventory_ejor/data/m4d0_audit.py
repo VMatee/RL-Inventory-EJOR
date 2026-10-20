@@ -1,25 +1,27 @@
-"""Independent read-only verifier for a saved M4d-0 synthetic reference run.
+"""Strict authorization audit and independent absolute-arrival numerical replay.
 
-Reconstruct training decision and every M1 transition from *pinned learner*
-and *separately authorized evaluator* inputs. Validated metadata / successful
-checks are NOT evidence of real scientific selection or non-synthetic validity.
+No production M1 transition is reused. Authorized metadata does not establish
+honest scientific execution or the actual raw observation bytes returned by M4c.
 """
 
 from __future__ import annotations
 
 import math
 
-from inventory_ejor.data.contracts import EvaluationTargets
-from inventory_ejor.data.m4d0_execution import (
-    METHOD,
-    PrivateExecutionStore,
-    scenario_contract,
-    source_hashes,
+from .contracts import EvaluationTargets, exact_keys
+from .m4d0_execution import (
+    TRACE_ROW_FIELDS,
+    _bounded_int,
+    _schema,
+    exact_reference_target,
+    validate_history_context,
+    validate_outcome_context,
+    validate_score_record,
+    validated_fit,
+    validated_plan,
 )
-from inventory_ejor.data.protocol import require
-from inventory_ejor.data.provenance import fingerprint
-from inventory_ejor.data.views import load_learner
-from inventory_ejor.envs import transition
+from .m4d0_store import PrivateExecutionStore
+from .protocol import require
 
 
 def verify_synthetic_reference_trace(
@@ -28,136 +30,133 @@ def verify_synthetic_reference_trace(
     fit_digest,
     score_digest,
     targets: EvaluationTargets,
+    *,
+    evidence,
+    config,
+    freeze,
+    catalog,
 ):
-    """Read-only counterfactual replay of all original saved synthetic results."""
-    require(
-        type(private_store) is PrivateExecutionStore,
-        "Use isolated private artifact store",
+    """Verify complete scoped reference evidence, not scientific selection.
+
+    Authorization context is mandatory; no numerical-only fallback can return
+    this success status. This function reads persisted records and writes none.
+    """
+    plan, scenario, initial, view = validated_plan(private_store, plan_digest)
+    fit, approval = validated_fit(
+        private_store, plan_digest, fit_digest, plan, scenario, view
     )
-    plan = private_store.read(plan_digest, kind="synthetic_reference_execution_plan")
-    fit = private_store.read(fit_digest, kind="synthetic_reference_fit_result")
-    saved_approval = private_store.read(
-        fit["execution_approval_sha256"],
-        kind="synthetic_reference_run_approval",
-    )
-    require(
-        saved_approval["approved"] is True
-        and saved_approval["plan_sha256"] == plan_digest
-        and saved_approval["approved_by_owner"]
-        and saved_approval["decision_record"],
-        "Execution approval is not a pinned owner attestation",
-    )
+    validate_history_context(plan, view, evidence, config, freeze, catalog)
     score = private_store.read(score_digest, kind="synthetic_reference_score_evidence")
-    require(
-        score["execution_approval_sha256"] == fingerprint(saved_approval),
-        "Score and persisted execution approval mismatch",
+    validate_score_record(score, plan_digest, fit_digest, plan, scenario, approval)
+    release = evidence.read(score["evaluation_release_sha256"])
+    validate_outcome_context(
+        plan,
+        evidence,
+        config,
+        freeze,
+        catalog,
+        release,
+        score["evaluation_receipt_sha256"],
+        targets,
     )
-    trace_record = private_store.read(
+    require(
+        len(targets.observations) == scenario.horizon, "Evaluation horizon mismatch"
+    )
+    trace = private_store.read(
         score["trace_sha256"], kind="synthetic_private_scoring_trace"
     )
-    require(
-        plan["dependency_sha256s"] == source_hashes()
-        and score["source_code_sha256s"] == source_hashes(),
-        "Execution/audit code drifted from pinned source dependencies",
+    _schema(
+        trace,
+        "synthetic_private_scoring_trace",
+        ("plan_sha256", "fit_sha256", "periods"),
     )
     require(
-        (
-            fit["plan_sha256"],
-            score["plan_sha256"],
-            score["fit_sha256"],
-            trace_record["plan_sha256"],
-            trace_record["fit_sha256"],
-        )
-        == (plan_digest, plan_digest, fit_digest, plan_digest, fit_digest),
+        trace["plan_sha256"] == plan_digest and trace["fit_sha256"] == fit_digest,
         "Broken result-to-plan-to-trace provenance chain",
     )
-    require(
-        plan["method"] == fit["method"] == METHOD
-        and plan["dataset"].startswith("synthetic-")
-        and fit["learner_sha256"] == plan["learner_sha256"]
-        and fit["seed"] == plan["seed"]
-        and score["scenario_sha256"]
-        == fit["scenario_sha256"]
-        == plan["scenario_sha256"]
-        == fingerprint(plan["scenario"]),
-        "Mismatched method/dataset/seed/scenario metadata",
-    )
-    view = load_learner(
-        private_store.file(plan["learner_sha256"]),
-        sha256=plan["learner_sha256"],
-        dataset=plan["dataset"],
-        series=plan["series"],
-        origin=plan["origin"],
-        budget=plan["budget"],
-    )
-    scenario, state = scenario_contract(plan["scenario"])
-    proposed = min(
-        scenario.max_order * (scenario.lead_time + 1),
-        math.ceil(
-            (math.fsum(o.sales for o in view.history.observations) / plan["budget"])
-            * (scenario.lead_time + 1)
-        ),
-    )
-    require(
-        fit["base_stock_target"] == proposed
-        and fit["sum_training_sales"] == sum(o.sales for o in view.history.observations)
-        and fit["real_history_observations"] == plan["budget"]
-        and fit["optimizer_steps"] == fit["simulated_transitions"] == 0
-        and fit["trained_gp"] is False
-        and fit["trained_rl"] is False,
-        "Fitted reference parameters/effort do not match pinned learner history",
-    )
-    require(
-        isinstance(targets, EvaluationTargets)
-        and (targets.dataset, targets.series) == (plan["dataset"], plan["series"])
-        and targets.window.start == plan["origin"]
-        and len(targets.observations) == scenario.horizon,
-        "Evaluation targets outside pinned synthetic task",
-    )
-    rows = trace_record["periods"]
+    rows = trace["periods"]
     require(
         type(rows) is list and len(rows) == scenario.horizon,
         "Missing or extra saved scorer transitions",
     )
-    costs = {
-        "holding": 0.0,
-        "lost_sales": 0.0,
-        "variable_order": 0.0,
-        "fixed_order": 0.0,
-    }
+    proposed = exact_reference_target(
+        sum(o.sales for o in view.history.observations),
+        plan["budget"],
+        scenario.lead_time,
+        scenario.max_order,
+    )
+    arrivals = dict(enumerate(initial.pipeline, 1))
+    stock = initial.on_hand
+    costs = dict.fromkeys(
+        ("holding", "lost_sales", "variable_order", "fixed_order"), 0.0
+    )
     served = requests = 0
     for t, (recorded, observed) in enumerate(
         zip(rows, targets.observations, strict=True)
     ):
-        q = max(
-            0, min(scenario.max_order, proposed - (state.on_hand + sum(state.pipeline)))
-        )
+        exact_keys(recorded, TRACE_ROW_FIELDS, "trace row")
+        stock += arrivals.pop(t, 0)
+        _bounded_int(stock, "oracle stock", 2**53)
+        pending = [arrivals.get(t + j, 0) for j in range(1, scenario.lead_time)]
+        q = max(0, min(scenario.max_order, proposed - stock - sum(pending)))
         if t + scenario.lead_time >= scenario.horizon:
             q = 0
+        for field in (
+            "period",
+            "day",
+            "on_hand",
+            "order",
+            "observed_sales_as_requests",
+            "fulfilled",
+            "lost_units",
+        ):
+            _bounded_int(recorded[field], field, 2**53)
         require(
-            recorded["day"] == observed.day
-            and recorded["period"] == t
+            type(recorded["pipeline"]) is list
+            and len(recorded["pipeline"]) == scenario.lead_time - 1,
+            "Invalid trace pipeline shape",
+        )
+        for count in recorded["pipeline"]:
+            _bounded_int(count, "trace batch", 2**53)
+        require(
+            recorded["period"] == t
+            and recorded["day"] == observed.day
             and recorded["observed_sales_as_requests"] == observed.sales
-            and recorded["on_hand"] == state.on_hand
-            and recorded["pipeline"] == list(state.pipeline)
+            and recorded["on_hand"] == stock
+            and recorded["pipeline"] == pending
             and recorded["order"] == q,
             "Saved action, history or current-request path differs",
         )
-        outcome = transition(scenario, state, q, observed.sales)
+        arrivals[t + scenario.lead_time] = q
+        fulfilled = min(stock, observed.sales)
+        lost = observed.sales - fulfilled
+        stock -= fulfilled
+        c = scenario.costs
+        current = {
+            "holding": c.holding * stock,
+            "lost_sales": c.lost_sales * lost,
+            "variable_order": c.variable_order * q,
+            "fixed_order": c.fixed_order if q else 0.0,
+        }
         require(
-            recorded["fulfilled"] == outcome.sales
-            and recorded["lost_units"] == outcome.lost_units
+            type(recorded["cost"]) in (int, float)
+            and math.isfinite(recorded["cost"])
+            and recorded["fulfilled"] == fulfilled
+            and recorded["lost_units"] == lost
             and math.isclose(
-                recorded["cost"], outcome.costs.total, rel_tol=1e-12, abs_tol=1e-9
+                recorded["cost"], sum(current.values()), rel_tol=1e-12, abs_tol=1e-9
             ),
             "Saved reference transition/cost differs",
         )
-        for name in costs:
-            costs[name] += getattr(outcome.costs, name)
-        served += outcome.sales
+        _bounded_int(stock + arrivals.get(t + 1, 0), "next stock", 2**53)
+        for name, value in current.items():
+            costs[name] += value
+        served += fulfilled
         requests += observed.sales
-        state = outcome.next_state
-    expected_cost = math.fsum(costs.values())
+    outstanding = [
+        arrivals.get(scenario.horizon + j, 0) for j in range(scenario.lead_time)
+    ]
+    total = math.fsum(costs.values())
     require(
         all(
             math.isclose(
@@ -165,27 +164,23 @@ def verify_synthetic_reference_trace(
             )
             for k in costs
         )
-        and math.isclose(
-            expected_cost, score["total_cost"], rel_tol=1e-12, abs_tol=1e-9
-        )
+        and math.isclose(total, score["total_cost"], rel_tol=1e-12, abs_tol=1e-9)
         and score["fulfilled"] == served
         and score["requests"] == requests
-        and score["simulation_periods"] == len(rows)
-        and score["ending_stock"] == rows[-1]["on_hand"] - rows[-1]["fulfilled"]
-        and score["ending_pipeline"] == list(state.pipeline)
-        and (
-            score["fill_rate"] == served / requests
-            if requests
-            else score["fill_rate"] is None
-        ),
+        and score["ending_stock"] == stock
+        and score["ending_pipeline"] == outstanding
+        and score["fill_rate"] == (served / requests if requests else None),
         "Saved score totals, fill rate or terminal state differ",
     )
     return {
         "status": "independent_synthetic_replay_verified",
         "periods": len(rows),
-        "total_cost": expected_cost,
+        "total_cost": total,
         "training_observations": len(view.history.observations),
         "evaluation_requests": requests,
         "trained_gp": False,
         "trained_rl": False,
+        "authorization_attestations_verified": True,
+        "scientific_selection_execution_verified": False,
+        "raw_observation_bytes_verified": False,
     }

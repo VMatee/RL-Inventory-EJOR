@@ -77,8 +77,14 @@ with private, content-addressed trace and run evidence; independent
 Tests cover release separation, code/data/seed/scenario fingerprints,
 tampering, symlinks, zero requests, rehashed adversarial scores, and
 persistence failures. Details: `experiments/protocol/M4D0_SAFE_EXECUTION.md`.
+Independent review of `ff05c5b` requested changes. B1/C1–C4 follow-up now adds
+shared strict validators with mandatory persisted authorization context,
+exact integer fitting, canonical terminal reporting, independent arrival
+replay and atomic durable publication/retry checks. Expanded validation:
+255 repository tests, including 37 M4d-0 tests, pass; re-review remains pending.
+See `docs/M4D0_CODEX_REVIEW_RESPONSE_20261020.md`.
 **This is NOT a GP/RL trainer, an M5 execution grant, real selection evidence,
-or an optimized real-data batch reader.** Await independent PR review;
+or an optimized real-data batch reader.** Await independent PR re-review;
 all M4d-1 real-data, GPU and final-outcome gates remain unapproved.
 
 ## M4d - Stronger crossed baselines [planned; separate execution approval]

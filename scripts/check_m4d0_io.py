@@ -48,7 +48,10 @@ def main(argv=None):
         }
         try:
             require_preparation_budget(
-                projection, maximum_logical_bytes=args.max_logical_gib * (2**30)
+                projection,
+                maximum_logical_bytes=args.max_logical_gib * (2**30),
+                config=config,
+                input_file_bytes=sizes,
             )
         except ValueError as exc:
             result["within_explicit_budget"] = False
