@@ -2,6 +2,30 @@
 
 Updated: 2026-10-20 (Asia/Bangkok). See Git history and SESSION_LOG for validation.
 
+## PR #12 final M4d-0 merge readiness
+
+Independent re-review APPROVED the scoped implementation at `e9698b0`.
+The final two minor fixes now enforce the defined floating-point cost
+identities and preserve primary persistence errors when temporary cleanup
+also fails. They are newly author-tested, not covered by the earlier approval.
+Current checks: **268/268 repository tests**, **50/50 M4d-0 tests**, scoped
+lint/format/structure checks, and **1,611/1,611 unchanged protected artifacts**.
+The author recommends **APPROVE TO MERGE** for synthetic-only M4d-0; PR #12
+remains open/unmerged. M4d-1 and EJOR readiness remain NOT READY.
+Details: `docs/M4D0_CODEX_REVIEW_RESPONSE_20261020.md`.
+
+### Earlier B1/C1–C4 correction record
+
+The independent review of `ff05c5b` requested changes despite 233 passing
+tests. The follow-up corrects B1 and C1–C4: strict shared artifact/evidence
+validation, exact integer reference fitting, correct terminal outstanding
+batches, an independent numerical replay and atomic, synchronized private
+publication. The expanded suite passes **255/255**, including **37 M4d-0
+tests**; original protected SHA256/size checks remain **1,611/1,611 unchanged**.
+See `docs/M4D0_CODEX_REVIEW_RESPONSE_20261020.md` for counterexamples,
+commands and remaining limits. PR #12 remains open for independent review;
+no merge, real M5 access, M4d-1 execution or scientific freeze is authorized.
+
 ## Research
 
 - Active scope: limited-demand-data, GP-informed, decision-sensitive inventory policy learning. The research direction has not changed.
@@ -43,10 +67,12 @@ Independent **Codex GPT-6.1 Ultra** review of PR #10 was supplied on 2026-10-19 
 
 Interpret development results and failures, design the inventory-sensitive contribution, add stronger published learning baselines, address sales censoring and cohort/terminal/cost sensitivity, freeze the final test/information/compute protocol and statistical design, verify data-use terms, acquire original Favorita through authorized access, and complete the literature/claim/proof audit. Passing software tests does not establish EJOR novelty or empirical superiority.
 
-## M4c implementation prepared for review — 2026-10-20
+## M4c merged as PR #11 / M4d-0 implementation (2026-10-20)
 
-Review PR: [#11](https://github.com/VMatee/RL-Inventory-EJOR/pull/11), open and
-unmerged on `feat/m4c-protocol-access-firewall`.
+PR [#11](https://github.com/VMatee/RL-Inventory-EJOR/pull/11) merged on
+2026-10-20 at `4d21c19371f0abaf089f194be685a21026c00999`.
+The local `main` has that merge. M4c remains limited trusted-owner
+infrastructure and does not authorize reserved outcomes or M4d experiments.
 
 M4b was merged as PR #10 at `bea7dcb5ad82c457e81f75b6965179d725acae45`.
 The M4c feature branch implements metadata-only planning, complete phase/history
@@ -60,8 +86,9 @@ See `experiments/protocol/M4C_SCIENTIFIC_PROTOCOL.md`,
 `docs/M4C_ACCESS_FIREWALL.md` and `experiments/protocol/M4D_READINESS.md`.
 Chronology A is a candidate, with B/C alternatives; no scientific freeze or
 positive real release exists. All new M5 values and M4d execution remain closed.
-The next task is independent PR review and owner scientific choices, followed
-by a separately scoped M4d implementation/execution decision. Verification and
+PR #11 received independent approval within trusted-owner scope and was
+merged. The next scoped task is M4d-0 synthetic-only execution infrastructure,
+not M4d-1 real data or owner scientific freeze. Verification and
 preserved-artifact evidence are in `results/summaries/M4C_VERIFICATION_20261020.md`.
 
 ### PR #11 critical follow-up

@@ -1,5 +1,40 @@
 # Research decision log
 
+2026-10-20 PR #12 response to independent REQUEST CHANGES at `ff05c5b`:
+
+- Treat audit false success as a blocking defect. Require the actual M4c
+  persisted authorization context and strict shared schemas/identities at
+  scoring and audit boundaries; do not retain a numerical-only success path.
+- Compute the integer reference target by exact division; report terminal
+  batches before next-period receipts. Keep M1 unchanged and check results
+  with a separate absolute-arrival oracle and test-only rational oracle.
+- Use bounded POSIX temporary writes, file synchronization, atomic
+  no-overwrite publication and directory synchronization. Existing objects
+  must also be verified and synchronized; a failed synchronization never
+  returns success. These guarantees apply to the private execution store,
+  not retrospectively to M4c EvidenceStore.
+- Pin the complete local Python package snapshot plus declared actual runtime
+  versions; state that this is not a hermetic binary/runtime image. Recompute
+  I/O projections from required declared context rather than trust totals.
+- Retain trusted-owner limitations, M4d-1 integration gates and every scientific
+  choice PENDING OWNER APPROVAL. No new real observations or experiments.
+
+2026-10-20 M4d-0 engineering decisions (provisional until independent PR review):
+
+- Isolate the new engineering branch in a separate Git worktree, because an
+  unrelated Codex session is active in the project workspace. Do not modify
+  the merged `main` checkout or original M5/results directories.
+- Implement **synthetic development ONLY**, with explicit independent owner
+  execution approval and source history/outcome releases. A trivial, pinned
+  empirical reference checks the architecture; no GP/RL/final evaluation.
+- Persist real executed synthetic fit and scorer trace as locally private,
+  content-addressed evidence; independently reconstruct from pinned learner
+  and separately released synthetic outcomes. Do not confuse recorded hashes
+  or local owner attestations with proof of honest M4d selection execution.
+- Add metadata-only I/O estimates and admission checks; DO NOT silently
+  remove M4c source hashes or install an unsafe unrestricted shared cache.
+  Actual performant batching and M4d-1 executor remain future review gates.
+
 2026-10-20 M4c engineering decisions (the older rows remain historical):
 
 - PR #11 critical follow-up: treat unguarded direct adapter access as an actual
