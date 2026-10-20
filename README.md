@@ -114,8 +114,19 @@ M5/Favorita contain sales, not complete uncensored demand or actual inventory co
 
 ## Next milestone
 
-**M1: finalize inventory event timing and implement a tested minimal simulator.** Do not begin large RL training before the simulator and exact reference are validated. EJOR is the target, not a guaranteed outcome. No automatic cloud training, paid APIs or self-hosted GitHub runner are configured.
+M4c now supplies a [scientific evaluation proposal](experiments/protocol/M4C_SCIENTIFIC_PROTOCOL.md),
+[staged access firewall](docs/M4C_ACCESS_FIREWALL.md), and
+[M4d readiness plan](experiments/protocol/M4D_READINESS.md).
+Owner scientific freeze and all new data releases remain pending. A metadata-only
+check writes nothing and reads no observations:
 
-## Start the finalized initial development baseline campaign
+```bash
+../code/.venv/bin/python -B scripts/plan_m4c.py --config experiments/configs/m4c_protocol_candidate.json
+```
 
-The owner has delegated the initial run settings; no further option selection is needed for this scope. From `<workspace>/code`, use `bash run_baselines.sh --check` for read-only preflight, or `bash run_baselines.sh` to start the sealed 192-job M5 development run in the foreground (four GPU lanes and two CPU lanes). Do not change branches, sync or run Codex in this checkout during execution. The real campaign is not launched during preparation. Full protocol, safety behavior and remaining research boundaries: [BASELINE_RUN_PROTOCOL](docs/BASELINE_RUN_PROTOCOL.md). Numerical and whole-stack synthetic acceptance: [readiness report](results/summaries/M4_RUN_READINESS_20261018.md). Raw and processed data/results remain local.
+## Historical initial baseline campaign
+
+The original 192-job campaign is complete and must not be rerun. Its sealed
+plans, approvals and outputs remain local and immutable. Historical preparation:
+[BASELINE_RUN_PROTOCOL](docs/BASELINE_RUN_PROTOCOL.md). New experiments need
+separate reviewed source, scientific scope, staged access and execution approval.

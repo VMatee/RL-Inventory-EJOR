@@ -1,6 +1,6 @@
 # Current status
 
-Updated: 2026-10-18. See Git history and SESSION_LOG for actual validation.
+Updated: 2026-10-20 (Asia/Bangkok). See Git history and SESSION_LOG for validation.
 
 ## Research
 
@@ -42,3 +42,21 @@ Independent **Codex GPT-6.1 Ultra** review of PR #10 was supplied on 2026-10-19 
 ## Later publication work (not a blocker for this initial pilot)
 
 Interpret development results and failures, design the inventory-sensitive contribution, add stronger published learning baselines, address sales censoring and cohort/terminal/cost sensitivity, freeze the final test/information/compute protocol and statistical design, verify data-use terms, acquire original Favorita through authorized access, and complete the literature/claim/proof audit. Passing software tests does not establish EJOR novelty or empirical superiority.
+
+## M4c implementation prepared for review — 2026-10-20
+
+M4b was merged as PR #10 at `bea7dcb5ad82c457e81f75b6965179d725acae45`.
+The M4c feature branch implements metadata-only planning, complete phase/history
+embargo checks, staged learner/scorer preparation, hash-bound owner releases,
+selection-before-calibration and calibration-before-final prerequisites, and
+live code/specification/source checks. It also closes legacy development-label,
+task-metadata and manifest-symlink bypasses before protected reads. Historical
+M3 synthetic behavior and the original d_225 audit remain supported.
+
+See `experiments/protocol/M4C_SCIENTIFIC_PROTOCOL.md`,
+`docs/M4C_ACCESS_FIREWALL.md` and `experiments/protocol/M4D_READINESS.md`.
+Chronology A is a candidate, with B/C alternatives; no scientific freeze or
+positive real release exists. All new M5 values and M4d execution remain closed.
+The next task is independent PR review and owner scientific choices, followed
+by a separately scoped M4d implementation/execution decision. Verification and
+preserved-artifact evidence are in `results/summaries/M4C_VERIFICATION_20261020.md`.

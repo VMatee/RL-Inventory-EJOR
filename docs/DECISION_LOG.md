@@ -1,5 +1,24 @@
 # Research decision log
 
+2026-10-20 M4c engineering decisions (the older rows remain historical):
+
+- Preserve legacy M3/M4 schemas; confine real-M5 legacy preparation/execution
+  to exposed d_225. A separate staged API checks metadata and owner records
+  before observation callbacks. Old planners cannot silently accept new stages.
+- Validate full-context phase geometry and nonadaptive embargo together, for
+  every declared origin; keep known M5 `[1,253)` development permanently.
+- Separate learner and scorer capabilities. Calibration requires frozen
+  procedure selection; final access also requires frozen calibration. Owner
+  approval and source/code/spec identity are separate from metadata validation.
+- Candidate cohort uses a pinned metadata frame without sales screening; retain
+  A/B/C chronology alternatives. Cohort count/seed, chronology, estimand,
+  dependence assumptions, power, costs, margin and execution are all **PENDING
+  OWNER APPROVAL**. No proposed date or passing test is a scientific freeze.
+- Refuse unsupported pooling/pretraining rather than accepting a lineage boolean.
+  Document shared development/validation/calibration information separately.
+- No additional observation values or real model execution are authorized in
+  M4c. The six-method M4d matrix and boundary panels are readiness proposals.
+
 | Date | Decision | Rationale |
 |---|---|---|
 | 2026-10-17 | Adopt limited-demand-data decision-sensitive inventory policy learning | Latest supplied research brief; earlier rolling-service-control idea is not the active main contribution |
