@@ -46,7 +46,7 @@ Original GitHub PR #9 merged at `5d01105`; four-GPU M5 development session `resu
 
 Use `scripts/analyze_m4_results.py` to read-only audit saved 192 jobs, provenance and learner hashes, rebuild aggregate values, independently replay 5,376 M1 transitions, report matched effects at the 12-series unit, relative/absolute cost components, startup unavoidable shortage and unequal compute budgets. Per-series artifacts under ignored `results/analysis/` must not be pushed. Source-anchored descriptive facts in `results/summaries/M4_BASELINE_RESULTS_AUDIT.md`. No model fitting/GPU execution or new evaluation data in M4b. M4b development protocol draft: `experiments/protocol/M4B_DEVELOPMENT_PROTOCOL.md`. An independent **Codex GPT-6.1 Ultra** review was received and verified the 4.11% arithmetic but found two blocking integrity gaps. Fixes include evaluator/ledger reconstruction, per-job wrapper binding, terminal/calendar replay, safe path checks, a feasible two-block final holdout **candidate**, synthetic full-session positive/negative tests, and 166/166 ordinary tests. See `docs/M4B_CODEX_REVIEW_RESPONSE_20261019.md`. Independent **Codex GPT-6.1 Ultra re-review APPROVED** the scoped M4b software audit at `eef0fd4`, with no BLOCKING or MAJOR issues. The author subsequently fixed three MINOR issues: valid zero-cost relative summaries, sealed calibration access after later validation selection, and 12-type synthetic symlink regression tests. These last minor changes are author-tested, not separately peer reviewed. The other-account Web Pro review was not performed; optional instructions remain in `docs/M4B_INDEPENDENT_REVIEW_HANDOFF.md`. Authoring-account tests are not independent peer review.
 
-## M4c - Scientific proposal and access firewall [implemented; PR review and owner freeze pending]
+## M4c - Scientific proposal and access firewall [merged as PR #11; owner scientific freeze pending]
 
 Choose/record chronological development/calibration/validation/final partitions, eligibility and common information allowances prospectively and without opening later outcomes. Preserve the examined d_225 pilot as development. Predefine initial stock/pipeline, cost/terminal scenarios and matched per-policy compute protocol; disclose sales censoring. Document treatment of dependent item-store/temporal observations and noninferiority-margin justification before final evaluation.
 
@@ -65,6 +65,21 @@ selection/calibration evidence before protected reads. Evidence covers declared
 series/origin/history/outcome access, not actual model/seed execution or scientific
 validity. See `results/summaries/M4C_FIREWALL_FOLLOWUP_20261020.md`; the strict M4d
 integration contract is mandatory before enabling a new executor.
+
+## M4d-0 - Synthetic-only execution/evidence prototype [implemented; independent review pending]
+
+The owner requested M4d-0 on 2026-10-20. On a separate writer worktree,
+implemented `src/inventory_ejor/data/m4d0_execution.py` as a narrow synthetic
+reference learner-only plan + approved CPU fit and separate released scorer,
+with private, content-addressed trace and run evidence; independent
+`m4d0_audit.py` replay; metadata-only `m4d0_io.py` and
+`scripts/check_m4d0_io.py` to reject an over-budget preparation estimate.
+Tests cover release separation, code/data/seed/scenario fingerprints,
+tampering, symlinks, zero requests, rehashed adversarial scores, and
+persistence failures. Details: `experiments/protocol/M4D0_SAFE_EXECUTION.md`.
+**This is NOT a GP/RL trainer, an M5 execution grant, real selection evidence,
+or an optimized real-data batch reader.** Await independent PR review;
+all M4d-1 real-data, GPU and final-outcome gates remain unapproved.
 
 ## M4d - Stronger crossed baselines [planned; separate execution approval]
 

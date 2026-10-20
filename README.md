@@ -114,6 +114,15 @@ M5/Favorita contain sales, not complete uncensored demand or actual inventory co
 
 ## Next milestone
 
+M4c Access Firewall was independently reviewed and merged as
+[PR #11](https://github.com/VMatee/RL-Inventory-EJOR/pull/11).
+M4d-0 adds a [synthetic-only learner/scorer reference execution and evidence
+prototype](experiments/protocol/M4D0_SAFE_EXECUTION.md) with independent
+reference replay and a metadata-only I/O admission guard. It is **not** an
+M5/GPU execution capability or the proposed novel research method. Real
+M4d-1 selection evidence, performant batching, scientific releases and six
+competitive baselines require their own review and owner authorization.
+
 M4c now supplies a [scientific evaluation proposal](experiments/protocol/M4C_SCIENTIFIC_PROTOCOL.md),
 [staged access firewall](docs/M4C_ACCESS_FIREWALL.md), and
 [M4d readiness plan](experiments/protocol/M4D_READINESS.md).

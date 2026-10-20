@@ -1,5 +1,31 @@
 # Session handoff log
 
+## 2026-10-20 - M4d-0 synthetic-only executor and execution evidence
+
+After M4c PR #11 was independently reviewed and merged at `4d21c193`,
+the owner authorized M4d-0 synthetic-only safe-executor engineering.
+Two Codex processes were found active in the project parent, so work was
+isolated to sibling Git worktree `code/worktrees/m4d0-safe-executor`, not
+the clean merged `github/main` checkout. No M5 raw, prepared or 192-job
+result files were edited. Verified **1,611/1,611** original protected files
+with SHA256/size against the pre-M4c snapshot.
+
+Added a content-addressed private learner plan and reference CPU execution,
+strict separate owner execution approval, independent M4c released scoring,
+fit/score receipts and local trace persistence; added a read-only M1 replay,
+metadata-only I/O budget rejection, 15 targeted synthetic-only tests and an
+independent reviewer handoff. The prototype **refuses non-synthetic datasets**
+and evaluation beyond synthetic development; no GP/RL fitting, new real
+M5 observation access, baseline runs, GPU jobs or scientific freeze.
+
+**Authoring checks:** full 233/233 tests passed with PYTHONPATH set to
+the feature worktree, scoped strict Ruff passed, project structural checks
+passed. Source code and results are not independent scientific validation.
+Private output roots are mode-0700 outside tracked Git directories.
+Scientific/real-data M4d-1 gates remain pending, including actual selection
+execution evidence, source-byte evaluator binding and scalable batching.
+Full report: `results/summaries/M4D0_VERIFICATION_20261020.md`.
+
 ## 2026-10-20 - PR #11 critical firewall follow-up
 
 Verified clean branch `feat/m4c-protocol-access-firewall`, local/remote head

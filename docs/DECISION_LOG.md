@@ -1,5 +1,21 @@
 # Research decision log
 
+2026-10-20 M4d-0 engineering decisions (provisional until independent PR review):
+
+- Isolate the new engineering branch in a separate Git worktree, because an
+  unrelated Codex session is active in the project workspace. Do not modify
+  the merged `main` checkout or original M5/results directories.
+- Implement **synthetic development ONLY**, with explicit independent owner
+  execution approval and source history/outcome releases. A trivial, pinned
+  empirical reference checks the architecture; no GP/RL/final evaluation.
+- Persist real executed synthetic fit and scorer trace as locally private,
+  content-addressed evidence; independently reconstruct from pinned learner
+  and separately released synthetic outcomes. Do not confuse recorded hashes
+  or local owner attestations with proof of honest M4d selection execution.
+- Add metadata-only I/O estimates and admission checks; DO NOT silently
+  remove M4c source hashes or install an unsafe unrestricted shared cache.
+  Actual performant batching and M4d-1 executor remain future review gates.
+
 2026-10-20 M4c engineering decisions (the older rows remain historical):
 
 - PR #11 critical follow-up: treat unguarded direct adapter access as an actual

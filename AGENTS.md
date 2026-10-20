@@ -32,8 +32,15 @@ The owner subsequently delegated finalization of all pre-run decisions and reque
 
 **2026-10-19 M4b update:** The owner actually started and completed the sealed M4 M5 development campaign on 2026-10-18: 192/192 saved tasks, session `results/runs/m4-approved-yc4xtrp1/`. The earlier preparation-only prohibitions above are historical **for that now-completed approved campaign**, not a reason to claim no real results exist. The current M4b task is **strictly read-only analysis of saved results, protocol drafting, tests and a PR**; do not run the one-shot 192 jobs again, edit original run/raw/processed data, open later M5 outcomes, download Favorita, fit new GP/RL models or launch new GPU sweeps. In the other ChatGPT account the SeneraAiServer reviewer must be read-only; only one Git writer per checkout. Refer to `results/summaries/M4_BASELINE_RESULTS_AUDIT.md` and `docs/M4B_INDEPENDENT_REVIEW_HANDOFF.md`.
 
-## Local execution
+**2026-10-20 M4d-0 engineering scope:** The owner requested synthetic-only
+safe learner/scorer execution architecture and proof-oriented CPU tests after
+merging M4c PR #11. Authorize only a separated feature worktree, code/docs,
+private synthetic fixtures, bounded offline tests and a reviewable PR. Do not
+launch new M5/GP/RL/GPU runs; do not open or regenerate held-out M5 outcomes;
+do not change original M4 results. A synthetic reference controller and
+metadata-only cost projection do NOT authorize M4d-1 real-data execution.
 
+## Local execution
 **2026-10-20 M4c scope:** The owner explicitly authorized implementation,
 synthetic CPU testing, a feature-branch commit/push and a PR for the scientific
 protocol/access firewall. This supersedes the historical M4b read-only editing
